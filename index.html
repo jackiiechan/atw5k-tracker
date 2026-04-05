@@ -1,0 +1,2561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Around the World — Relic Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES — updated by JS on week change
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --t-primary:  #C45100;
+  --t-secondary:#1B7A8A;
+  --t-accent:   #E8A020;
+  --t-bg:       #fdf0dc;
+  --t-card:     #fff8ee;
+  --t-text:     #2a1200;
+  --t-border:   #c4a020;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--t-bg);
+  background-image:
+    radial-gradient(ellipse at 15% 50%, rgba(255,200,100,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 20%, rgba(180,140,80,0.10) 0%, transparent 50%);
+  color: var(--t-text);
+  min-height: 100vh;
+  transition: background-color 0.6s ease;
+}
+
+/* ── AIRMAIL STRIPE ─────────────────────────────────────── */
+.airmail-stripe {
+  height: 7px;
+  background: repeating-linear-gradient(
+    90deg,
+    #CC2222 0px,   #CC2222 18px,
+    #fff    18px,  #fff    28px,
+    #1E3A8A 28px,  #1E3A8A 46px,
+    #fff    46px,  #fff    56px
+  );
+}
+
+/* ── NAV ────────────────────────────────────────────────── */
+.nav {
+  background: rgba(10,18,30,0.97);
+  border-bottom: 2px solid var(--t-accent);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.nav-mascot { font-size: 28px; line-height: 1; }
+.nav-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 900;
+  color: var(--t-accent);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.nav-dest {
+  font-size: 11px; color: #aaa;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 7px 14px;
+  border: 2px solid #333;
+  background: transparent; color: #aaa;
+  border-radius: 6px; cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px; font-weight: 800;
+  letter-spacing: 0.5px; transition: all 0.15s;
+}
+.tab-btn.active { background: var(--t-accent); border-color: var(--t-accent); color: #0a0a0a; }
+.tab-btn:hover:not(.active) { border-color: var(--t-accent); color: var(--t-accent); }
+.briefing-btn {
+  padding: 7px 14px;
+  border: 2px solid var(--t-primary);
+  background: transparent; color: var(--t-primary);
+  border-radius: 6px; cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px; font-weight: 800;
+  transition: all 0.15s; white-space: nowrap;
+}
+.briefing-btn:hover { background: var(--t-primary); color: white; }
+
+/* ── VIEWS ──────────────────────────────────────────────── */
+.view { display: none; max-width: 1200px; margin: 0 auto; padding: 20px; }
+.view.active { display: block; }
+
+.section-label {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--t-primary); font-weight: 800;
+  margin-bottom: 14px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--t-border);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEADERBOARD VIEW
+   ═══════════════════════════════════════════════════════════ */
+#view-leaderboard { padding: 16px 20px; }
+
+.lb-week-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, rgba(10,18,30,0.95), rgba(20,35,55,0.95));
+  border: 2px solid var(--t-accent);
+  border-radius: 12px; padding: 14px 20px;
+  margin-bottom: 8px;
+}
+.lb-week-left { display: flex; align-items: center; gap: 12px; }
+.lb-week-flag { font-size: 36px; }
+.lb-week-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 900; color: var(--t-accent);
+}
+.lb-week-sub { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+.lb-week-right { text-align: right; }
+.lb-week-num { font-size: 11px; color: #666; letter-spacing: 2px; text-transform: uppercase; }
+.lb-koala-msg {
+  font-size: 12px; color: #aaa; font-style: italic;
+  max-width: 320px; line-height: 1.4;
+}
+
+/* ── LEADERBOARD FILTER BAR ─────────────────────────────── */
+.lb-filter-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; margin-bottom: 12px;
+  background: rgba(10,18,30,0.7);
+  border: 1px solid #1e3550; border-radius: 8px;
+  flex-wrap: wrap;
+}
+.lb-filter-label { font-size: 11px; color: #666; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+#lb-asof {
+  padding: 5px 10px; border: 1.5px solid #1e3550;
+  border-radius: 6px; background: #0a1520; color: #ccc;
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 600;
+  outline: none; transition: border-color 0.15s;
+}
+#lb-asof:focus { border-color: var(--t-accent); }
+.lb-live-btn {
+  padding: 5px 12px; border: 1.5px solid #1a9e53;
+  border-radius: 6px; background: transparent; color: #1a9e53;
+  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
+  cursor: pointer; opacity: 0.4; transition: all 0.15s; white-space: nowrap;
+}
+.lb-live-btn.on { opacity: 1; background: rgba(26,158,83,0.1); }
+.lb-filter-badge {
+  font-size: 11px; color: var(--t-accent); font-weight: 800; font-style: italic;
+}
+
+.lb-grid { display: flex; flex-direction: column; gap: 6px; }
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 52px 48px 1fr 100px 120px 110px;
+  align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(13,27,42,0.92);
+  border-radius: 10px; border: 1px solid #1e3550;
+  cursor: pointer; transition: all 0.15s;
+}
+.lb-row:hover { background: rgba(20,40,65,0.95); transform: translateX(3px); }
+.lb-row.rank-1 { border: 2px solid #FFD700; box-shadow: 0 0 18px rgba(255,215,0,0.2); }
+.lb-row.rank-2 { border: 2px solid #A8A8A8; box-shadow: 0 0 12px rgba(168,168,168,0.15); }
+.lb-row.rank-3 { border: 2px solid #CD7F32; box-shadow: 0 0 12px rgba(205,127,50,0.15); }
+
+.lb-rank-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 900; color: #444; text-align: center;
+}
+.lb-rank-num.gold   { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+.lb-rank-num.silver { color: #C0C0C0; }
+.lb-rank-num.bronze { color: #CD7F32; }
+
+.lb-avatar {
+  font-size: 28px; text-align: center; line-height: 1;
+  width: 44px; height: 44px; display: flex; align-items: center;
+  justify-content: center; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid #2a3a4a;
+}
+.lb-name-block { min-width: 0; }
+.lb-name { font-size: 16px; font-weight: 800; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-title-tag { font-size: 10px; color: var(--t-accent); font-weight: 700; letter-spacing: 0.5px; margin-top: 1px; }
+
+.lb-miles { font-size: 13px; color: #888; text-align: right; }
+.lb-miles span { font-size: 10px; color: #555; }
+
+.lb-relics {
+  text-align: right;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 900; color: var(--t-accent);
+}
+.lb-relics small { font-family: 'Nunito', sans-serif; font-size: 10px; color: #666; font-weight: 400; }
+
+.lb-badges { display: flex; gap: 4px; justify-content: flex-end; flex-wrap: wrap; }
+.badge {
+  font-size: 9px; padding: 3px 7px; border-radius: 20px;
+  font-weight: 800; letter-spacing: 0.3px; white-space: nowrap;
+}
+.badge.bracelet { background: #1a5e33; color: #90ee90; }
+.badge.stamped  { background: rgba(var(--t-accent-rgb, 232,160,32), 0.2); color: var(--t-accent); border: 1px solid var(--t-accent); }
+.badge.none     { background: #222; color: #555; }
+
+/* ═══════════════════════════════════════════════════════════
+   SESSION INPUT VIEW
+   ═══════════════════════════════════════════════════════════ */
+.session-header-bar {
+  display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap;
+}
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-group label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #888; font-weight: 700; }
+.field-group input, .field-group select {
+  padding: 8px 12px; border: 1.5px solid var(--t-border);
+  border-radius: 7px; background: var(--t-card); color: var(--t-text);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; outline: none;
+}
+.field-group input:focus, .field-group select:focus { border-color: var(--t-primary); }
+
+.student-input-panel {
+  background: var(--t-card);
+  border: 1.5px solid var(--t-border); border-radius: 12px; overflow: hidden;
+}
+.student-input-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 90px 90px auto;
+  align-items: center; gap: 10px;
+  padding: 9px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  transition: background 0.1s;
+}
+.student-input-row:last-child { border-bottom: none; }
+.student-input-row:hover { background: rgba(0,0,0,0.02); }
+.sin-name { font-size: 14px; font-weight: 700; color: var(--t-text); }
+.lap-field {
+  width: 60px; padding: 5px 8px; text-align: center;
+  border: 1.5px solid var(--t-border); border-radius: 6px;
+  background: white; font-family: 'Nunito', sans-serif;
+  font-size: 17px; font-weight: 800; color: var(--t-primary); outline: none;
+}
+.lap-field:focus { border-color: var(--t-primary); }
+.sin-miles { font-size: 12px; color: #888; text-align: right; }
+.sin-relics { font-size: 13px; font-weight: 800; color: var(--t-accent); text-align: right; }
+.sin-relics.zero { color: #ccc; }
+
+.bonus-trigger {
+  padding: 4px 10px; border: 1.5px solid var(--t-border);
+  border-radius: 6px; background: transparent; cursor: pointer;
+  font-size: 11px; font-weight: 800; color: #888; transition: all 0.15s;
+}
+.bonus-trigger:hover { border-color: var(--t-accent); color: var(--t-accent); }
+
+.bonus-panel {
+  display: none; padding: 8px 16px 10px 44px;
+  background: rgba(0,0,0,0.03); border-bottom: 1px solid rgba(0,0,0,0.06);
+  gap: 6px; flex-wrap: wrap;
+}
+.bonus-panel.open { display: flex; }
+.bonus-chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1.5px solid var(--t-border); background: white;
+  cursor: pointer; font-size: 11px; font-weight: 800; color: var(--t-text);
+  transition: all 0.15s;
+}
+.bonus-chip:hover { background: var(--t-accent); border-color: var(--t-accent); color: white; }
+
+.session-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0 0; flex-wrap: wrap; gap: 10px;
+}
+.session-total { font-size: 13px; color: #888; }
+.session-total span { color: var(--t-accent); font-weight: 800; font-size: 16px; }
+.submit-btn {
+  padding: 11px 28px; background: var(--t-primary); color: white;
+  border: none; border-radius: 8px; font-family: 'Nunito', sans-serif;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+  transition: all 0.15s; letter-spacing: 0.3px;
+}
+.submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ═══════════════════════════════════════════════════════════
+   HISTORY VIEW
+   ═══════════════════════════════════════════════════════════ */
+.hist-entry {
+  background: var(--t-card); border: 1.5px solid var(--t-border);
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
+}
+.hist-entry-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 700; color: var(--t-primary); margin-bottom: 6px;
+}
+.hist-entry-rows { display: flex; flex-wrap: wrap; gap: 6px; }
+.hist-chip {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  background: rgba(0,0,0,0.05); color: var(--t-text); font-weight: 600;
+}
+.hist-chip strong { color: var(--t-accent); }
+
+/* ═══════════════════════════════════════════════════════════
+   ADMIN VIEW
+   ═══════════════════════════════════════════════════════════ */
+.admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 700px) { .admin-grid { grid-template-columns: 1fr; } }
+
+.admin-card {
+  background: var(--t-card); border: 1.5px solid var(--t-border);
+  border-radius: 12px; padding: 18px;
+}
+.admin-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 700; color: var(--t-primary); margin-bottom: 12px;
+}
+.week-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.week-chip {
+  padding: 6px 12px; border-radius: 7px;
+  border: 1.5px solid var(--t-border); background: white;
+  cursor: pointer; font-size: 12px; font-weight: 700; color: var(--t-text);
+  transition: all 0.15s;
+}
+.week-chip.active { background: var(--t-primary); border-color: var(--t-primary); color: white; }
+.week-chip:hover:not(.active) { border-color: var(--t-primary); }
+
+.admin-btn {
+  display: block; width: 100%; margin-bottom: 8px;
+  padding: 10px 16px; border-radius: 8px; border: 1.5px solid var(--t-border);
+  background: white; cursor: pointer; text-align: left;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+  color: var(--t-text); transition: all 0.15s;
+}
+.admin-btn:hover { border-color: var(--t-primary); background: var(--t-card); }
+.admin-btn.danger { border-color: #cc2222; color: #cc2222; }
+.admin-btn.danger:hover { background: #fff5f5; }
+
+/* ═══════════════════════════════════════════════════════════
+   STUDENT PROFILE MODAL
+   ═══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(5,10,18,0.88); z-index: 200;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  width: 100%; max-width: 540px; max-height: 92vh;
+  overflow-y: auto; border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.modal-profile-header {
+  padding: 24px 22px 18px; position: relative;
+  background: linear-gradient(135deg, #1E3550, #0a1520);
+}
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: none;
+  color: white; cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.2); }
+
+.modal-avatar-wrap { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 12px; }
+.modal-avatar-circle {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.2);
+}
+.modal-name-block { flex: 1; min-width: 0; }
+.modal-runner-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 900; color: white; line-height: 1.1;
+}
+.modal-runner-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-top: 3px; }
+.modal-stats-row { display: flex; gap: 20px; }
+.mstat { text-align: center; }
+.mstat-val { font-size: 20px; font-weight: 900; color: var(--t-accent); font-family: 'Playfair Display', serif; }
+.mstat-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #888; }
+
+.modal-tabs { display: flex; border-bottom: 1px solid #1e3550; background: #0d1b2a; }
+.modal-tab {
+  flex: 1; padding: 10px 8px; border: none; background: transparent;
+  color: #666; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.modal-tab.active { color: var(--t-accent); border-bottom: 2px solid var(--t-accent); }
+.modal-tab:hover:not(.active) { color: #aaa; }
+
+.modal-body { background: #0d1b2a; padding: 18px; }
+
+/* Gate status */
+.gate-block {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #1e3550; border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 16px;
+}
+.gate-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+.gate-row:last-child { margin-bottom: 0; }
+.gate-icon { font-size: 16px; width: 22px; text-align: center; }
+.gate-label { flex: 1; font-size: 13px; color: #ccc; font-weight: 600; }
+.gate-sub { font-size: 10px; color: #666; }
+.gate-action {
+  padding: 5px 12px; border-radius: 6px; border: none;
+  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.ga-buy    { background: var(--t-accent); color: #0a0a0a; }
+.ga-buy:hover { opacity: 0.85; }
+.ga-owned  { background: #1a5e33; color: #90ee90; cursor: default; }
+.ga-locked { background: #222; color: #555; cursor: not-allowed; }
+
+/* Shop items */
+.shop-locked { text-align: center; padding: 24px; color: #555; font-size: 13px; line-height: 1.6; }
+.shop-section-label {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: #555; margin: 12px 0 6px;
+}
+.shop-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; background: rgba(255,255,255,0.03);
+  border: 1px solid #1a2a3a; border-radius: 8px;
+  margin-bottom: 6px; transition: border-color 0.15s;
+}
+.shop-item:hover { border-color: #2a3a4a; }
+.shop-item.dim { opacity: 0.45; }
+.shop-item-icon { font-size: 20px; margin-right: 10px; }
+.shop-item-info { flex: 1; min-width: 0; }
+.shop-item-name { font-size: 13px; font-weight: 700; color: #ddd; }
+.shop-item-desc { font-size: 10px; color: #666; margin-top: 1px; }
+.shop-item-price {
+  font-size: 15px; font-weight: 900; color: var(--t-accent);
+  margin: 0 12px; white-space: nowrap;
+}
+.shop-item-price small { font-size: 9px; color: #555; font-weight: 400; }
+.shop-buy-btn {
+  padding: 6px 13px; border-radius: 6px; border: none;
+  background: var(--t-accent); color: #0a0a0a;
+  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
+  cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+}
+.shop-buy-btn:hover { opacity: 0.85; }
+.shop-buy-btn:disabled { background: #222; color: #555; cursor: not-allowed; }
+
+/* Cosmetic grid */
+.cosmetic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 6px; }
+.cosmetic-item {
+  border: 2px solid #1e3550; border-radius: 10px; padding: 8px 4px;
+  text-align: center; cursor: pointer; transition: all 0.15s; background: rgba(255,255,255,0.03);
+}
+.cosmetic-item:hover { border-color: #2a4a6a; }
+.cosmetic-item.owned { border-color: var(--t-accent); }
+.cosmetic-item.equipped { background: rgba(var(--t-accent-rgb,232,160,32),0.15); border-color: var(--t-accent); }
+.cosmetic-item.locked { opacity: 0.45; cursor: not-allowed; }
+.cosmetic-item-emoji { font-size: 24px; display: block; margin-bottom: 3px; }
+.cosmetic-item-name { font-size: 9px; color: #888; font-weight: 700; }
+.cosmetic-item-cost { font-size: 9px; color: var(--t-accent); font-weight: 800; }
+.cosmetic-item-status { font-size: 8px; color: #1a9e53; font-weight: 800; margin-top: 1px; }
+
+.bg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.bg-item {
+  height: 40px; border-radius: 8px; border: 2px solid #1e3550;
+  cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.bg-item:hover { border-color: #444; }
+.bg-item.owned { border-color: var(--t-accent); }
+.bg-item.equipped { border-color: var(--t-accent); box-shadow: 0 0 8px rgba(232,160,32,0.4); }
+.bg-item.locked { opacity: 0.5; cursor: not-allowed; }
+.bg-item-name { font-size: 10px; font-weight: 800; text-shadow: 0 1px 3px rgba(0,0,0,0.8); color: white; }
+.bg-item-cost { font-size: 9px; color: rgba(255,220,100,0.9); font-weight: 700; }
+
+/* Purchase history */
+.ph-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 0; border-bottom: 1px solid #1a2a3a;
+  font-size: 12px;
+}
+.ph-item:last-child { border-bottom: none; }
+.ph-name { color: #ccc; }
+.ph-date { color: #555; font-size: 10px; }
+.ph-cost { color: #cc4444; font-weight: 800; }
+
+/* Title picker */
+.title-picker {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.85);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.title-picker.open { display: flex; }
+.title-picker-inner {
+  background: #0d1b2a; border: 1px solid #2a3a4a;
+  border-radius: 14px; padding: 22px; max-width: 420px; width: 100%;
+  max-height: 80vh; overflow-y: auto;
+}
+.tp-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 900; color: var(--t-accent); margin-bottom: 14px;
+}
+.title-option {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; margin-bottom: 5px;
+  background: rgba(255,255,255,0.03); border: 1px solid #1e3550;
+  border-radius: 8px; cursor: pointer; transition: all 0.15s;
+}
+.title-option:hover { border-color: var(--t-accent); background: rgba(232,160,32,0.05); }
+.title-option.selected { border-color: var(--t-accent); background: rgba(232,160,32,0.1); }
+.title-text { font-size: 13px; font-weight: 700; color: #ddd; }
+.tp-confirm {
+  width: 100%; margin-top: 14px; padding: 11px;
+  background: var(--t-accent); color: #0a0a0a;
+  border: none; border-radius: 8px; font-family: 'Nunito', sans-serif;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+}
+.tp-confirm:disabled { background: #333; color: #666; cursor: not-allowed; }
+.tp-cancel {
+  width: 100%; margin-top: 6px; padding: 9px;
+  background: transparent; color: #666;
+  border: 1px solid #333; border-radius: 8px; font-family: 'Nunito', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EDIT TAB (admin)
+   ═══════════════════════════════════════════════════════════ */
+.edit-section { margin-bottom: 20px; }
+.edit-section-title {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: #555; margin-bottom: 8px; font-weight: 800;
+  padding-bottom: 4px; border-bottom: 1px solid #1e3550;
+}
+.edit-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+.edit-input {
+  flex: 1; min-width: 80px; padding: 7px 10px; border: 1.5px solid #1e3550;
+  border-radius: 6px; background: #0a1520; color: #ddd;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 600; outline: none;
+  transition: border-color 0.15s;
+}
+.edit-input:focus { border-color: var(--t-accent); }
+.edit-apply-btn {
+  padding: 7px 14px; border: none; border-radius: 6px;
+  background: var(--t-accent); color: #0a0a0a;
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+  cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+}
+.edit-apply-btn:hover { opacity: 0.85; }
+.edit-toggle-btn {
+  padding: 7px 14px; border: 1.5px solid #1e3550; border-radius: 6px;
+  background: transparent; color: #aaa;
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.edit-toggle-btn:hover { border-color: #aaa; }
+.edit-toggle-btn.on { background: #1a5e33; border-color: #1a5e33; color: #90ee90; }
+.edit-hint { font-size: 10px; color: #555; margin-top: 3px; }
+
+/* Transaction log rows */
+.txn-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid #1a2a3a; font-size: 12px;
+}
+.txn-item:last-child { border-bottom: none; }
+.txn-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.txn-dot.earn    { background: #1a9e53; }
+.txn-dot.spend   { background: #cc4444; }
+.txn-dot.manual  { background: #888; }
+.txn-label { flex: 1; color: #ccc; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.txn-date  { color: #555; font-size: 10px; white-space: nowrap; }
+.txn-amt   { font-weight: 800; white-space: nowrap; font-size: 12px; }
+.txn-del {
+  padding: 2px 7px; border: 1px solid rgba(204,34,34,0.35);
+  border-radius: 4px; background: transparent; color: #cc4444;
+  cursor: pointer; font-size: 11px; font-weight: 800; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.txn-del:hover { background: rgba(204,34,34,0.12); border-color: #cc4444; }
+
+/* Stamp pills */
+.stamp-pill {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px; background: rgba(255,255,255,0.03);
+  border: 1px solid #1e3550; border-radius: 6px; margin-bottom: 4px;
+  font-size: 12px; color: #ccc;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MISSION VIEW (nav tab)
+   ═══════════════════════════════════════════════════════════ */
+.mission-card {
+  background: linear-gradient(135deg, rgba(10,18,30,0.97), rgba(18,32,50,0.97));
+  border: 2px solid var(--t-accent);
+  border-radius: 16px; padding: 28px 30px; margin-bottom: 16px;
+}
+.mission-dest-row {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
+}
+.mission-flag { font-size: 52px; line-height: 1; }
+.mission-dest-info {}
+.mission-dest-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 900; color: var(--t-accent);
+}
+.mission-dest-sub { font-size: 11px; color: #666; letter-spacing: 2.5px; text-transform: uppercase; margin-top: 3px; }
+.mission-day-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+.mission-day-btn {
+  padding: 9px 24px; border-radius: 8px;
+  border: 2px solid #2a3a4a; background: transparent;
+  color: #555; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.mission-day-btn.active {
+  background: var(--t-accent); border-color: var(--t-accent); color: #0a0a0a;
+}
+.mission-koala-row {
+  display: flex; gap: 14px; align-items: flex-start; margin-bottom: 22px;
+}
+.mission-koala { font-size: 44px; line-height: 1; flex-shrink: 0; }
+.mission-koala-meta {}
+.mission-koala-from {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--t-accent); font-weight: 700; margin-bottom: 4px;
+}
+.mission-msg {
+  font-size: 17px; font-weight: 700; color: #ddd; line-height: 1.6;
+}
+.mission-fullscreen-btn {
+  padding: 9px 20px; border: 2px solid #2a3a4a; border-radius: 8px;
+  background: transparent; color: #666; font-family: 'Nunito', sans-serif;
+  font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s;
+  margin-top: 10px;
+}
+.mission-fullscreen-btn:hover { border-color: var(--t-accent); color: var(--t-accent); }
+
+/* Workout plan table */
+.workout-card {
+  background: var(--t-card); border: 1.5px solid var(--t-border);
+  border-radius: 14px; overflow: hidden; margin-bottom: 12px;
+}
+.workout-card-head {
+  background: var(--t-primary); color: white;
+  padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+  justify-content: space-between;
+}
+.workout-title {
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 900;
+}
+.workout-notes { font-size: 11px; opacity: 0.75; font-style: italic; }
+.workout-group-row {
+  display: grid; grid-template-columns: 110px 1fr 80px;
+  gap: 12px; align-items: start;
+  padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.07);
+  font-size: 13px;
+}
+.workout-group-row:last-child { border-bottom: none; }
+.workout-group-label { font-weight: 800; color: var(--t-primary); font-size: 12px; }
+.workout-group-sets { color: var(--t-text); font-weight: 700; }
+.workout-group-members { font-size: 11px; color: #888; line-height: 1.5; }
+.workout-group-rest { font-size: 11px; color: #888; font-weight: 700; text-align: right; }
+.workout-empty {
+  padding: 18px; text-align: center; color: #aaa; font-size: 13px; font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TRACK MAP VIEW
+   ═══════════════════════════════════════════════════════════ */
+.map-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+}
+.map-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 900; color: var(--t-accent);
+}
+.map-subtitle { font-size: 11px; color: #666; letter-spacing: 1px; }
+.map-outer {
+  position: relative;
+  width: 100%; height: 72vh; min-height: 520px;
+  background: linear-gradient(180deg, rgba(8,16,28,0.98) 0%, rgba(4,10,18,1) 100%);
+  border-radius: 16px; border: 1px solid #1e3550;
+  overflow: hidden;
+}
+/* Vertical track line */
+.map-outer::before {
+  content: '';
+  position: absolute; left: 50%; top: 24px; bottom: 36px; width: 3px;
+  background: linear-gradient(180deg, var(--t-accent) 0%, rgba(232,160,32,0.08) 100%);
+  transform: translateX(-50%);
+  border-radius: 2px; z-index: 0;
+}
+.map-inner { position: absolute; inset: 0; }
+.map-finish-label {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--t-accent);
+  font-weight: 800; white-space: nowrap; z-index: 3;
+}
+.map-start-label {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444;
+  font-weight: 800; white-space: nowrap; z-index: 3;
+}
+.map-runner {
+  position: absolute; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  cursor: pointer; transition: filter 0.2s, transform 0.5s ease;
+  z-index: 2;
+}
+.map-runner:hover { filter: brightness(1.3); transform: translateX(-50%) scale(1.18); }
+.map-emoji { font-size: 26px; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7)); }
+.map-name  { font-size: 9px; color: #bbb; font-weight: 800; white-space: nowrap; line-height: 1; }
+.map-laps  { font-size: 8px; color: var(--t-accent); font-weight: 700; line-height: 1; }
+.map-runner.is-leader .map-emoji { font-size: 34px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.7)); }
+.map-runner.is-leader .map-name  { color: #FFD700; font-size: 10px; }
+.map-tick {
+  position: absolute; right: 14px; transform: translateY(50%);
+  font-size: 9px; color: #2a3a4a; font-weight: 700; z-index: 1; white-space: nowrap;
+}
+.map-zero-msg {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+}
+.map-zero-msg .mz-emoji { font-size: 48px; }
+.map-zero-msg .mz-text { font-size: 14px; color: #444; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════
+   INVENTORY TAB (modal)
+   ═══════════════════════════════════════════════════════════ */
+.inv-section { margin-bottom: 16px; }
+.inv-section-title {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: #555; font-weight: 800; padding-bottom: 4px;
+  border-bottom: 1px solid #1e3550; margin-bottom: 8px;
+}
+.inv-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: 7px; margin-bottom: 4px;
+  background: rgba(255,255,255,0.03); border: 1px solid #1a2a3a;
+  font-size: 12px; transition: border-color 0.1s;
+}
+.inv-item.owned  { border-color: rgba(232,160,32,0.25); }
+.inv-item.locked { opacity: 0.35; }
+.inv-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.inv-name { flex: 1; color: #ccc; font-weight: 600; }
+.inv-count {
+  font-size: 11px; font-weight: 900; color: var(--t-accent);
+  background: rgba(232,160,32,0.12); padding: 2px 8px; border-radius: 12px;
+}
+.inv-status-badge {
+  font-size: 10px; font-weight: 800; color: #1a9e53;
+  background: rgba(26,158,83,0.12); padding: 2px 8px; border-radius: 12px;
+}
+
+/* ── BG-ITEM READABILITY FIX ──────────────────────────────── */
+/* Dark overlay so text is always readable over any gradient */
+.bg-item { position: relative; }
+.bg-item::after {
+  content: ''; position: absolute; inset: 0; border-radius: 5px;
+  background: rgba(0,0,0,0.38); pointer-events: none;
+}
+.bg-item > div { position: relative; z-index: 1; }
+.bg-item-name { color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); font-size: 10px; font-weight: 800; }
+.bg-item-cost { color: rgba(255,235,150,1); text-shadow: 0 1px 3px rgba(0,0,0,0.9); font-size: 9px; font-weight: 800; }
+
+/* ── PRICE EDITOR ─────────────────────────────────────── */
+.price-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+@media (max-width: 500px) { .price-grid { grid-template-columns: 1fr; } }
+.price-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 7px 10px;
+  background: rgba(0,0,0,0.04); border-radius: 7px;
+  border: 1px solid var(--t-border);
+}
+.price-row-icon { font-size: 16px; flex-shrink: 0; }
+.price-row-name { flex: 1; font-size: 12px; font-weight: 700; color: var(--t-text); }
+.price-input {
+  width: 62px; padding: 4px 8px; text-align: center;
+  border: 1.5px solid var(--t-border); border-radius: 6px;
+  background: white; font-family: 'Nunito', sans-serif;
+  font-size: 14px; font-weight: 800; color: var(--t-primary); outline: none;
+}
+.price-input:focus { border-color: var(--t-primary); }
+.price-save-btn {
+  margin-top: 12px; padding: 9px 22px;
+  background: var(--t-primary); color: white; border: none;
+  border-radius: 8px; font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 800; cursor: pointer; transition: opacity 0.15s;
+}
+.price-save-btn:hover { opacity: 0.85; }
+
+/* Admin danger buttons in edit tab */
+.edit-danger-btn {
+  display: block; width: 100%; margin-bottom: 7px; padding: 9px 14px;
+  border-radius: 7px; border: 1.5px solid #cc222255; background: transparent;
+  color: #cc4444; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+  cursor: pointer; text-align: left; transition: all 0.15s;
+}
+.edit-danger-btn:hover { background: rgba(204,34,34,0.08); border-color: #cc4444; }
+
+/* ═══════════════════════════════════════════════════════════
+   MISSION BRIEFING OVERLAY
+   ═══════════════════════════════════════════════════════════ */
+.briefing-overlay {
+  display: none; position: fixed; inset: 0; z-index: 400;
+  background: rgba(5,10,18,0.97);
+  align-items: center; justify-content: center; padding: 24px;
+}
+.briefing-overlay.open { display: flex; }
+.briefing-inner {
+  max-width: 680px; width: 100%; text-align: center;
+}
+.briefing-flag { font-size: 64px; margin-bottom: 10px; }
+.briefing-dest {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px; font-weight: 900; color: var(--t-accent);
+  margin-bottom: 4px;
+}
+.briefing-subtitle { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 32px; }
+.briefing-koala { font-size: 72px; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(232,160,32,0.4)); }
+.briefing-from {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--t-accent); margin-bottom: 8px; font-weight: 700;
+}
+.briefing-msg {
+  font-size: 20px; font-weight: 700; color: white; line-height: 1.6;
+  max-width: 520px; margin: 0 auto 32px;
+}
+.briefing-day-toggle { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+.day-btn {
+  padding: 8px 20px; border-radius: 8px;
+  border: 2px solid #333; background: transparent;
+  color: #666; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.day-btn.active { background: var(--t-accent); border-color: var(--t-accent); color: #0a0a0a; }
+.briefing-close {
+  padding: 12px 36px; background: var(--t-primary); color: white;
+  border: none; border-radius: 10px; font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.15s;
+}
+.briefing-close:hover { opacity: 0.9; }
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST + FLOAT ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 11px 22px; border-radius: 8px;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+.toast.success { background: var(--t-accent); color: #0a0a0a; }
+.toast.error   { background: #cc2222; color: white; }
+.toast.info    { background: #1E3550; color: white; }
+
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-70px) scale(1.2); }
+}
+.float-relic {
+  position: fixed; pointer-events: none; z-index: 600;
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900;
+  color: var(--t-accent); text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  animation: floatUp 1.4s ease-out forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════ */
+.empty-state { text-align: center; padding: 40px; color: #aaa; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="airmail-stripe"></div>
+
+<!-- ── NAV ─────────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="nav-mascot" id="nav-mascot">🦔</div>
+      <div>
+        <div class="nav-title">All Around the World · 5K</div>
+        <div class="nav-dest" id="nav-dest-label">Week 3 — Austin, TX 🇺🇸</div>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('mission',this)">🐨 Mission</button>
+      <button class="tab-btn" onclick="switchTab('map',this)">🗺 Track</button>
+      <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏆 Board</button>
+      <button class="tab-btn" onclick="switchTab('session',this)">⚡ Session</button>
+      <button class="tab-btn" onclick="switchTab('history',this)">📖 History</button>
+      <button class="tab-btn" onclick="switchTab('admin',this)">⚙ Admin</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MISSION ──────────────────────────────────────── -->
+<div class="view active" id="view-mission" style="max-width:1200px;margin:0 auto;padding:20px;">
+  <div class="mission-card" id="mission-card">
+    <div class="mission-dest-row">
+      <div class="mission-flag" id="ms-flag">🇺🇸</div>
+      <div class="mission-dest-info">
+        <div class="mission-dest-name" id="ms-dest">Austin, TX</div>
+        <div class="mission-dest-sub" id="ms-sub">The Hill Country Challenge · Week 3 of 11</div>
+      </div>
+    </div>
+    <div class="mission-day-toggle">
+      <button class="mission-day-btn active" onclick="setMissionDay('Tuesday',this)">Tuesday</button>
+      <button class="mission-day-btn" onclick="setMissionDay('Thursday',this)">Thursday</button>
+    </div>
+    <div class="mission-koala-row">
+      <div class="mission-koala">🐨</div>
+      <div class="mission-koala-meta">
+        <div class="mission-koala-from">Agent Koala · Mission Briefing</div>
+        <div class="mission-msg" id="ms-msg">Loading...</div>
+      </div>
+    </div>
+    <button class="mission-fullscreen-btn" onclick="openBriefing()">⛶ Fullscreen Mode</button>
+  </div>
+  <div id="mission-workout"></div>
+</div>
+
+<!-- ── LEADERBOARD ────────────────────────────────────── -->
+<div class="view" id="view-leaderboard">
+  <div class="lb-week-banner">
+    <div class="lb-week-left">
+      <div class="lb-week-flag" id="lb-flag">🇺🇸</div>
+      <div>
+        <div class="lb-week-name" id="lb-dest-name">Austin, TX</div>
+        <div class="lb-week-sub" id="lb-dest-sub">The Hill Country Challenge</div>
+      </div>
+    </div>
+    <div class="lb-week-right">
+      <div class="lb-week-num" id="lb-week-num">Week 3 of 11</div>
+      <div class="lb-koala-msg" id="lb-koala-msg">🐨 "Every lap today is your answer."</div>
+    </div>
+  </div>
+  <!-- Time-travel filter -->
+  <div class="lb-filter-bar">
+    <span class="lb-filter-label">🕐 View as of:</span>
+    <input type="date" id="lb-asof" oninput="setViewAsOf(this.value)">
+    <button class="lb-live-btn" id="lb-live-btn" onclick="clearViewAsOf()">● Live</button>
+    <span class="lb-filter-badge" id="lb-filter-badge"></span>
+  </div>
+  <div class="lb-grid" id="lb-grid"></div>
+</div>
+
+<!-- ── TRACK MAP ───────────────────────────────────────── -->
+<div class="view" id="view-map">
+  <div class="map-header">
+    <div>
+      <div class="map-title">🗺 Runner Progress Track</div>
+      <div class="map-subtitle">Laps run · click any runner to open their profile</div>
+    </div>
+    <button class="mission-fullscreen-btn" onclick="renderMap()">↻ Refresh</button>
+  </div>
+  <div class="map-outer">
+    <div class="map-inner" id="map-inner"></div>
+    <div class="map-finish-label" id="map-finish-label">⭐ LEADER</div>
+    <div class="map-start-label">— START LINE —</div>
+  </div>
+</div>
+
+<!-- ── SESSION INPUT ──────────────────────────────────── -->
+<div class="view" id="view-session">
+  <div class="section-label">Log a Session</div>
+  <div class="session-header-bar">
+    <div class="field-group">
+      <label>Date</label>
+      <input type="date" id="sess-date">
+    </div>
+  </div>
+  <div class="student-input-panel" id="student-input-panel"></div>
+  <div class="session-footer">
+    <div class="session-total">Total Relics this session: <span id="sess-total">0</span> ⬡</div>
+    <button class="submit-btn" onclick="submitSession()">⚡ Award Relics</button>
+  </div>
+</div>
+
+<!-- ── HISTORY ────────────────────────────────────────── -->
+<div class="view" id="view-history">
+  <div class="section-label">Session History</div>
+  <div id="history-log"></div>
+</div>
+
+<!-- ── ADMIN ──────────────────────────────────────────── -->
+<div class="view" id="view-admin">
+  <div class="section-label">Admin Settings</div>
+  <div class="admin-grid">
+    <div class="admin-card">
+      <div class="admin-card-title">📍 Active Destination (Week)</div>
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-title">💾 Data Backup</div>
+      <button class="admin-btn" onclick="exportJSON()">⬇ Export JSON Backup</button>
+      <button class="admin-btn" onclick="exportCSV()">📊 Export CSV (Google Sheets / Excel)</button>
+      <label class="admin-btn" style="cursor:pointer;">
+        ⬆ Import JSON Backup
+        <input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
+      </label>
+    </div>
+    <div class="admin-card" style="grid-column: 1 / -1">
+      <div class="admin-card-title">💰 Item Prices — edit any value and click Save</div>
+      <div id="price-editor"></div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-title">⚠ Danger Zone</div>
+      <button class="admin-btn danger" onclick="confirmReset()">🗑 Reset All Data (cannot undo)</button>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-title">ℹ Economy Reference</div>
+      <p style="font-size:12px;color:#888;line-height:1.7;">
+        <strong>15 Relics</strong> per mile &nbsp;·&nbsp; <strong>3 Relics</strong> per lap<br>
+        Stamp: 5 &nbsp;·&nbsp; Bracelet: 30 &nbsp;·&nbsp; Sticker: 10<br>
+        Song: 25 &nbsp;·&nbsp; Fuel Point: 35 &nbsp;·&nbsp; Shoelaces: 50<br>
+        Avatar: 40–60 &nbsp;·&nbsp; Profile BG: 50<br>
+        Title: 75 &nbsp;·&nbsp; Lead Warm-Up: 100
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── STUDENT MODAL ──────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-profile-header" id="modal-header"></div>
+    <div class="modal-tabs" id="modal-tabs"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ── TITLE PICKER ───────────────────────────────────── -->
+<div class="title-picker" id="title-picker">
+  <div class="title-picker-inner">
+    <div class="tp-head">🏅 Choose Your Runner Title</div>
+    <div id="title-options"></div>
+    <button class="tp-confirm" id="tp-confirm" onclick="confirmTitle()" disabled>Confirm Title</button>
+    <button class="tp-cancel" onclick="closeTitlePicker()">Cancel</button>
+  </div>
+</div>
+
+<!-- ── MISSION BRIEFING ───────────────────────────────── -->
+<div class="briefing-overlay" id="briefing-overlay">
+  <div class="briefing-inner">
+    <div class="briefing-flag" id="br-flag">🇺🇸</div>
+    <div class="briefing-dest" id="br-dest">Austin, TX</div>
+    <div class="briefing-subtitle" id="br-subtitle">The Hill Country Challenge</div>
+    <div class="briefing-koala">🐨</div>
+    <div class="briefing-from">Agent Koala · Mission Briefing</div>
+    <div class="briefing-msg" id="br-msg">Loading mission...</div>
+    <div class="briefing-day-toggle">
+      <button class="day-btn active" onclick="setBriefDay('Tuesday',this)">Tuesday</button>
+      <button class="day-btn" onclick="setBriefDay('Thursday',this)">Thursday</button>
+    </div>
+    <button class="briefing-close" onclick="closeBriefing()">Start Session →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║               ★  CONFIGURATION  ★                                ║
+// ║  Edit this block freely — all game settings live here            ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const CFG = {
+
+  RELICS_PER_MILE: 15,
+  LAP_MILES: 0.20,
+
+  BONUSES: [
+    { id: 'leadership', label: 'Leadership Bonus',           relics: 8,  icon: '⭐' },
+    { id: 'teammate',   label: 'Positive Teammate',          relics: 5,  icon: '🤝' },
+    { id: 'pr',         label: 'Personal Distance Record',   relics: 10, icon: '📈' },
+    { id: 'pacing',     label: 'Pacing Legend (No Walking)', relics: 12, icon: '🏃' },
+  ],
+
+  TITLES: [
+    'Trail Scout','Lone Star','Cherry Blossom','Safari Runner',
+    'Desert Sprinter','Pacing Legend','Iron Legs','No-Stop Nova',
+    'Finish Line','The Anchor','Trailblazer','Steady Pace',
+    'Heart of the Pack','Distance King','Distance Queen',
+  ],
+
+  SHOP: [
+    { id:'stamp',    name:'Passport Stamp',    icon:'📋', cost:5,   cat:'gate',     desc:'Required each session — opens the shop', isStamp:true },
+    { id:'bracelet', name:"Runner's Bracelet", icon:'⌚', cost:30,  cat:'gate',     desc:'Fitness tracker — permanently unlocks the full shop', isBracelet:true },
+    { id:'sticker',  name:'Passport Sticker',  icon:'✦',  cost:10,  cat:'item',     desc:'A custom sticker for your runner passport' },
+    { id:'song',     name:'Pick Warm-Up Song', icon:'🎵', cost:25,  cat:'item',     desc:'Choose the music for the next session' },
+    { id:'fuel',     name:'Fuel Point',        icon:'⚡', cost:35,  cat:'item',     desc:'Extra snack — earned through distance, not given' },
+    { id:'laces',    name:'Custom Shoelaces',  icon:'👟', cost:50,  cat:'item',     desc:'Pick your color, own your look' },
+    { id:'title',    name:'Leaderboard Title', icon:'🏅', cost:75,  cat:'cosmetic', desc:'Pick your runner title — shown on the leaderboard', isTitle:true },
+    { id:'leadwu',   name:'Lead the Warm-Up', icon:'👑', cost:100, cat:'item',     desc:'You run the whole session warm-up' },
+  ],
+
+  AVATARS: [
+    { id:'koala',  emoji:'🐨', name:'Koala Scout',     cost:0  },
+    { id:'lion',   emoji:'🦁', name:'Safari Lion',     cost:40 },
+    { id:'panda',  emoji:'🐼', name:'Panda Explorer',  cost:40 },
+    { id:'fox',    emoji:'🦊', name:'Fox Ranger',      cost:40 },
+    { id:'rabbit', emoji:'🐰', name:'Bunny Guide',     cost:40 },
+    { id:'bear',   emoji:'🐻', name:'Bear Adventurer', cost:40 },
+    { id:'tiger',  emoji:'🐯', name:'Tokyo Tiger',     cost:40 },
+    { id:'eagle',  emoji:'🦅', name:'Eagle Legend',    cost:60 },
+  ],
+
+  BACKGROUNDS: [
+    { id:'parchment', name:'Parchment',       cost:0,  css:'linear-gradient(135deg,#f5e6c8,#e8d0a0)' },
+    { id:'austin',    name:'Austin Sunset',   cost:50, css:'linear-gradient(135deg,#C45100,#1B7A8A)' },
+    { id:'london',    name:'London Royal',    cost:50, css:'linear-gradient(135deg,#003580,#9B1B1B)' },
+    { id:'tokyo',     name:'Tokyo Blossom',   cost:50, css:'linear-gradient(135deg,#ffb7c5,#C41E3A)' },
+    { id:'china',     name:'China Dynasty',   cost:50, css:'linear-gradient(135deg,#AA0000,#D4AF37)' },
+    { id:'kenya',     name:'Safari Gold',     cost:50, css:'linear-gradient(135deg,#8B6914,#2D5A1B)' },
+    { id:'dubai',     name:'Dubai Dunes',     cost:50, css:'linear-gradient(135deg,#B8860B,#1B5E3A)' },
+    { id:'brazil',    name:'Brazil Carnival', cost:50, css:'linear-gradient(135deg,#009639,#002776)' },
+  ],
+
+  DESTINATIONS: [
+    { week:1,  name:'Training Hub',   flag:'🌍', mascot:'🐨', subtitle:'Where every journey begins',
+      missionTue:"Agent Koala here. The Training Hub is live. Lace up and prove you belong.",
+      missionThu:"Last session at the Hub. Push harder than Tuesday. The world is waiting.",
+      theme:{ primary:'#1E3550', secondary:'#8B6914', bg:'#f5e6c8', cardBg:'#fffdf5', accent:'#D4AF37', text:'#2a1800', border:'#c4a868' }},
+    { week:3,  name:'Austin, TX',     flag:'🇺🇸', mascot:'🦔', subtitle:'The Hill Country Challenge',
+      missionTue:"This is Austin, Texas. The Hill Country Runners don't believe you're ready. Every lap today is your answer.",
+      missionThu:"Final run in Texas. The Lone Star checkpoint only stamps passports for runners who finish strong.",
+      theme:{ primary:'#C45100', secondary:'#1B7A8A', bg:'#fdf0dc', cardBg:'#fff8ee', accent:'#E8A020', text:'#2a1200', border:'#c4a020' }},
+    { week:4,  name:'London, UK',     flag:'🇬🇧', mascot:'🐕', subtitle:'Royal Routes',
+      missionTue:"You've landed in London. The Queen's Guards run these streets every morning before breakfast. Keep up.",
+      missionThu:"Final push through London. Big Ben only rings for runners who finish. Make it count.",
+      theme:{ primary:'#9B1B1B', secondary:'#003580', bg:'#f5f0e8', cardBg:'#fff5f5', accent:'#C4A020', text:'#1a0a0a', border:'#9b1b1b' }},
+    { week:5,  name:'Tokyo, Japan',   flag:'🇯🇵', mascot:'🦊', subtitle:'Fast & Focused',
+      missionTue:"Konnichiwa. Tokyo runners train before the sakura bloom. Move like the wind through the cherry trees.",
+      missionThu:"Ninja Training Thursday. No noise. No slowing. Smooth, controlled speed. Go.",
+      theme:{ primary:'#C41E3A', secondary:'#1a1a2e', bg:'#fdf0f5', cardBg:'#fff5f8', accent:'#E8207A', text:'#1a0010', border:'#c41e3a' }},
+    { week:6,  name:'China',          flag:'🇨🇳', mascot:'🐼', subtitle:"The Dragon's Route",
+      missionTue:"China's runners train through mountains and mist. Today you train with them.",
+      missionThu:"The Great Wall was built by people who didn't stop. Neither will you.",
+      theme:{ primary:'#AA0000', secondary:'#2a0000', bg:'#fff5e8', cardBg:'#fff8f0', accent:'#D4AF37', text:'#1a0000', border:'#aa0000' }},
+    { week:7,  name:'San Francisco',  flag:'🇺🇸', mascot:'🦁', subtitle:'Golden Gate Miles',
+      missionTue:"The Golden Gate fog doesn't slow SF runners. Nothing slows you down today either.",
+      missionThu:"Final crossing. The Bay is watching. Finish strong.",
+      theme:{ primary:'#C46A00', secondary:'#2D6A8A', bg:'#f5f0e5', cardBg:'#fff8ee', accent:'#E8A020', text:'#1a0800', border:'#c46a00' }},
+    { week:8,  name:'Kenya',          flag:'🇰🇪', mascot:'🦁', subtitle:'The Savanna Sprint',
+      missionTue:"Kenya produces the fastest distance runners on Earth. Today you train like them.",
+      missionThu:"The savanna has no easy route. Every mile here is earned.",
+      theme:{ primary:'#8B6914', secondary:'#2D5A1B', bg:'#fdf5e0', cardBg:'#fff8e8', accent:'#D4AF37', text:'#1a1000', border:'#8b6914' }},
+    { week:9,  name:'Dubai',          flag:'🇦🇪', mascot:'🐪', subtitle:'Desert Elite',
+      missionTue:"Dubai runners train at 100 degrees. You have no excuse.",
+      missionThu:"Final sprint through the desert. The finish line is gold. So is your effort.",
+      theme:{ primary:'#B8860B', secondary:'#1B5E3A', bg:'#fdf8e8', cardBg:'#fffaee', accent:'#DAA520', text:'#1a0e00', border:'#b8860b' }},
+    { week:10, name:'Brazil',         flag:'🇧🇷', mascot:'🦜', subtitle:'Carnival Miles',
+      missionTue:"Brazil runs with music in its heart. Find your rhythm and don't let it go.",
+      missionThu:"Last destination before the Final Route. Leave everything on the course.",
+      theme:{ primary:'#009639', secondary:'#002776', bg:'#f0fce8', cardBg:'#f5fff0', accent:'#FEDD00', text:'#001a00', border:'#009639' }},
+    { week:11, name:'Final Route 🏁', flag:'🏁', mascot:'🏆', subtitle:'Race Week — June 6, 2026',
+      missionTue:"This is it. Every lap you've run has led here. One last push.",
+      missionThu:"Race day is June 6. You are ready. You have always been ready. Go make history.",
+      theme:{ primary:'#1E3550', secondary:'#C45100', bg:'#f5f0e0', cardBg:'#fffef5', accent:'#D4AF37', text:'#0a0a0a', border:'#D4AF37' }},
+  ],
+
+  // ── WORKOUT PLANS ────────────────────────────────────────
+  // Update this each week when the coach uploads the plan.
+  // Format: WORKOUTS[week][day] = { title, notes, groups:[{label,sets,rest,members:[]}] }
+  WORKOUTS: {
+    2: {
+      Tuesday: {
+        title: 'Hill Country Warmup', notes: '',
+        groups: [
+          { label: 'Group A', sets: '1×1 + 3×2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Junning Zhang (Grace)','Nayel Bajwa'] },
+          { label: 'Group B', sets: '2×1 + 1×2 + 2×1 laps', rest: '60s', members: ['Reverie Stinson','Lucia Quimby','Caleb Chang','Emma Baklanova','Arthur Przybyl','Sabrina Yang'] },
+          { label: 'Group C', sets: '5×1 lap', rest: '75s', members: ['Sophie Yang','Molly Going','Mia Baklanova','Rexa Gupta','Hana Wong','Graham Gattegno','Annalise Faheem','Sojourn Stinson','Cora Ishaq','Lauren Creelman'] },
+        ]
+      },
+      Thursday: {
+        title: 'Lone Star Push', notes: 'Set 3 challenge ★ for Groups A & C',
+        groups: [
+          { label: 'Group A', sets: '2+2+3+2+2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Junning Zhang (Grace)','Nayel Bajwa'] },
+          { label: 'Group B', sets: '1+2+2+2+2 laps', rest: '60s', members: ['Reverie Stinson','Lucia Quimby','Caleb Chang','Emma Baklanova','Arthur Przybyl','Sabrina Yang'] },
+          { label: 'Group C', sets: '1+1+2+2+1 laps', rest: '75s', members: ['Sophie Yang','Molly Going','Mia Baklanova','Rexa Gupta','Hana Wong','Graham Gattegno','Annalise Faheem','Sojourn Stinson','Cora Ishaq','Lauren Creelman'] },
+        ]
+      },
+    },
+    3: {
+      Tuesday: {
+        title: 'Austin Ladder', notes: 'Upload Week 3 workout plan to update',
+        groups: []
+      },
+      Thursday: {
+        title: 'Hill Country Finish', notes: 'Upload Week 3 workout plan to update',
+        groups: []
+      },
+    },
+  },
+
+  // ── AUTHORITATIVE 24-STUDENT ROSTER ─────────────────────
+  // IDs are stable and match any existing localStorage data.
+  // Add new students here; do NOT change existing IDs.
+  STUDENTS: [
+    { id:'ari',      name:'Ari Faheem'             },
+    { id:'audrey',   name:'Audrey Going'           },
+    { id:'cameron',  name:'Cameron Creelman'       },
+    { id:'lorenzo',  name:'Lorenzo Di Rocco'       },
+    { id:'olivia',   name:'Olivia Wojtowicz'       },
+    { id:'nate',     name:'Nathaniel Kelly'        },
+    { id:'grace',    name:'Junning Zhang (Grace)'  },
+    { id:'nayel',    name:'Nayel Bajwa'            },
+    { id:'reverie',  name:'Reverie Stinson'        },
+    { id:'lucia',    name:'Lucia Quimby'           },
+    { id:'caleb',    name:'Caleb Chang'            },
+    { id:'emma',     name:'Emma Baklanova'         },
+    { id:'arthur',   name:'Arthur Przybyl'         },
+    { id:'sabrina',  name:'Sabrina Yang'           },
+    { id:'sophie',   name:'Sophie Yang'            },
+    { id:'molly',    name:'Molly Going'            },
+    { id:'mia',      name:'Mia Baklanova'          },
+    { id:'rexa',     name:'Rexa Gupta'             },
+    { id:'hana',     name:'Hana Wong'              },
+    { id:'graham',   name:'Graham Gattegno'        },
+    { id:'annalise', name:'Annalise Faheem'        },
+    { id:'jojo',     name:'Sojourn Stinson'        },
+    { id:'cora',     name:'Cora Ishaq'             },
+    { id:'lauren',   name:'Lauren Creelman'        },
+  ],
+};
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    STATE & STORAGE                               ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const STORE_KEY = 'atw5k_v2';
+
+function makeStudent({ id, name }) {
+  return {
+    id,
+    name,
+    relics: 0,
+    totalMiles: 0,
+    totalLaps: 0,
+    hasBracelet: false,
+    stampDates: [],           // array of 'YYYY-MM-DD' strings, one per session purchased
+    equippedAvatar: 'koala',
+    equippedBg: 'parchment',
+    title: null,
+    ownedAvatars: ['koala'],
+    ownedBgs: ['parchment'],
+    purchases: [],            // { itemId, itemName, cost, date }
+    bonuses: [],              // { type, label, amount, date }
+    sessionLog: [],           // { date, week, day, laps, miles, relics }
+    manualAdjustments: [],    // { amount, reason, date }  ← admin-only
+  };
+}
+
+function initState() {
+  const raw = localStorage.getItem(STORE_KEY);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      // ── MIGRATION: old lastStampDate → stampDates array ──
+      Object.values(parsed.students || {}).forEach(s => {
+        if (!s.stampDates) {
+          s.stampDates = s.lastStampDate ? [s.lastStampDate] : [];
+          delete s.lastStampDate;
+        }
+        if (!s.manualAdjustments) s.manualAdjustments = [];
+      });
+      // ── Add any new roster students not yet in saved state ──
+      CFG.STUDENTS.forEach(def => {
+        if (!parsed.students[def.id]) {
+          parsed.students[def.id] = makeStudent(def);
+        } else {
+          // Keep stored data but ensure name reflects latest roster
+          parsed.students[def.id].name = def.name;
+        }
+      });
+      return parsed;
+    } catch(e) {}
+  }
+  const students = {};
+  CFG.STUDENTS.forEach(def => { students[def.id] = makeStudent(def); });
+  return { currentWeek: 3, students, sessions: [] };
+}
+
+let STATE = initState();
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(STATE)); }
+
+function getDestination(week) {
+  return CFG.DESTINATIONS.find(d => d.week === week) || CFG.DESTINATIONS[0];
+}
+
+// ── Recompute Relic balance from transaction log (call after any admin edit) ──
+function recalcRelics(s) {
+  let total = 0;
+  (s.sessionLog || []).forEach(l => total += l.relics);
+  (s.bonuses || []).forEach(b => total += b.amount);
+  (s.purchases || []).forEach(p => total -= p.cost);
+  (s.manualAdjustments || []).forEach(a => total += a.amount);
+  s.relics = Math.max(0, total);
+  // Recompute mileage from session log
+  s.totalLaps  = (s.sessionLog || []).reduce((a,l) => a + l.laps, 0);
+  s.totalMiles = parseFloat((s.sessionLog || []).reduce((a,l) => a + l.miles, 0).toFixed(3));
+}
+
+// ── Compute what a student's state looked like as of a specific date ──
+function calcStateAsOf(s, targetDate) {
+  const sessions  = (s.sessionLog || []).filter(l => l.date <= targetDate);
+  const bonuses   = (s.bonuses || []).filter(b => b.date <= targetDate);
+  const purchases = (s.purchases || []).filter(p => p.date <= targetDate);
+  const manuals   = (s.manualAdjustments || []).filter(a => a.date <= targetDate);
+  let relics = 0;
+  sessions.forEach(l  => relics += l.relics);
+  bonuses.forEach(b   => relics += b.amount);
+  purchases.forEach(p => relics -= p.cost);
+  manuals.forEach(a   => relics += a.amount);
+  const hasBracelet = purchases.some(p => p.itemId === 'bracelet');
+  // Derive title from last title purchase before targetDate
+  const titlePurchase = [...purchases].reverse().find(p => p.itemId === 'title');
+  const title = titlePurchase ? titlePurchase.itemName.replace(/^Title: /, '') : null;
+  return {
+    relics: Math.max(0, relics),
+    totalMiles: parseFloat(sessions.reduce((a,l) => a + l.miles, 0).toFixed(3)),
+    totalLaps:  sessions.reduce((a,l) => a + l.laps, 0),
+    hasBracelet,
+    title,
+    stampDates: (s.stampDates || []).filter(d => d <= targetDate),
+  };
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    THEME ENGINE                                  ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function applyTheme(dest) {
+  const t = dest.theme;
+  const root = document.documentElement;
+  root.style.setProperty('--t-primary',   t.primary);
+  root.style.setProperty('--t-secondary', t.secondary);
+  root.style.setProperty('--t-accent',    t.accent);
+  root.style.setProperty('--t-bg',        t.bg);
+  root.style.setProperty('--t-card',      t.cardBg);
+  root.style.setProperty('--t-text',      t.text);
+  root.style.setProperty('--t-border',    t.border);
+  document.getElementById('nav-mascot').textContent = dest.mascot;
+  document.getElementById('nav-dest-label').textContent = `Week ${dest.week} — ${dest.name} ${dest.flag}`;
+  document.getElementById('lb-flag').textContent = dest.flag;
+  document.getElementById('lb-dest-name').textContent = dest.name;
+  document.getElementById('lb-dest-sub').textContent = dest.subtitle;
+  document.getElementById('lb-week-num').textContent = `Week ${dest.week} of 11`;
+  document.getElementById('lb-koala-msg').textContent = `🐨 "${dest.missionTue}"`;
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    TAB SWITCHING                                 ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function switchTab(tab, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (tab === 'mission')     renderMission();
+  if (tab === 'leaderboard') renderLeaderboard();
+  if (tab === 'map')         renderMap();
+  if (tab === 'session')     renderSession();
+  if (tab === 'history')     renderHistory();
+  if (tab === 'admin')       renderAdmin();
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    MISSION TAB                                   ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+let missionDay = 'Tuesday';
+
+function renderMission() {
+  const dest = getDestination(STATE.currentWeek);
+  document.getElementById('ms-flag').textContent = dest.flag;
+  document.getElementById('ms-dest').textContent = dest.name;
+  document.getElementById('ms-sub').textContent = `${dest.subtitle} · Week ${dest.week} of 11`;
+  document.getElementById('ms-msg').textContent =
+    missionDay === 'Tuesday' ? dest.missionTue : dest.missionThu;
+
+  // Workout plan
+  const wk = CFG.WORKOUTS[STATE.currentWeek];
+  const plan = wk ? wk[missionDay] : null;
+  const container = document.getElementById('mission-workout');
+  if (!plan) {
+    container.innerHTML = `<div class="workout-card"><div class="workout-empty">No workout plan uploaded for Week ${STATE.currentWeek} ${missionDay} yet.</div></div>`;
+    return;
+  }
+  let html = `<div class="workout-card">
+    <div class="workout-card-head">
+      <div class="workout-title">${plan.title || missionDay + ' Workout'}</div>
+      ${plan.notes ? `<div class="workout-notes">${plan.notes}</div>` : ''}
+    </div>`;
+  if (!plan.groups || plan.groups.length === 0) {
+    html += `<div class="workout-empty">Workout details coming — upload the plan to update.</div>`;
+  } else {
+    plan.groups.forEach(g => {
+      html += `<div class="workout-group-row">
+        <div>
+          <div class="workout-group-label">${g.label}</div>
+          <div class="workout-group-rest">${g.rest}</div>
+        </div>
+        <div>
+          <div class="workout-group-sets">${g.sets}</div>
+          ${g.members && g.members.length ? `<div class="workout-group-members" style="margin-top:4px">${g.members.map(m => m.split(' ')[0]).join(' · ')}</div>` : ''}
+        </div>
+      </div>`;
+    });
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function setMissionDay(day, btn) {
+  missionDay = day;
+  document.querySelectorAll('.mission-day-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderMission();
+  // sync briefing overlay day too
+  briefDay = day;
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    TRACK MAP                                     ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function renderMap() {
+  const inner = document.getElementById('map-inner');
+  if (!inner) return;
+  const students = Object.values(STATE.students);
+  const maxLaps = Math.max(...students.map(s => s.totalLaps), 0);
+
+  if (maxLaps === 0) {
+    inner.innerHTML = `<div class="map-zero-msg">
+      <div class="mz-emoji">🏁</div>
+      <div class="mz-text">Log your first session to see runners on the track</div>
+    </div>`;
+    document.getElementById('map-finish-label').textContent = '⭐ LEADER';
+    return;
+  }
+
+  // Group students by lap count
+  const groups = new Map();
+  students.slice().sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
+    const k = s.totalLaps;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(s);
+  });
+
+  // Track height range: 7% (bottom padding) to 88% (top)
+  const BOTTOM_PAD = 7, TOP_PAD = 88;
+  const leaderLaps = maxLaps;
+  document.getElementById('map-finish-label').textContent =
+    `⭐ LEADER — ${leaderLaps} laps`;
+
+  let html = '';
+
+  // Lap tick marks (right side)
+  const step = Math.max(1, Math.ceil(maxLaps / 8));
+  for (let l = step; l <= maxLaps; l += step) {
+    const pct = BOTTOM_PAD + (l / maxLaps) * (TOP_PAD - BOTTOM_PAD);
+    html += `<div class="map-tick" style="bottom:${pct.toFixed(1)}%">${l} laps</div>`;
+  }
+
+  // Runner pins
+  groups.forEach((group, laps) => {
+    const pct = BOTTOM_PAD + (laps / maxLaps) * (TOP_PAD - BOTTOM_PAD);
+    const n = group.length;
+    const isLeader = laps === maxLaps;
+    group.forEach((s, i) => {
+      const av = CFG.AVATARS.find(a => a.id === s.equippedAvatar) || CFG.AVATARS[0];
+      // Spread students across full width, in clusters at each position
+      const leftPct = ((i + 0.5) / n) * 100;
+      html += `<div class="map-runner ${isLeader ? 'is-leader' : ''}"
+        style="bottom:${pct.toFixed(1)}%;left:${leftPct.toFixed(1)}%"
+        onclick="openModal('${s.id}')" title="${s.name} — ${laps} laps">
+        <div class="map-emoji">${av.emoji}</div>
+        <div class="map-name">${s.name.split(' ')[0]}</div>
+        <div class="map-laps">${laps}L</div>
+      </div>`;
+    });
+  });
+
+  inner.innerHTML = html;
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    LEADERBOARD                                   ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+let viewAsOfDate = null; // null = live/current
+
+function setViewAsOf(dateStr) {
+  viewAsOfDate = dateStr || null;
+  const liveBtn = document.getElementById('lb-live-btn');
+  const badge   = document.getElementById('lb-filter-badge');
+  if (liveBtn) liveBtn.classList.toggle('on', !!viewAsOfDate);
+  if (badge)   badge.textContent = viewAsOfDate ? `Showing snapshot: ${viewAsOfDate}` : '';
+  renderLeaderboard();
+}
+
+function clearViewAsOf() {
+  viewAsOfDate = null;
+  const input = document.getElementById('lb-asof');
+  if (input) input.value = '';
+  const liveBtn = document.getElementById('lb-live-btn');
+  const badge   = document.getElementById('lb-filter-badge');
+  if (liveBtn) liveBtn.classList.remove('on');
+  if (badge)   badge.textContent = '';
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const today = todayStr();
+  const asOf  = viewAsOfDate;
+
+  // Build effective student list (live or time-traveled)
+  const students = Object.values(STATE.students).map(s => {
+    if (asOf) {
+      const snap = calcStateAsOf(s, asOf);
+      return {
+        // base cosmetic fields
+        id: s.id, name: s.name,
+        equippedAvatar: s.equippedAvatar,
+        equippedBg: s.equippedBg,
+        // overwrite with snapshot values
+        relics:       snap.relics,
+        totalMiles:   snap.totalMiles,
+        totalLaps:    snap.totalLaps,
+        hasBracelet:  snap.hasBracelet,
+        title:        snap.title,
+        stampDates:   snap.stampDates,
+      };
+    }
+    return s;
+  }).sort((a,b) => b.relics - a.relics || b.totalMiles - a.totalMiles);
+
+  const grid = document.getElementById('lb-grid');
+  grid.innerHTML = students.map((s, i) => {
+    const rank = i + 1;
+    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+    const numClass  = rank===1?'gold':rank===2?'silver':rank===3?'bronze':'';
+    const av = CFG.AVATARS.find(a => a.id === s.equippedAvatar) || CFG.AVATARS[0];
+    const bg = CFG.BACKGROUNDS.find(b => b.id === s.equippedBg) || CFG.BACKGROUNDS[0];
+    // Stamped = has a stamp for today (live) or for the as-of date (snapshot)
+    const checkDate = asOf || today;
+    const stamped = (s.stampDates || []).includes(checkDate);
+
+    return `<div class="lb-row ${rankClass}" onclick="openModal('${s.id}')">
+      <div class="lb-rank-num ${numClass}">${rank===1?'👑':rank===2?'🥈':rank===3?'🥉':rank}</div>
+      <div class="lb-avatar" style="background:${bg.css}">${av.emoji}</div>
+      <div class="lb-name-block">
+        <div class="lb-name">${s.name}</div>
+        ${s.title ? `<div class="lb-title-tag">✦ ${s.title}</div>` : ''}
+      </div>
+      <div class="lb-miles">${s.totalMiles.toFixed(2)} <span>mi</span></div>
+      <div class="lb-relics">${s.relics} <small>⬡</small></div>
+      <div class="lb-badges">
+        ${s.hasBracelet ? '<span class="badge bracelet">⌚ Bracelet</span>' : '<span class="badge none">No Bracelet</span>'}
+        ${stamped ? '<span class="badge stamped">✦ Stamped</span>' : '<span class="badge none">No Stamp</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    SESSION INPUT                                 ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function renderSession() {
+  document.getElementById('sess-date').value = todayStr();
+  const students = Object.values(STATE.students)
+    .sort((a,b) => a.name.localeCompare(b.name));
+
+  const panel = document.getElementById('student-input-panel');
+  panel.innerHTML = students.map((s,i) => {
+    const bonusBtns = CFG.BONUSES.map(b =>
+      `<button class="bonus-chip" onclick="grantBonus('${s.id}','${b.id}',this)">
+        ${b.icon} ${b.label} +${b.relics}
+      </button>`
+    ).join('');
+    return `
+      <div class="student-input-row" id="srow-${s.id}">
+        <div class="sin-name">${s.name}</div>
+        <input class="lap-field" type="number" min="0" max="25" value="0"
+          id="laps-${s.id}" oninput="updateSessionTotal()" placeholder="0">
+        <div class="sin-miles" id="smiles-${s.id}">0.00 mi</div>
+        <div class="sin-relics zero" id="srelics-${s.id}">+0 ⬡</div>
+        <button class="bonus-trigger" onclick="toggleBonus('${s.id}')">⭐ Bonus</button>
+      </div>
+      <div class="bonus-panel" id="bonus-${s.id}">${bonusBtns}</div>`;
+  }).join('');
+  updateSessionTotal();
+}
+
+function toggleBonus(id) {
+  const panel = document.getElementById('bonus-'+id);
+  panel.classList.toggle('open');
+}
+
+function updateSessionTotal() {
+  let total = 0;
+  Object.values(STATE.students).forEach(s => {
+    const inp = document.getElementById('laps-'+s.id);
+    const milesEl = document.getElementById('smiles-'+s.id);
+    const relicsEl = document.getElementById('srelics-'+s.id);
+    if (!inp) return;
+    const laps = parseInt(inp.value) || 0;
+    const miles = laps * CFG.LAP_MILES;
+    const relics = Math.round(miles * CFG.RELICS_PER_MILE);
+    total += relics;
+    if (milesEl) milesEl.textContent = miles.toFixed(2) + ' mi';
+    if (relicsEl) {
+      relicsEl.textContent = relics > 0 ? '+'+relics+' ⬡' : '+0 ⬡';
+      relicsEl.className = 'sin-relics' + (relics === 0 ? ' zero' : '');
+    }
+  });
+  document.getElementById('sess-total').textContent = total;
+}
+
+function grantBonus(studentId, bonusId, btnEl) {
+  const s = STATE.students[studentId];
+  const bonus = CFG.BONUSES.find(b => b.id === bonusId);
+  if (!s || !bonus) return;
+  s.relics += bonus.relics;
+  s.bonuses.push({ type: bonusId, label: bonus.label, amount: bonus.relics, date: todayStr() });
+  save();
+  floatRelics(btnEl, '+'+bonus.relics+' ⬡');
+  showToast(`${s.name} +${bonus.relics} ⬡ — ${bonus.label}`, 'success');
+}
+
+function dayFromDate(dateStr) {
+  const names = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  return names[new Date(dateStr + 'T12:00:00').getDay()];
+}
+
+function submitSession() {
+  const date = document.getElementById('sess-date').value;
+  if (!date) { showToast('Pick a date first', 'error'); return; }
+  const day  = dayFromDate(date);
+  const week = STATE.currentWeek;
+
+  let anyLaps = false;
+  const entries = [];
+
+  Object.values(STATE.students).forEach(s => {
+    const inp = document.getElementById('laps-'+s.id);
+    const laps = parseInt(inp?.value) || 0;
+    if (laps > 0) {
+      anyLaps = true;
+      const miles = laps * CFG.LAP_MILES;
+      const relics = Math.round(miles * CFG.RELICS_PER_MILE);
+      s.relics     += relics;
+      s.totalLaps  += laps;
+      s.totalMiles  = parseFloat((s.totalMiles + miles).toFixed(3));
+      s.sessionLog.push({ date, week, day, laps, miles: parseFloat(miles.toFixed(3)), relics });
+      entries.push({ name: s.name, laps, miles: parseFloat(miles.toFixed(3)), relics });
+    }
+  });
+
+  if (!anyLaps) { showToast('Enter at least one lap count', 'error'); return; }
+  STATE.sessions.push({ date, day, week, entries, ts: Date.now() });
+  save();
+  showToast(`✦ Session logged — Relics awarded!`, 'success');
+  renderSession();
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    HISTORY                                       ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function renderHistory() {
+  const log = document.getElementById('history-log');
+
+  // Build session map directly from student sessionLogs — always in sync with edits/wipes
+  const sessionMap = {}; // keyed by date
+  Object.values(STATE.students).forEach(s => {
+    (s.sessionLog || []).forEach(l => {
+      if (!sessionMap[l.date]) {
+        sessionMap[l.date] = { date: l.date, week: l.week, day: l.day, entries: [] };
+      }
+      sessionMap[l.date].entries.push({ name: s.name, laps: l.laps, miles: l.miles, relics: l.relics });
+    });
+  });
+
+  const sessions = Object.values(sessionMap).sort((a,b) => b.date.localeCompare(a.date));
+
+  if (!sessions.length) {
+    log.innerHTML = '<div class="empty-state">No sessions logged yet.</div>';
+    return;
+  }
+
+  log.innerHTML = sessions.map(sess => {
+    const sorted = [...sess.entries].sort((a,b) => b.relics - a.relics);
+    const chips = sorted.map(e =>
+      `<span class="hist-chip">${e.name} — ${e.laps} laps · <strong>${e.relics} ⬡</strong></span>`
+    ).join('');
+    const totalLaps = sorted.reduce((a,e) => a + e.laps, 0);
+    return `<div class="hist-entry">
+      <div class="hist-entry-head">Week ${sess.week} · ${sess.day || ''} · ${sess.date} <span style="font-size:11px;color:#aaa;font-weight:400;margin-left:8px">${sorted.length} runners · ${totalLaps} laps total</span></div>
+      <div class="hist-entry-rows">${chips}</div>
+    </div>`;
+  }).join('');
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    ADMIN + PRICE EDITOR                          ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const PRICE_KEY = 'atw5k_prices';
+
+function loadPriceOverrides() {
+  try {
+    const raw = localStorage.getItem(PRICE_KEY);
+    if (!raw) return;
+    JSON.parse(raw).forEach(({ type, id, cost }) => {
+      if (type === 'shop')   { const o = CFG.SHOP.find(i => i.id === id);        if (o) o.cost = cost; }
+      if (type === 'avatar') { const o = CFG.AVATARS.find(a => a.id === id);     if (o) o.cost = cost; }
+      if (type === 'bg')     { const o = CFG.BACKGROUNDS.find(b => b.id === id); if (o) o.cost = cost; }
+    });
+  } catch(e) {}
+}
+
+function savePrices() {
+  const rows = document.querySelectorAll('#price-editor [data-price-id]');
+  const overrides = [];
+  rows.forEach(input => {
+    const type = input.dataset.priceType;
+    const id   = input.dataset.priceId;
+    const cost = parseInt(input.value);
+    if (isNaN(cost) || cost < 0) return;
+    // Mutate CFG live
+    if (type === 'shop')   { const o = CFG.SHOP.find(i => i.id === id);        if (o) o.cost = cost; }
+    if (type === 'avatar') { const o = CFG.AVATARS.find(a => a.id === id);     if (o) o.cost = cost; }
+    if (type === 'bg')     { const o = CFG.BACKGROUNDS.find(b => b.id === id); if (o) o.cost = cost; }
+    overrides.push({ type, id, cost });
+  });
+  localStorage.setItem(PRICE_KEY, JSON.stringify(overrides));
+  showToast('Prices saved ✓', 'success');
+  // Refresh the economy reference card text
+  const ref = document.querySelector('#view-admin .admin-card:last-child p');
+  if (ref) ref.innerHTML = economyReferenceHtml();
+}
+
+function economyReferenceHtml() {
+  const s = n => CFG.SHOP.find(i => i.id === n)?.cost ?? '?';
+  const a = n => CFG.AVATARS.find(i => i.id === n)?.cost ?? '?';
+  return `<strong>${CFG.RELICS_PER_MILE} Relics</strong> per mile &nbsp;·&nbsp; <strong>${Math.round(CFG.LAP_MILES * CFG.RELICS_PER_MILE)} Relics</strong> per lap<br>
+    Stamp: ${s('stamp')} &nbsp;·&nbsp; Bracelet: ${s('bracelet')} &nbsp;·&nbsp; Sticker: ${s('sticker')}<br>
+    Song: ${s('song')} &nbsp;·&nbsp; Fuel Point: ${s('fuel')} &nbsp;·&nbsp; Shoelaces: ${s('laces')}<br>
+    Avatar: ${a('lion')}–${a('eagle')} &nbsp;·&nbsp; Profile BG: ${CFG.BACKGROUNDS.find(b=>b.id==='austin')?.cost??50}<br>
+    Title: ${s('title')} &nbsp;·&nbsp; Lead Warm-Up: ${s('leadwu')}`;
+}
+
+function renderPriceEditor() {
+  const el = document.getElementById('price-editor');
+  if (!el) return;
+
+  const priceRow = (type, id, icon, name, cost) =>
+    `<div class="price-row">
+      <span class="price-row-icon">${icon}</span>
+      <span class="price-row-name">${name}</span>
+      <input class="price-input" type="number" min="0" max="9999" value="${cost}"
+        data-price-type="${type}" data-price-id="${id}"> <span style="font-size:11px;color:#888">⬡</span>
+    </div>`;
+
+  let html = '<div class="price-grid">';
+
+  // Shop items
+  CFG.SHOP.forEach(i => { html += priceRow('shop', i.id, i.icon, i.name, i.cost); });
+
+  // Paid avatars
+  CFG.AVATARS.filter(a => a.cost > 0).forEach(a => { html += priceRow('avatar', a.id, a.emoji, a.name, a.cost); });
+
+  // Paid backgrounds
+  CFG.BACKGROUNDS.filter(b => b.cost > 0).forEach(b => { html += priceRow('bg', b.id, '🖼', b.name + ' BG', b.cost); });
+
+  html += `</div><button class="price-save-btn" onclick="savePrices()">💾 Save Prices</button>`;
+  el.innerHTML = html;
+}
+
+function renderAdmin() {
+  renderPriceEditor();
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = CFG.DESTINATIONS.map(d =>
+    `<button class="week-chip ${STATE.currentWeek===d.week?'active':''}"
+       onclick="setWeek(${d.week})">
+       ${d.flag} W${d.week} ${d.name}
+     </button>`
+  ).join('');
+}
+
+function setWeek(w) {
+  STATE.currentWeek = w;
+  save();
+  const dest = getDestination(w);
+  applyTheme(dest);
+  renderAdmin();
+  showToast(`Destination set: ${dest.name} ${dest.flag}`, 'info');
+}
+
+function confirmReset() {
+  if (confirm('RESET ALL DATA? This cannot be undone. Export a backup first.')) {
+    localStorage.removeItem(STORE_KEY);
+    STATE = initState();
+    save();
+    renderLeaderboard();
+    showToast('Data reset. Starting fresh.', 'info');
+  }
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    STUDENT MODAL                                 ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+let activeStudentId = null;
+let activeModalTab  = 'shop';
+
+function openModal(id) {
+  activeStudentId = id;
+  activeModalTab  = 'shop';
+  renderModal();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  activeStudentId = null;
+  renderLeaderboard();
+}
+
+function renderModal() {
+  const s = STATE.students[activeStudentId];
+  if (!s) return;
+  const av = CFG.AVATARS.find(a => a.id === s.equippedAvatar) || CFG.AVATARS[0];
+  const bg = CFG.BACKGROUNDS.find(b => b.id === s.equippedBg) || CFG.BACKGROUNDS[0];
+
+  // Header
+  document.getElementById('modal-header').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-avatar-wrap">
+      <div class="modal-avatar-circle" style="background:${bg.css}">${av.emoji}</div>
+      <div class="modal-name-block">
+        <div class="modal-runner-name">${s.name}</div>
+        ${s.title ? `<div class="modal-runner-title" style="color:var(--t-accent)">✦ ${s.title}</div>` : ''}
+      </div>
+    </div>
+    <div class="modal-stats-row">
+      <div class="mstat"><div class="mstat-val" style="color:var(--t-accent)">${s.relics}</div><div class="mstat-label">Relics</div></div>
+      <div class="mstat"><div class="mstat-val">${s.totalMiles.toFixed(2)}</div><div class="mstat-label">Miles</div></div>
+      <div class="mstat"><div class="mstat-val">${s.totalLaps}</div><div class="mstat-label">Laps</div></div>
+      <div class="mstat"><div class="mstat-val">${s.hasBracelet?'⌚':'—'}</div><div class="mstat-label">Bracelet</div></div>
+    </div>`;
+
+  // Tabs
+  const tabs = ['shop','loadout','inventory','history','edit'];
+  const tabLabels = { shop:'🛒 Shop', loadout:'🎨 Loadout', inventory:'🎁 Items', history:'📋 Log', edit:'⚙ Edit' };
+  document.getElementById('modal-tabs').innerHTML = tabs.map(t =>
+    `<button class="modal-tab ${activeModalTab===t?'active':''}" onclick="switchModalTab('${t}')">${tabLabels[t]}</button>`
+  ).join('');
+
+  renderModalTab();
+}
+
+function switchModalTab(tab) {
+  activeModalTab = tab;
+  renderModal();
+}
+
+function renderModalTab() {
+  const s = STATE.students[activeStudentId];
+  const body = document.getElementById('modal-body');
+  if (activeModalTab === 'shop')      body.innerHTML = renderShopTab(s);
+  if (activeModalTab === 'loadout')   body.innerHTML = renderLoadoutTab(s);
+  if (activeModalTab === 'inventory') body.innerHTML = renderInventoryTab(s);
+  if (activeModalTab === 'history')   body.innerHTML = renderHistoryTab(s);
+  if (activeModalTab === 'edit')      body.innerHTML = renderEditTab(s);
+}
+
+// ── SHOP TAB ──────────────────────────────────────────────
+function renderShopTab(s) {
+  const today = todayStr();
+  const stamped = (s.stampDates || []).includes(today);
+
+  const braceGate = s.hasBracelet
+    ? `<span class="gate-action ga-owned">✓ Owned</span>`
+    : s.relics >= 30
+      ? `<button class="gate-action ga-buy" onclick="purchase('bracelet')">Buy — 30 ⬡</button>`
+      : `<button class="gate-action ga-locked" disabled>30 ⬡ needed</button>`;
+
+  const stampGate = stamped
+    ? `<span class="gate-action ga-owned">✓ Done today</span>`
+    : s.relics >= 5
+      ? `<button class="gate-action ga-buy" onclick="purchase('stamp')">Buy — 5 ⬡</button>`
+      : `<button class="gate-action ga-locked" disabled>5 ⬡ needed</button>`;
+
+  let html = `<div class="gate-block">
+    <div class="gate-row">
+      <div class="gate-icon">${s.hasBracelet?'✅':'🔒'}</div>
+      <div class="gate-label">Runner's Bracelet <span class="gate-sub">— unlocks the full shop</span></div>
+      ${braceGate}
+    </div>
+    <div class="gate-row">
+      <div class="gate-icon">${stamped?'✅':'🔒'}</div>
+      <div class="gate-label">Daily Passport Stamp <span class="gate-sub">— required each session</span></div>
+      ${stampGate}
+    </div>
+  </div>`;
+
+  if (!s.hasBracelet) {
+    html += `<div class="shop-locked">🔒 Purchase the Runner's Bracelet to unlock the shop.</div>`;
+  } else if (!stamped) {
+    html += `<div class="shop-locked">📋 Buy today's Passport Stamp to open the shop.</div>`;
+  } else {
+    html += `<div class="shop-section-label">Items</div>`;
+    CFG.SHOP.filter(i => !i.isStamp && !i.isBracelet && i.cat !== 'cosmetic').forEach(item => {
+      const canAfford = s.relics >= item.cost;
+      html += `<div class="shop-item ${!canAfford?'dim':''}">
+        <span class="shop-item-icon">${item.icon}</span>
+        <div class="shop-item-info">
+          <div class="shop-item-name">${item.name}</div>
+          <div class="shop-item-desc">${item.desc}</div>
+        </div>
+        <div class="shop-item-price">${item.cost} <small>⬡</small></div>
+        <button class="shop-buy-btn" onclick="purchase('${item.id}')" ${!canAfford?'disabled':''}>
+          ${canAfford ? 'Buy' : 'Need more'}
+        </button>
+      </div>`;
+    });
+
+    html += `<div class="shop-section-label">Cosmetics</div>`;
+    CFG.AVATARS.filter(a => a.cost > 0 && !s.ownedAvatars.includes(a.id)).forEach(av => {
+      const canAfford = s.relics >= av.cost;
+      html += `<div class="shop-item ${!canAfford?'dim':''}">
+        <span class="shop-item-icon">${av.emoji}</span>
+        <div class="shop-item-info">
+          <div class="shop-item-name">${av.name}</div>
+          <div class="shop-item-desc">Avatar — unlock and equip in Loadout</div>
+        </div>
+        <div class="shop-item-price">${av.cost} <small>⬡</small></div>
+        <button class="shop-buy-btn" onclick="buyAvatar('${av.id}')" ${!canAfford?'disabled':''}>
+          ${canAfford?'Buy':'Need more'}
+        </button>
+      </div>`;
+    });
+    CFG.BACKGROUNDS.filter(b => b.cost > 0 && !s.ownedBgs.includes(b.id)).forEach(bg => {
+      const canAfford = s.relics >= bg.cost;
+      html += `<div class="shop-item ${!canAfford?'dim':''}">
+        <span class="shop-item-icon" style="width:28px;height:28px;border-radius:6px;background:${bg.css};display:inline-block;"></span>
+        <div class="shop-item-info">
+          <div class="shop-item-name">${bg.name} Profile</div>
+          <div class="shop-item-desc">Profile background — equip in Loadout</div>
+        </div>
+        <div class="shop-item-price">${bg.cost} <small>⬡</small></div>
+        <button class="shop-buy-btn" onclick="buyBg('${bg.id}')" ${!canAfford?'disabled':''}>
+          ${canAfford?'Buy':'Need more'}
+        </button>
+      </div>`;
+    });
+
+    const titleItem = CFG.SHOP.find(i => i.isTitle);
+    const canTitle = s.relics >= titleItem.cost;
+    html += `<div class="shop-item ${!canTitle?'dim':''}">
+      <span class="shop-item-icon">${titleItem.icon}</span>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${titleItem.name}</div>
+        <div class="shop-item-desc">${titleItem.desc}</div>
+      </div>
+      <div class="shop-item-price">${titleItem.cost} <small>⬡</small></div>
+      <button class="shop-buy-btn" onclick="openTitlePicker()" ${!canTitle?'disabled':''}>
+        ${canTitle?'Buy':'Need more'}
+      </button>
+    </div>`;
+  }
+
+  return html;
+}
+
+// ── LOADOUT TAB ───────────────────────────────────────────
+function renderLoadoutTab(s) {
+  const avRows = CFG.AVATARS.map(av => {
+    const owned    = s.ownedAvatars.includes(av.id);
+    const equipped = s.equippedAvatar === av.id;
+    const cls = equipped ? 'equipped' : owned ? 'owned' : 'locked';
+    const status = equipped ? '<div class="cosmetic-item-status">EQUIPPED</div>' : owned ? '<div class="cosmetic-item-status" style="color:#aaa">OWNED</div>' : '';
+    return `<div class="cosmetic-item ${cls}" onclick="${owned && !equipped ? `equipAvatar('${av.id}')` : ''}">
+      <span class="cosmetic-item-emoji">${av.emoji}</span>
+      <div class="cosmetic-item-name">${av.name}</div>
+      ${av.cost > 0 && !owned ? `<div class="cosmetic-item-cost">${av.cost} ⬡</div>` : status}
+    </div>`;
+  }).join('');
+
+  const bgRows = CFG.BACKGROUNDS.map(bg => {
+    const owned    = s.ownedBgs.includes(bg.id);
+    const equipped = s.equippedBg === bg.id;
+    const cls = equipped ? 'equipped' : owned ? 'owned' : 'locked';
+    return `<div class="bg-item ${cls}" style="background:${bg.css}" onclick="${owned && !equipped ? `equipBg('${bg.id}')` : ''}">
+      <div style="text-align:center">
+        <div class="bg-item-name">${bg.name}</div>
+        ${!owned ? `<div class="bg-item-cost">${bg.cost} ⬡</div>` : ''}
+        ${equipped ? '<div class="bg-item-cost" style="color:#90ee90">✓ EQUIPPED</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="shop-section-label" style="margin-top:0">Avatars</div>
+    <div class="cosmetic-grid">${avRows}</div>
+    <div class="shop-section-label">Profile Backgrounds</div>
+    <div class="bg-grid">${bgRows}</div>`;
+}
+
+// ── HISTORY TAB ───────────────────────────────────────────
+function renderHistoryTab(s) {
+  const allItems = [
+    ...s.purchases.map(p => ({ ...p, type: 'purchase' })),
+    ...s.bonuses.map(b => ({ ...b, type: 'bonus', itemName: b.label, cost: -b.amount })),
+    ...s.sessionLog.map(l => ({ type: 'session', itemName: `Ran ${l.laps} laps (${l.miles.toFixed(2)} mi)`, cost: -l.relics, date: l.date })),
+    ...(s.manualAdjustments||[]).map(a => ({ type: 'manual', itemName: `Manual: ${a.reason||'Adjustment'}`, cost: -a.amount, date: a.date })),
+  ].sort((a,b) => b.date.localeCompare(a.date));
+
+  if (!allItems.length) return '<div class="empty-state" style="color:#666">No activity yet.</div>';
+
+  return allItems.map(item => {
+    const isEarn = item.type === 'session' || item.type === 'bonus' || (item.type === 'manual' && item.cost < 0);
+    const costStr = isEarn ? `+${Math.abs(item.cost)} ⬡` : `-${Math.abs(item.cost)} ⬡`;
+    const costColor = isEarn ? '#1a9e53' : '#cc4444';
+    return `<div class="ph-item">
+      <span class="ph-name">${item.itemName}</span>
+      <span class="ph-date">${item.date}</span>
+      <span class="ph-cost" style="color:${costColor}">${costStr}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── INVENTORY TAB ─────────────────────────────────────
+function renderInventoryTab(s) {
+  // Count purchases by itemId
+  const bought = {};
+  (s.purchases || []).forEach(p => { bought[p.itemId] = (bought[p.itemId] || 0) + 1; });
+
+  const row = (icon, name, status, owned, count) => {
+    const countHtml = count > 1 ? `<span class="inv-count">×${count}</span>` : '';
+    const statusHtml = status ? `<span class="inv-status-badge">${status}</span>` : '';
+    return `<div class="inv-item ${owned ? 'owned' : 'locked'}">
+      <div class="inv-icon">${icon}</div>
+      <div class="inv-name">${name}</div>
+      ${countHtml}${statusHtml}
+    </div>`;
+  };
+
+  // ── Gate Unlocks ──
+  const stampCount = (s.stampDates || []).length;
+  let html = `<div class="inv-section">
+    <div class="inv-section-title">🎖 Unlocks</div>
+    ${row('⌚', "Runner's Bracelet", s.hasBracelet ? '✓ Owned' : null, s.hasBracelet, 1)}
+    ${row('📋', `Passport Stamps`, stampCount > 0 ? `${stampCount} total` : null, stampCount > 0, stampCount)}
+  </div>`;
+
+  // ── Items ──
+  const shopItems = CFG.SHOP.filter(i => !i.isStamp && !i.isBracelet && !i.isTitle);
+  const hasAnyItem = shopItems.some(i => bought[i.id]);
+  html += `<div class="inv-section">
+    <div class="inv-section-title">🎁 Items Purchased</div>`;
+  shopItems.forEach(item => {
+    const n = bought[item.id] || 0;
+    html += row(item.icon, item.name, n > 0 ? null : null, n > 0, n || 1);
+  });
+  html += '</div>';
+
+  // ── Title ──
+  html += `<div class="inv-section">
+    <div class="inv-section-title">🏅 Title</div>
+    ${row('🏅', s.title ? `"${s.title}"` : 'No title yet', s.title ? '✦ Active' : null, !!s.title, 1)}
+  </div>`;
+
+  // ── Cosmetics ──
+  html += `<div class="inv-section">
+    <div class="inv-section-title">🎨 Cosmetics</div>`;
+  CFG.AVATARS.forEach(av => {
+    const owns = s.ownedAvatars.includes(av.id);
+    const equipped = s.equippedAvatar === av.id;
+    html += row(av.emoji, av.name, equipped ? '✓ Equipped' : owns ? 'Owned' : null, owns, 1);
+  });
+  CFG.BACKGROUNDS.forEach(bg => {
+    const owns = s.ownedBgs.includes(bg.id);
+    const equipped = s.equippedBg === bg.id;
+    html += row('🖼', bg.name + ' BG', equipped ? '✓ Equipped' : owns ? 'Owned' : null, owns, 1);
+  });
+  html += '</div>';
+
+  return html;
+}
+
+// ── EDIT TAB (admin) ──────────────────────────────────────
+function renderEditTab(s) {
+  // Build chronological transaction list preserving original indices for deletion
+  const allTxns = [];
+  (s.sessionLog || []).forEach((l, i) => allTxns.push({
+    type: 'session', idx: i,
+    label: `Session W${l.week} ${l.day} — ${l.laps} laps`,
+    amount: +l.relics, date: l.date,
+  }));
+  (s.bonuses || []).forEach((b, i) => allTxns.push({
+    type: 'bonus', idx: i,
+    label: `Bonus — ${b.label}`,
+    amount: +b.amount, date: b.date,
+  }));
+  (s.purchases || []).forEach((p, i) => allTxns.push({
+    type: 'purchase', idx: i,
+    label: `Purchase — ${p.itemName}`,
+    amount: -p.cost, date: p.date,
+  }));
+  (s.manualAdjustments || []).forEach((a, i) => allTxns.push({
+    type: 'manual', idx: i,
+    label: `Manual — ${a.reason || 'Adjustment'}`,
+    amount: a.amount, date: a.date,
+  }));
+  allTxns.sort((a,b) => b.date.localeCompare(a.date) || b.idx - a.idx);
+
+  const txnHtml = allTxns.length === 0
+    ? '<div style="color:#555;font-size:12px;padding:8px 0">No transactions yet.</div>'
+    : allTxns.map(t => {
+        const dotCls = t.type === 'purchase' ? 'spend' : t.type === 'manual' && t.amount < 0 ? 'spend' : 'earn';
+        const amtStr = (t.amount >= 0 ? '+' : '') + t.amount + ' ⬡';
+        const amtColor = t.amount >= 0 ? '#1a9e53' : '#cc4444';
+        return `<div class="txn-item">
+          <div class="txn-dot ${dotCls}"></div>
+          <div class="txn-label" title="${t.label}">${t.label}</div>
+          <div class="txn-date">${t.date}</div>
+          <div class="txn-amt" style="color:${amtColor}">${amtStr}</div>
+          <button class="txn-del" onclick="deleteTxn('${s.id}','${t.type}',${t.idx})">✕</button>
+        </div>`;
+      }).join('');
+
+  const sortedStamps = [...(s.stampDates || [])].sort((a,b) => b.localeCompare(a));
+  const stampHtml = sortedStamps.length === 0
+    ? '<div style="color:#555;font-size:12px;padding:8px 0">No stamps yet.</div>'
+    : sortedStamps.map(d =>
+        `<div class="stamp-pill">
+          📋 ${d}
+          <button class="txn-del" onclick="removeStamp('${s.id}','${d}')">✕</button>
+        </div>`
+      ).join('');
+
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Manual Relic Adjustment</div>
+      <div class="edit-row">
+        <input class="edit-input" type="number" id="edit-adj-amount" placeholder="e.g. 10 or -5" style="max-width:110px">
+        <input class="edit-input" type="text" id="edit-adj-reason" placeholder="Reason (required)">
+        <button class="edit-apply-btn" onclick="applyManualAdj('${s.id}')">Apply</button>
+      </div>
+      <div class="edit-hint">Positive = add Relics &nbsp;·&nbsp; Negative = deduct Relics.</div>
+    </div>
+
+    <div class="edit-section">
+      <div class="edit-section-title">Bracelet Status</div>
+      <div class="edit-row">
+        <span style="font-size:13px;color:#ccc;flex:1">${s.hasBracelet ? '⌚ Bracelet granted' : '— No bracelet'}</span>
+        <button class="edit-toggle-btn ${s.hasBracelet?'on':''}"
+          onclick="toggleBracelet('${s.id}')">
+          ${s.hasBracelet ? 'Revoke' : 'Grant Bracelet'}
+        </button>
+      </div>
+      <div class="edit-hint">Does not touch the Relic balance — cosmetic override only.</div>
+    </div>
+
+    <div class="edit-section">
+      <div class="edit-section-title">Passport Stamps (${sortedStamps.length})</div>
+      ${stampHtml}
+    </div>
+
+    <div class="edit-section">
+      <div class="edit-section-title">⚠ Admin Actions</div>
+      <button class="edit-danger-btn" onclick="clearAllPurchases('${s.id}')">
+        🗑 Clear All Purchases — removes all shop items, resets bracelet &amp; title (keeps miles &amp; Relics from running)
+      </button>
+      <button class="edit-danger-btn" onclick="wipeStudent('${s.id}')">
+        💥 Wipe Student — resets everything to zero (miles, laps, Relics, all history)
+      </button>
+    </div>
+
+    <div class="edit-section">
+      <div class="edit-section-title">Transaction Log — click ✕ to delete an entry</div>
+      ${txnHtml}
+    </div>`;
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    ADMIN EDIT ACTIONS                            ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function applyManualAdj(studentId) {
+  const s = STATE.students[studentId];
+  const amountEl = document.getElementById('edit-adj-amount');
+  const reasonEl = document.getElementById('edit-adj-reason');
+  const amount = parseInt(amountEl.value);
+  const reason = (reasonEl.value || '').trim();
+  if (isNaN(amount) || amount === 0) { showToast('Enter a non-zero amount', 'error'); return; }
+  if (!reason) { showToast('Add a reason first', 'error'); return; }
+  if (!s.manualAdjustments) s.manualAdjustments = [];
+  s.manualAdjustments.push({ amount, reason, date: todayStr() });
+  recalcRelics(s);
+  save();
+  amountEl.value = '';
+  reasonEl.value = '';
+  showToast(`${amount > 0 ? '+' : ''}${amount} ⬡ — ${reason}`, 'success');
+  renderModal();
+}
+
+function toggleBracelet(studentId) {
+  const s = STATE.students[studentId];
+  s.hasBracelet = !s.hasBracelet;
+  save();
+  showToast(s.hasBracelet ? '⌚ Bracelet granted' : 'Bracelet revoked', 'info');
+  renderModal();
+}
+
+function removeStamp(studentId, dateStr) {
+  const s = STATE.students[studentId];
+  s.stampDates = (s.stampDates || []).filter(d => d !== dateStr);
+  save();
+  showToast(`Stamp removed: ${dateStr}`, 'info');
+  renderModal();
+}
+
+function deleteTxn(studentId, type, idx) {
+  const s = STATE.students[studentId];
+  let label = '';
+  if (type === 'session') {
+    const removed = s.sessionLog.splice(idx, 1)[0];
+    label = `Session deleted (${removed.date}, ${removed.laps} laps)`;
+  } else if (type === 'bonus') {
+    const removed = s.bonuses.splice(idx, 1)[0];
+    label = `Bonus deleted: ${removed.label}`;
+  } else if (type === 'purchase') {
+    const removed = s.purchases.splice(idx, 1)[0];
+    // If bracelet purchase is deleted, revoke the bracelet flag
+    if (removed.itemId === 'bracelet') s.hasBracelet = false;
+    label = `Purchase deleted: ${removed.itemName}`;
+  } else if (type === 'manual') {
+    const removed = (s.manualAdjustments || []).splice(idx, 1)[0];
+    label = `Manual adjustment deleted`;
+  }
+  recalcRelics(s);
+  save();
+  showToast(label, 'info');
+  renderModal();
+}
+
+function clearAllPurchases(studentId) {
+  if (!confirm(`Clear ALL purchases for this student? Their Relics from running and session history are kept.`)) return;
+  const s = STATE.students[studentId];
+  s.purchases = [];
+  s.hasBracelet = false;
+  s.title = null;
+  s.ownedAvatars = ['koala'];
+  s.equippedAvatar = 'koala';
+  s.ownedBgs = ['parchment'];
+  s.equippedBg = 'parchment';
+  recalcRelics(s);
+  save();
+  showToast('All purchases cleared.', 'info');
+  renderModal();
+}
+
+function wipeStudent(studentId) {
+  const s = STATE.students[studentId];
+  if (!confirm(`WIPE ${s.name}? This erases ALL data — miles, laps, Relics, history, purchases. Cannot undo.`)) return;
+  const fresh = makeStudent({ id: s.id, name: s.name });
+  STATE.students[studentId] = fresh;
+  save();
+  showToast(`${s.name} wiped to zero.`, 'info');
+  renderModal();
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    SHOP LOGIC                                    ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function purchase(itemId) {
+  const s = STATE.students[activeStudentId];
+  const item = CFG.SHOP.find(i => i.id === itemId);
+  if (!s || !item) return;
+  if (s.relics < item.cost) { showToast('Not enough Relics', 'error'); return; }
+
+  s.relics -= item.cost;
+  if (item.isBracelet) s.hasBracelet = true;
+  if (item.isStamp) {
+    const today = todayStr();
+    if (!(s.stampDates || []).includes(today)) {
+      if (!s.stampDates) s.stampDates = [];
+      s.stampDates.push(today);
+    }
+  }
+  s.purchases.push({ itemId, itemName: item.name, cost: item.cost, date: todayStr() });
+
+  save();
+  showToast(`✦ ${item.name} purchased!`, 'success');
+  floatRelics(document.getElementById('modal'), `-${item.cost} ⬡`);
+  renderModal();
+}
+
+function buyAvatar(avId) {
+  const s = STATE.students[activeStudentId];
+  const av = CFG.AVATARS.find(a => a.id === avId);
+  if (!s || !av || s.relics < av.cost) return;
+  s.relics -= av.cost;
+  s.ownedAvatars.push(avId);
+  s.equippedAvatar = avId;
+  s.purchases.push({ itemId:'avatar_'+avId, itemName: av.name+' Avatar', cost: av.cost, date: todayStr() });
+  save();
+  showToast(`${av.emoji} ${av.name} unlocked & equipped!`, 'success');
+  renderModal();
+}
+
+function buyBg(bgId) {
+  const s = STATE.students[activeStudentId];
+  const bg = CFG.BACKGROUNDS.find(b => b.id === bgId);
+  if (!s || !bg || s.relics < bg.cost) return;
+  s.relics -= bg.cost;
+  s.ownedBgs.push(bgId);
+  s.equippedBg = bgId;
+  s.purchases.push({ itemId:'bg_'+bgId, itemName: bg.name+' Background', cost: bg.cost, date: todayStr() });
+  save();
+  showToast(`✦ ${bg.name} background unlocked!`, 'success');
+  renderModal();
+}
+
+function equipAvatar(avId) {
+  const s = STATE.students[activeStudentId];
+  if (!s) return;
+  s.equippedAvatar = avId;
+  save();
+  renderModal();
+}
+
+function equipBg(bgId) {
+  const s = STATE.students[activeStudentId];
+  if (!s) return;
+  s.equippedBg = bgId;
+  save();
+  renderModal();
+}
+
+// ── Title Picker ─────────────────────────────────────────
+let pendingTitle = null;
+
+function openTitlePicker() {
+  const s = STATE.students[activeStudentId];
+  if (!s || s.relics < 75) return;
+  pendingTitle = null;
+  const picker = document.getElementById('title-picker');
+  const opts = document.getElementById('title-options');
+  opts.innerHTML = CFG.TITLES.map(t =>
+    `<div class="title-option" onclick="selectTitle('${t}',this)">
+      <span class="title-text">✦ ${t}</span>
+    </div>`
+  ).join('');
+  document.getElementById('tp-confirm').disabled = true;
+  picker.classList.add('open');
+}
+
+function selectTitle(title, el) {
+  pendingTitle = title;
+  document.querySelectorAll('.title-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('tp-confirm').disabled = false;
+}
+
+function confirmTitle() {
+  if (!pendingTitle || !activeStudentId) return;
+  const s = STATE.students[activeStudentId];
+  const titleItem = CFG.SHOP.find(i => i.isTitle);
+  if (s.relics < titleItem.cost) { showToast('Not enough Relics', 'error'); return; }
+  s.relics -= titleItem.cost;
+  s.title = pendingTitle;
+  s.purchases.push({ itemId:'title', itemName:`Title: ${pendingTitle}`, cost: titleItem.cost, date: todayStr() });
+  save();
+  closeTitlePicker();
+  showToast(`🏅 "${pendingTitle}" — title equipped!`, 'success');
+  renderModal();
+}
+
+function closeTitlePicker() {
+  document.getElementById('title-picker').classList.remove('open');
+  pendingTitle = null;
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    MISSION BRIEFING                              ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+let briefDay = 'Tuesday';
+
+function openBriefing() {
+  const dest = getDestination(STATE.currentWeek);
+  document.getElementById('br-flag').textContent = dest.flag;
+  document.getElementById('br-dest').textContent = dest.name;
+  document.getElementById('br-subtitle').textContent = dest.subtitle;
+  // Sync to whichever day is selected in the Mission tab
+  briefDay = missionDay;
+  document.querySelectorAll('.day-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === missionDay);
+  });
+  setBriefDay(briefDay, null);
+  document.getElementById('briefing-overlay').classList.add('open');
+}
+
+function setBriefDay(day, btn) {
+  briefDay = day;
+  const dest = getDestination(STATE.currentWeek);
+  document.getElementById('br-msg').textContent =
+    day === 'Tuesday' ? dest.missionTue : dest.missionThu;
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function closeBriefing() {
+  document.getElementById('briefing-overlay').classList.remove('open');
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    EXPORT / IMPORT                               ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(STATE, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relic-backup-${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('JSON backup downloaded', 'success');
+}
+
+function exportCSV() {
+  const rows = [
+    ['Name','Relics','Total Miles','Total Laps','Has Bracelet','Title','Avatar','Profile BG',
+     'Stamp Count','Last Stamp','Sessions Count','Bonuses Count','Manual Adjustments'],
+  ];
+  Object.values(STATE.students).sort((a,b) => b.relics - a.relics).forEach(s => {
+    const av = CFG.AVATARS.find(a => a.id === s.equippedAvatar)?.name || s.equippedAvatar;
+    const bg = CFG.BACKGROUNDS.find(b => b.id === s.equippedBg)?.name || s.equippedBg;
+    const stamps = s.stampDates || [];
+    const lastStamp = stamps.length ? [...stamps].sort().pop() : 'Never';
+    const manualTotal = (s.manualAdjustments||[]).reduce((a,m) => a + m.amount, 0);
+    rows.push([
+      s.name, s.relics, s.totalMiles.toFixed(3), s.totalLaps,
+      s.hasBracelet ? 'Yes' : 'No',
+      s.title || '', av, bg,
+      stamps.length, lastStamp,
+      s.sessionLog.length, s.bonuses.length,
+      manualTotal !== 0 ? (manualTotal > 0 ? '+' : '') + manualTotal : '0',
+    ]);
+  });
+
+  rows.push([]);
+  rows.push(['SESSION LOG']);
+  rows.push(['Date','Week','Day','Student','Laps','Miles','Relics']);
+  STATE.sessions.forEach(sess => {
+    sess.entries.forEach(e => {
+      rows.push([sess.date, sess.week, sess.day, e.name, e.laps, e.miles, e.relics]);
+    });
+  });
+
+  rows.push([]);
+  rows.push(['MANUAL ADJUSTMENTS']);
+  rows.push(['Date','Student','Amount','Reason']);
+  Object.values(STATE.students).forEach(s => {
+    (s.manualAdjustments||[]).forEach(a => {
+      rows.push([a.date, s.name, a.amount, a.reason || '']);
+    });
+  });
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relic-data-${todayStr()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV exported — open in Google Sheets or Excel', 'success');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.students) throw new Error('Invalid backup file');
+      // Run migration on import too
+      Object.values(imported.students).forEach(s => {
+        if (!s.stampDates) {
+          s.stampDates = s.lastStampDate ? [s.lastStampDate] : [];
+          delete s.lastStampDate;
+        }
+        if (!s.manualAdjustments) s.manualAdjustments = [];
+      });
+      STATE = imported;
+      save();
+      applyTheme(getDestination(STATE.currentWeek));
+      renderLeaderboard();
+      renderAdmin();
+      showToast('Backup restored successfully!', 'success');
+    } catch(err) {
+      showToast('Invalid backup file', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    UTILITIES                                     ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function floatRelics(anchor, text) {
+  const el = document.createElement('div');
+  el.className = 'float-relic';
+  el.textContent = text;
+  const rect = anchor ? anchor.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
+  el.style.left = (rect.left + rect.width/2 - 30) + 'px';
+  el.style.top  = (rect.top - 10) + 'px';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    INIT                                          ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+(function init() {
+  loadPriceOverrides();       // apply any saved price overrides before anything renders
+  const dest = getDestination(STATE.currentWeek);
+  applyTheme(dest);
+  renderMission();
+  renderSession();
+})();
+</script>
+</body>
+</html>
