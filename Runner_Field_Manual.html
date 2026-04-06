@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Around the World 5K — Runner's Field Manual</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Lato:wght@300;400;700&family=UnifrakturMaguntia&display=swap');
+
+  :root {
+    --gold: #D4AF37;
+    --gold-light: #F0D060;
+    --dark: #1a1208;
+    --parchment: #f5e6c8;
+    --parchment-dark: #e8d0a0;
+    --red: #8B1A1A;
+    --ink: #2a1f0e;
+    --border: #8B6914;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lato', Georgia, serif;
+    background: #111;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* ── PAGE SHELL ── */
+  .page {
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto 40px;
+    background: var(--parchment);
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  /* ── AIRMAIL BORDER ── */
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 14px solid transparent;
+    border-image: repeating-linear-gradient(
+      45deg,
+      #B22222 0px, #B22222 10px,
+      #fff 10px, #fff 20px,
+      #1B3A8A 20px, #1B3A8A 30px,
+      #fff 30px, #fff 40px
+    ) 14;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .page-inner {
+    padding: 0.55in 0.6in 0.5in;
+    min-height: 11in;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 11in;
+  }
+
+  .cover-inner {
+    padding: 0.6in 0.7in;
+    width: 100%;
+    min-height: 11in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cover-badge {
+    border: 3px solid var(--gold);
+    border-radius: 50%;
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    margin: 0 auto 22px;
+    background: radial-gradient(circle, #2a1f0e 60%, #1a1208 100%);
+    box-shadow: 0 0 0 6px rgba(212,175,55,0.15), 0 0 30px rgba(212,175,55,0.2);
+  }
+
+  .cover-eyebrow {
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .cover-title {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    text-shadow: 2px 2px 12px rgba(212,175,55,0.4);
+  }
+
+  .cover-title span { color: var(--gold); }
+
+  .cover-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 30px;
+  }
+
+  .cover-divider {
+    width: 220px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 0 auto 28px;
+  }
+
+  .cover-manual-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: #aaa;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+  }
+
+  .cover-world-strip {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 50px;
+    padding: 0 20px;
+  }
+
+  .cover-flag {
+    font-size: 26px;
+    opacity: 0.85;
+  }
+
+  .cover-footer {
+    font-family: 'Lato', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  .cover-stat-row {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .cover-stat {
+    text-align: center;
+  }
+
+  .cover-stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+
+  .cover-stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #777;
+    text-transform: uppercase;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .chapter-header {
+    text-align: center;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+    position: relative;
+  }
+
+  .chapter-num {
+    font-family: 'Lato', sans-serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--border);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+
+  .chapter-title {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.2;
+  }
+
+  .chapter-title .icon { margin-right: 8px; }
+
+  .chapter-sub {
+    font-size: 11px;
+    color: #7a6030;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* corner ornaments */
+  .chapter-header::before, .chapter-header::after {
+    content: '❧';
+    position: absolute;
+    bottom: -10px;
+    font-size: 14px;
+    color: var(--gold);
+  }
+  .chapter-header::before { left: 0; }
+  .chapter-header::after { right: 0; }
+
+  /* ── CONTENT BLOCKS ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* callout box */
+  .callout {
+    border: 2px solid var(--gold);
+    background: rgba(212,175,55,0.08);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    position: relative;
+  }
+
+  .callout-label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+
+  .callout p { font-size: 12px; color: var(--ink); }
+
+  /* alert box */
+  .alert {
+    border: 2px solid var(--red);
+    background: rgba(139,26,26,0.06);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin: 14px 0;
+  }
+
+  .alert-label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+
+  .alert p { font-size: 12px; color: var(--ink); }
+
+  /* info card */
+  .card {
+    background: rgba(139,105,20,0.06);
+    border: 1px solid var(--parchment-dark);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+
+  .card p { font-size: 11.5px; color: #4a3a1a; }
+
+  /* item row */
+  .item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(139,105,20,0.2);
+  }
+
+  .item-row:last-child { border-bottom: none; }
+
+  .item-icon {
+    font-size: 20px;
+    min-width: 28px;
+    text-align: center;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  .item-body { flex: 1; }
+
+  .item-name {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  .item-desc { font-size: 11px; color: #5a4a2a; margin-top: 2px; }
+
+  .item-cost {
+    background: var(--dark);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 52px;
+    text-align: center;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* destination stop */
+  .dest-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    background: rgba(139,105,20,0.05);
+    border: 1px solid rgba(139,105,20,0.15);
+  }
+
+  .dest-flag { font-size: 22px; min-width: 30px; }
+  .dest-week {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--border);
+    min-width: 48px;
+  }
+  .dest-name {
+    font-family: 'Cinzel', serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--dark);
+    flex: 1;
+  }
+  .dest-sub { font-size: 10px; color: #7a6030; font-style: italic; }
+
+  /* stat block (like D&D) */
+  .stat-block {
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    background: rgba(212,175,55,0.05);
+    text-align: center;
+  }
+
+  .stat-block .num {
+    font-family: 'Cinzel', serif;
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--dark);
+    line-height: 1;
+  }
+
+  .stat-block .label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--border);
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .stat-block .sub {
+    font-size: 10px;
+    color: #7a6030;
+    font-style: italic;
+    margin-top: 3px;
+  }
+
+  /* numbered steps */
+  .step-list { list-style: none; counter-reset: steps; }
+
+  .step-list li {
+    counter-increment: steps;
+    padding: 8px 12px 8px 38px;
+    position: relative;
+    border-bottom: 1px solid rgba(139,105,20,0.15);
+    font-size: 12px;
+  }
+
+  .step-list li:last-child { border-bottom: none; }
+
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 8px;
+    top: 7px;
+    width: 20px;
+    height: 20px;
+    background: var(--dark);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 20px;
+  }
+
+  .step-strong { font-weight: 700; color: var(--dark); }
+
+  /* badge row */
+  .avatar-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+  }
+
+  .avatar-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 10px;
+    background: rgba(139,105,20,0.06);
+    border: 1px solid rgba(139,105,20,0.2);
+    border-radius: 6px;
+    min-width: 70px;
+  }
+
+  .avatar-chip .emoji { font-size: 22px; }
+  .avatar-chip .name { font-size: 9px; font-weight: 700; color: var(--dark); text-align: center; line-height: 1.2; }
+  .avatar-chip .cost {
+    font-size: 9px;
+    color: var(--border);
+    font-weight: 700;
+  }
+
+  /* quick reference page */
+  .ref-page { background: var(--dark); }
+
+  .ref-page .page-inner {
+    background: var(--dark);
+  }
+
+  .ref-chapter-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .ref-sub {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .ref-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 14px 0;
+  }
+
+  .ref-card {
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .ref-card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .ref-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px;
+  }
+
+  .ref-row:last-child { border-bottom: none; }
+  .ref-label { color: #bbb; }
+  .ref-val { color: var(--gold); font-weight: 700; font-family: 'Cinzel', serif; font-size: 12px; }
+
+  .ref-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .cut-line {
+    border-top: 2px dashed rgba(212,175,55,0.3);
+    margin: 20px 0;
+    position: relative;
+    text-align: center;
+  }
+  .cut-line span {
+    background: var(--dark);
+    padding: 0 10px;
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    top: -7px;
+  }
+
+  h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 14px 0 6px;
+    letter-spacing: 0.5px;
+  }
+
+  p { margin-bottom: 8px; font-size: 12px; }
+
+  .section-break {
+    text-align: center;
+    color: var(--gold);
+    font-size: 14px;
+    margin: 16px 0;
+    letter-spacing: 8px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .tag-gate { background: var(--red); color: #fff; }
+  .tag-item { background: var(--border); color: #fff; }
+  .tag-cosmetic { background: #444; color: var(--gold); }
+  .tag-bonus { background: #1B5E3A; color: #a8f0c6; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ COVER ═══════════════════════════════════ -->
+<div class="page">
+  <div class="cover page-inner">
+    <div class="cover-inner">
+      <div class="cover-badge">🌍</div>
+
+      <div class="cover-eyebrow">Official Player's Guide</div>
+
+      <div class="cover-title">All Around<br><span>the World</span></div>
+      <div class="cover-subtitle">5 K &nbsp;·&nbsp; Running Adventure</div>
+
+      <div class="cover-divider"></div>
+
+      <div class="cover-manual-label">Runner's Field Manual — Season 1</div>
+
+      <div class="cover-world-strip">
+        <span class="cover-flag">🌍</span>
+        <span class="cover-flag">🇺🇸</span>
+        <span class="cover-flag">🇬🇧</span>
+        <span class="cover-flag">🇯🇵</span>
+        <span class="cover-flag">🇨🇳</span>
+        <span class="cover-flag">🇺🇸</span>
+        <span class="cover-flag">🇰🇪</span>
+        <span class="cover-flag">🇦🇪</span>
+        <span class="cover-flag">🇧🇷</span>
+        <span class="cover-flag">🏁</span>
+      </div>
+
+      <div class="cover-stat-row">
+        <div class="cover-stat">
+          <span class="cover-stat-num">11</span>
+          <span class="cover-stat-label">Weeks</span>
+        </div>
+        <div class="cover-stat">
+          <span class="cover-stat-num">9</span>
+          <span class="cover-stat-label">Destinations</span>
+        </div>
+        <div class="cover-stat">
+          <span class="cover-stat-num">5K</span>
+          <span class="cover-stat-label">Final Race</span>
+        </div>
+        <div class="cover-stat">
+          <span class="cover-stat-num">∞</span>
+          <span class="cover-stat-label">Relics to Earn</span>
+        </div>
+      </div>
+
+      <div class="cover-divider"></div>
+
+      <div class="cover-footer">Race Day — June 6, 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 2: THE QUEST ═══════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter I</div>
+      <div class="chapter-title"><span class="icon">📜</span>Your Quest Begins</div>
+      <div class="chapter-sub">Read this before anything else.</div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Mission Briefing</div>
+      <p>You have been selected to join an elite team of young runners on a globe-spanning adventure. Over 11 weeks, you will train twice a week — Tuesday and Thursday — visiting legendary destinations along the way. Each mile you run earns <strong>Relics</strong>, the in-game currency of this world. Spend Relics at The Shop. Earn enough and you unlock gear, powers, and titles. The final destination: the <strong>5K Race Finish Line</strong> on <strong>June 6, 2026</strong>.</p>
+    </div>
+
+    <div class="two-col" style="margin: 16px 0;">
+      <div class="stat-block">
+        <div class="num">15</div>
+        <div class="label">Relics per Mile</div>
+        <div class="sub">Run more, earn more</div>
+      </div>
+      <div class="stat-block">
+        <div class="num">Tue<br>&amp; Thu</div>
+        <div class="label">Training Days</div>
+        <div class="sub">Every week, two sessions</div>
+      </div>
+    </div>
+
+    <h3>⚙ How a Session Works</h3>
+
+    <ul class="step-list">
+      <li><span class="step-strong">Show up.</span> Attendance is the first gate. No show = no Relics.</li>
+      <li><span class="step-strong">Buy your Passport Stamp</span> (5 Relics). This unlocks the shop for that day. If you don't have 5 Relics yet — run your way there first.</li>
+      <li><span class="step-strong">Run your assigned group workout.</span> Miles are logged by your Guide.</li>
+      <li><span class="step-strong">Relics are awarded</span> — 15 per mile, automatically calculated and added to your balance.</li>
+      <li><span class="step-strong">Spend your Relics</span> in The Shop before you leave. Unspent Relics carry over to the next session.</li>
+      <li><span class="step-strong">Watch the Leaderboard.</span> Rankings update live. Your position reflects total miles traveled, not just Relics.</li>
+    </ul>
+
+    <div class="alert">
+      <div class="alert-label">⚠ Important Rule</div>
+      <p>The Passport Stamp costs 5 Relics and is <strong>required every session</strong>. You cannot shop, unlock items, or use any reward without stamping in first. Think of it like punching your ticket before boarding the train.</p>
+    </div>
+
+    <h3>🏆 How to Win</h3>
+    <p>There is no single winner. Every runner who crosses the <strong>5K finish line on June 6</strong> completes the quest. But runners who earn more Relics, collect more items, and climb the leaderboard go down in history as Legends. Your final title, avatar, and background are your trophies.</p>
+
+    <div class="section-break">· · · ✦ · · ·</div>
+
+    <div class="callout">
+      <div class="callout-label">Traveler's Tip</div>
+      <p>Every Relic you earn is permanent — even after spending. The leaderboard tracks <strong>total miles run</strong>, so the only way to climb is to run. No shortcut. No trade. Just distance.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 3: THE WORLD MAP ═══════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter II</div>
+      <div class="chapter-title"><span class="icon">🗺</span>The World Map</div>
+      <div class="chapter-sub">Nine destinations. One destination per week. One final race.</div>
+    </div>
+
+    <p style="margin-bottom:14px;">Each week your team travels to a new destination. The weekly <strong>Mission Briefing</strong> gives you the training theme, the local mascot, and two workout missions — one for Tuesday, one for Thursday. Complete both and you stay on pace for the 5K.</p>
+
+    <div style="margin-bottom: 16px;">
+      <div class="dest-row" style="background:rgba(139,105,20,0.12); border-color: var(--border);">
+        <div class="dest-flag">🌍</div>
+        <div class="dest-week">WEEK 1</div>
+        <div>
+          <div class="dest-name">Training Hub</div>
+          <div class="dest-sub">Where every journey begins</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇺🇸</div>
+        <div class="dest-week">WEEK 2</div>
+        <div>
+          <div class="dest-name">—</div>
+          <div class="dest-sub">Destination unlocked in briefing</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇺🇸</div>
+        <div class="dest-week">WEEK 3</div>
+        <div>
+          <div class="dest-name">Austin, TX</div>
+          <div class="dest-sub">The Hill Country Challenge 🦔</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇬🇧</div>
+        <div class="dest-week">WEEK 4</div>
+        <div>
+          <div class="dest-name">London, UK</div>
+          <div class="dest-sub">Royal Routes 🐕</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇯🇵</div>
+        <div class="dest-week">WEEK 5</div>
+        <div>
+          <div class="dest-name">Tokyo, Japan</div>
+          <div class="dest-sub">Fast &amp; Focused 🦊</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇨🇳</div>
+        <div class="dest-week">WEEK 6</div>
+        <div>
+          <div class="dest-name">China</div>
+          <div class="dest-sub">The Dragon's Route 🐼</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇺🇸</div>
+        <div class="dest-week">WEEK 7</div>
+        <div>
+          <div class="dest-name">San Francisco</div>
+          <div class="dest-sub">Golden Gate Miles 🦁</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇰🇪</div>
+        <div class="dest-week">WEEK 8</div>
+        <div>
+          <div class="dest-name">Kenya</div>
+          <div class="dest-sub">The Savanna Sprint 🦁</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇦🇪</div>
+        <div class="dest-week">WEEK 9</div>
+        <div>
+          <div class="dest-name">Dubai</div>
+          <div class="dest-sub">Desert Elite 🐪</div>
+        </div>
+      </div>
+      <div class="dest-row">
+        <div class="dest-flag">🇧🇷</div>
+        <div class="dest-week">WEEK 10</div>
+        <div>
+          <div class="dest-name">Brazil</div>
+          <div class="dest-sub">Carnival Miles 🦜</div>
+        </div>
+      </div>
+      <div class="dest-row" style="background: rgba(139,26,26,0.07); border-color: var(--red);">
+        <div class="dest-flag">🏁</div>
+        <div class="dest-week">WEEK 11</div>
+        <div>
+          <div class="dest-name" style="color: var(--red);">Final Route — Race Week</div>
+          <div class="dest-sub">June 6, 2026 · The 5K Finish Line 🏆</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">How to Read the Mission Tab</div>
+      <p>Open the tracker app and tap <strong>🐨 Mission</strong>. You'll see the current destination, the mascot, both mission descriptions for the week, and the full world map showing where you are in the journey. Check it at the start of every session.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 4: YOUR CHARACTER ═══════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter III</div>
+      <div class="chapter-title"><span class="icon">🎨</span>Your Character</div>
+      <div class="chapter-sub">Avatars, Backgrounds, and Titles — your runner identity.</div>
+    </div>
+
+    <p>Every runner has a profile card on the leaderboard. The longer you run, the more you can customize it. Your avatar, background, and title are yours to unlock and equip — build a profile that represents who you are as a runner.</p>
+
+    <h3>🐾 Avatars — Your Runner Icon</h3>
+    <p>Your avatar appears on the leaderboard and your profile. Start as a <strong>Koala Scout</strong> — earn Relics to unlock the rest.</p>
+
+    <div class="avatar-grid">
+      <div class="avatar-chip"><div class="emoji">🐨</div><div class="name">Koala Scout</div><div class="cost">FREE</div></div>
+      <div class="avatar-chip"><div class="emoji">🦁</div><div class="name">Safari Lion</div><div class="cost">40 ⬡</div></div>
+      <div class="avatar-chip"><div class="emoji">🐼</div><div class="name">Panda Explorer</div><div class="cost">40 ⬡</div></div>
+      <div class="avatar-chip"><div class="emoji">🦊</div><div class="name">Fox Ranger</div><div class="cost">40 ⬡</div></div>
+      <div class="avatar-chip"><div class="emoji">🐰</div><div class="name">Bunny Guide</div><div class="cost">40 ⬡</div></div>
+      <div class="avatar-chip"><div class="emoji">🐻</div><div class="name">Bear Adventurer</div><div class="cost">40 ⬡</div></div>
+      <div class="avatar-chip"><div class="emoji">🐯</div><div class="name">Tokyo Tiger</div><div class="cost">40 ⬡</div></div>
+      <div class="avatar-chip"><div class="emoji">🦅</div><div class="name">Eagle Legend</div><div class="cost">60 ⬡</div></div>
+    </div>
+
+    <h3>🌄 Profile Backgrounds</h3>
+    <p>Equip a destination background to show where your heart is.</p>
+
+    <div class="three-col" style="margin: 8px 0 14px;">
+      <div class="card" style="background:linear-gradient(135deg,#f5e6c8,#e8d0a0); border:1px solid #c4a050;"><div class="card-title">Parchment</div><div style="font-size:10px;color:#7a6030;">FREE — default</div></div>
+      <div class="card" style="background:linear-gradient(135deg,#C45100,#1B7A8A);"><div class="card-title" style="color:#fff;">Austin Sunset</div><div style="font-size:10px;color:#ffd580;">50 ⬡</div></div>
+      <div class="card" style="background:linear-gradient(135deg,#003580,#9B1B1B);"><div class="card-title" style="color:#fff;">London Royal</div><div style="font-size:10px;color:#ffd580;">50 ⬡</div></div>
+      <div class="card" style="background:linear-gradient(135deg,#ffb7c5,#C41E3A);"><div class="card-title" style="color:#fff;">Tokyo Blossom</div><div style="font-size:10px;color:#fff;">50 ⬡</div></div>
+      <div class="card" style="background:linear-gradient(135deg,#AA0000,#D4AF37);"><div class="card-title" style="color:#fff;">China Dynasty</div><div style="font-size:10px;color:#fff;">50 ⬡</div></div>
+      <div class="card" style="background:linear-gradient(135deg,#009639,#002776);"><div class="card-title" style="color:#fff;">Brazil Carnival</div><div style="font-size:10px;color:#fff;">50 ⬡</div></div>
+    </div>
+
+    <h3>🏅 Runner Titles</h3>
+    <p>Buy a <strong>Leaderboard Title</strong> from the shop (75 Relics) to pick your honorary name. Displayed on the leaderboard under your avatar.</p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:6px; margin: 8px 0 14px;">
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Trail Scout</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Lone Star</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Cherry Blossom</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Safari Runner</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Desert Sprinter</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Pacing Legend</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Iron Legs</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">No-Stop Nova</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Finish Line</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">The Anchor</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Trailblazer</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Steady Pace</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Heart of the Pack</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Distance King</span>
+      <span style="background:rgba(139,105,20,0.1); border:1px solid var(--border); border-radius:12px; padding:3px 10px; font-size:10px; font-family:'Cinzel',serif; color:var(--dark);">Distance Queen</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">How to Equip</div>
+      <p>In the tracker app, click your name on the leaderboard → open the <strong>🎨 Loadout</strong> tab → select avatar and background. Must be purchased first in the <strong>🛒 Shop</strong>. Once purchased, yours forever.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 5: THE SHOP ═══════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter IV</div>
+      <div class="chapter-title"><span class="icon">🛒</span>The Shop</div>
+      <div class="chapter-sub">Spend your Relics wisely, Adventurer.</div>
+    </div>
+
+    <p>The Shop is unlocked two ways. First, you need a <strong>Passport Stamp</strong> each session to enter. Then, once you have 30 Relics saved up to buy the <strong>Runner's Bracelet</strong>, the full shop opens permanently. Here is everything available:</p>
+
+    <div class="alert" style="margin-bottom:16px;">
+      <div class="alert-label">⛩ Gates — Unlock These First</div>
+      <div class="item-row" style="border-bottom: 1px solid rgba(139,26,26,0.15);">
+        <div class="item-icon">📋</div>
+        <div class="item-body">
+          <div class="item-name">Passport Stamp <span class="tag tag-gate" style="margin-left:6px;">Required Daily</span></div>
+          <div class="item-desc">Must be purchased every session before you can access any other shop item.</div>
+        </div>
+        <div class="item-cost">5 ⬡</div>
+      </div>
+      <div class="item-row" style="border-bottom:none;">
+        <div class="item-icon">⌚</div>
+        <div class="item-body">
+          <div class="item-name">Runner's Bracelet <span class="tag tag-gate" style="margin-left:6px;">One-Time Unlock</span></div>
+          <div class="item-desc">A real fitness tracker bracelet. Permanently unlocks the full shop — buy once, keep forever.</div>
+        </div>
+        <div class="item-cost">30 ⬡</div>
+      </div>
+    </div>
+
+    <h3>🎒 Items — Spend on These Anytime</h3>
+
+    <div style="border: 1px solid rgba(139,105,20,0.25); border-radius:6px; overflow:hidden; margin-bottom:14px;">
+      <div class="item-row">
+        <div class="item-icon">✦</div>
+        <div class="item-body">
+          <div class="item-name">Passport Sticker</div>
+          <div class="item-desc">A custom sticker for your runner passport. Collect them all.</div>
+        </div>
+        <div class="item-cost">10 ⬡</div>
+      </div>
+      <div class="item-row">
+        <div class="item-icon">🎵</div>
+        <div class="item-body">
+          <div class="item-name">Pick Warm-Up Song</div>
+          <div class="item-desc">You choose the music for the next session's warm-up. Your vibe, your run.</div>
+        </div>
+        <div class="item-cost">25 ⬡</div>
+      </div>
+      <div class="item-row">
+        <div class="item-icon">⚡</div>
+        <div class="item-body">
+          <div class="item-name">Fuel Point</div>
+          <div class="item-desc">An extra snack at the end of session. Earned through distance — not handed out.</div>
+        </div>
+        <div class="item-cost">35 ⬡</div>
+      </div>
+      <div class="item-row">
+        <div class="item-icon">👟</div>
+        <div class="item-body">
+          <div class="item-name">Custom Shoelaces</div>
+          <div class="item-desc">Pick your color. Own your look. These are real laces you take home.</div>
+        </div>
+        <div class="item-cost">50 ⬡</div>
+      </div>
+      <div class="item-row">
+        <div class="item-icon">🏅</div>
+        <div class="item-body">
+          <div class="item-name">Leaderboard Title <span class="tag tag-cosmetic" style="margin-left:6px;">Cosmetic</span></div>
+          <div class="item-desc">Choose your official runner title from the list. Displayed permanently on the leaderboard.</div>
+        </div>
+        <div class="item-cost">75 ⬡</div>
+      </div>
+      <div class="item-row">
+        <div class="item-icon">👑</div>
+        <div class="item-body">
+          <div class="item-name">Lead the Warm-Up</div>
+          <div class="item-desc">You run the entire session warm-up — in front, calling the pace. Big energy.</div>
+        </div>
+        <div class="item-cost">100 ⬡</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Saving Strategy</div>
+      <p>Don't blow all your Relics early. The <strong>Runner's Bracelet (30 ⬡)</strong> is the single most important purchase — save for it fast. After that, decide: cosmetics (avatar, background, title) or experiences (lead warm-up, pick the song). Both are valid builds.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 6: BONUS MISSIONS ═══════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter V</div>
+      <div class="chapter-title"><span class="icon">⭐</span>Bonus Missions</div>
+      <div class="chapter-sub">Extra Relics for runners who go above and beyond.</div>
+    </div>
+
+    <p>Beyond the miles you log, your Guide can award Bonus Relics for standout behavior during a session. These aren't guaranteed — they're earned by being exceptional. Four bonus types exist:</p>
+
+    <div style="border: 2px solid var(--gold); border-radius: 6px; overflow: hidden; margin: 14px 0;">
+      <div class="item-row" style="background: rgba(212,175,55,0.06);">
+        <div class="item-icon">⭐</div>
+        <div class="item-body">
+          <div class="item-name">Leadership Bonus</div>
+          <div class="item-desc">You helped push the group forward. You led by example, encouraged teammates, or set the tone for the session.</div>
+        </div>
+        <div class="item-cost" style="background: #1B5E3A; color:#a8f0c6;">+8 ⬡</div>
+      </div>
+      <div class="item-row" style="background: rgba(212,175,55,0.03);">
+        <div class="item-icon">🤝</div>
+        <div class="item-body">
+          <div class="item-name">Positive Teammate</div>
+          <div class="item-desc">You cheered someone on, helped a runner who was struggling, or brought good energy to the whole group.</div>
+        </div>
+        <div class="item-cost" style="background: #1B5E3A; color:#a8f0c6;">+5 ⬡</div>
+      </div>
+      <div class="item-row" style="background: rgba(212,175,55,0.06);">
+        <div class="item-icon">📈</div>
+        <div class="item-body">
+          <div class="item-name">Personal Distance Record</div>
+          <div class="item-desc">You ran further than any previous session. PR bonuses celebrate personal growth — compare yourself, not others.</div>
+        </div>
+        <div class="item-cost" style="background: #1B5E3A; color:#a8f0c6;">+10 ⬡</div>
+      </div>
+      <div class="item-row" style="background: rgba(212,175,55,0.03);">
+        <div class="item-icon">🏃</div>
+        <div class="item-body">
+          <div class="item-name">Pacing Legend</div>
+          <div class="item-desc">You ran your full session without walking. Complete run, start to finish, no breaks. Hardest bonus to earn.</div>
+        </div>
+        <div class="item-cost" style="background: #1B5E3A; color:#a8f0c6;">+12 ⬡</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Guide Note</div>
+      <p>Bonuses are Guide-awarded and applied in the tracker. Runners do not award their own bonuses. If you think you earned one, ask your Guide — they'll decide.</p>
+    </div>
+
+    <div class="section-break">· · · ✦ · · ·</div>
+
+    <h3>🗓 The Runner's Bracelet Gate — Explained</h3>
+
+    <p>The <strong>Runner's Bracelet</strong> is the most important unlock in the game. Here is the math on how fast you can get there:</p>
+
+    <div class="two-col" style="margin: 10px 0 14px;">
+      <div class="stat-block">
+        <div class="num">2</div>
+        <div class="label">Sessions to earn 30 ⬡</div>
+        <div class="sub">If you run ~1 mile per session</div>
+      </div>
+      <div class="stat-block">
+        <div class="num">1</div>
+        <div class="label">Session if you earn a bonus</div>
+        <div class="sub">Pacing Legend + 1 mile = 27 ⬡</div>
+      </div>
+    </div>
+
+    <p>The faster you get your bracelet, the faster everything else opens up. Make it your first goal.</p>
+
+    <div class="alert">
+      <div class="alert-label">Reminder — Stamp Cost Each Day</div>
+      <p>Don't forget the Passport Stamp (5 ⬡) is required every session before you can buy anything. Factor it into your Relic math when planning purchases.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 7: RACE DAY ═══════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+
+    <div class="chapter-header">
+      <div class="chapter-num">Final Chapter</div>
+      <div class="chapter-title"><span class="icon">🏁</span>Race Day — The Final Boss</div>
+      <div class="chapter-sub">June 6, 2026 · 5K · Everything you trained for.</div>
+    </div>
+
+    <div style="text-align:center; padding: 20px 0 10px;">
+      <div style="font-size: 60px; line-height:1; margin-bottom:10px;">🏆</div>
+      <div style="font-family:'Cinzel',serif; font-size:26px; font-weight:700; color:var(--dark); margin-bottom:4px;">The 5K</div>
+      <div style="font-size:12px; color:#7a6030; letter-spacing:2px; font-style:italic;">June 6, 2026</div>
+    </div>
+
+    <div class="callout" style="margin: 20px 0;">
+      <div class="callout-label">What Is a 5K?</div>
+      <p>3.1 miles. That is it. Eleven weeks of training with your team is specifically designed to get you ready to run 3.1 miles without stopping. By Race Day, you will have run this distance many times in training — Race Day is just the victory lap.</p>
+    </div>
+
+    <h3>🎯 Race Day Goals</h3>
+
+    <ul class="step-list">
+      <li><span class="step-strong">Start with your group.</span> Don't sprint out at the beginning. Your training pace is your race pace.</li>
+      <li><span class="step-strong">Don't stop.</span> Walk breaks are allowed — but every runner who trained with us can finish without them.</li>
+      <li><span class="step-strong">Find someone to pace with.</span> Eleven weeks of team training means you know your pack. Run with them.</li>
+      <li><span class="step-strong">The finish line is the only finish that matters.</span> Your time is yours. Cross it.</li>
+    </ul>
+
+    <div class="section-break">· · · ✦ · · ·</div>
+
+    <h3>📋 Week 11 — Race Week Protocol</h3>
+    <p>The final week is not about gaining new fitness — it's about showing up sharp. Sessions will be shorter. Focus on staying loose, staying hydrated, and getting rest. Race week rules:</p>
+
+    <div class="card"><div class="card-title">Tuesday Session</div><p>Short shakeout run. Light, easy pace. Review your race-day plan with your Guide.</p></div>
+    <div class="card"><div class="card-title">Thursday / Race Eve</div><p>Rest. Sleep early. Eat a normal dinner — not too much, not too little. Lay out your gear the night before.</p></div>
+    <div class="card"><div class="card-title">Saturday — Race Day 🏁</div><p>Arrive early. Warm up with your team. Run your race. Collect your Relics for the finish line mile. Celebrate.</p></div>
+
+    <div class="alert" style="margin-top: 16px;">
+      <div class="alert-label">You've Already Done The Hard Part</div>
+      <p>If you showed up, stamped in, and ran your sessions — Race Day is a celebration, not a challenge. The training is the hard part. Race Day is the reward.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 8: QUICK REFERENCE ═══════════════════════════════════ -->
+<div class="page ref-page">
+  <div class="page-inner">
+
+    <div class="ref-chapter-title">⚡ Quick Reference Card</div>
+    <div class="ref-sub">Cut out and keep in your shoe bag</div>
+
+    <div class="ref-divider"></div>
+
+    <div class="ref-two-col">
+
+      <div>
+        <div class="ref-card">
+          <div class="ref-card-title">💰 Relic Math</div>
+          <div class="ref-row"><span class="ref-label">Per mile run</span><span class="ref-val">+15 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">Leadership bonus</span><span class="ref-val">+8 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">Positive teammate</span><span class="ref-val">+5 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">Personal record</span><span class="ref-val">+10 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">Pacing Legend (no walk)</span><span class="ref-val">+12 ⬡</span></div>
+        </div>
+
+        <div class="ref-card">
+          <div class="ref-card-title">🛒 Shop Prices</div>
+          <div class="ref-row"><span class="ref-label">📋 Passport Stamp (daily)</span><span class="ref-val">5 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">⌚ Runner's Bracelet</span><span class="ref-val">30 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">✦ Passport Sticker</span><span class="ref-val">10 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">🎵 Pick Warm-Up Song</span><span class="ref-val">25 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">⚡ Fuel Point</span><span class="ref-val">35 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">👟 Custom Shoelaces</span><span class="ref-val">50 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">🏅 Leaderboard Title</span><span class="ref-val">75 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">👑 Lead the Warm-Up</span><span class="ref-val">100 ⬡</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ref-card">
+          <div class="ref-card-title">📋 Every Session — In Order</div>
+          <div class="ref-row"><span class="ref-label" style="font-size:12px;">① Show up</span><span class="ref-val">Required</span></div>
+          <div class="ref-row"><span class="ref-label" style="font-size:12px;">② Buy Passport Stamp</span><span class="ref-val">5 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label" style="font-size:12px;">③ Run your workout</span><span class="ref-val">+Relics</span></div>
+          <div class="ref-row"><span class="ref-label" style="font-size:12px;">④ Shop if you want</span><span class="ref-val">Optional</span></div>
+          <div class="ref-row"><span class="ref-label" style="font-size:12px;">⑤ Check leaderboard</span><span class="ref-val">Always</span></div>
+        </div>
+
+        <div class="ref-card">
+          <div class="ref-card-title">🐾 Avatar Costs</div>
+          <div class="ref-row"><span class="ref-label">🐨 Koala Scout</span><span class="ref-val">Free</span></div>
+          <div class="ref-row"><span class="ref-label">🦁 🐼 🦊 🐰 🐻 🐯 any</span><span class="ref-val">40 ⬡</span></div>
+          <div class="ref-row"><span class="ref-label">🦅 Eagle Legend</span><span class="ref-val">60 ⬡</span></div>
+        </div>
+
+        <div class="ref-card">
+          <div class="ref-card-title">🌍 The Journey</div>
+          <div class="ref-row"><span class="ref-label">Weeks</span><span class="ref-val">11 total</span></div>
+          <div class="ref-row"><span class="ref-label">Training days</span><span class="ref-val">Tue + Thu</span></div>
+          <div class="ref-row"><span class="ref-label">Race Day</span><span class="ref-val">June 6, 2026</span></div>
+          <div class="ref-row"><span class="ref-label">Race distance</span><span class="ref-val">5K / 3.1 mi</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cut-line"><span>✂ cut here</span></div>
+
+    <div style="text-align: center; padding: 10px 0;">
+      <div style="font-family:'Cinzel',serif; font-size:14px; color: var(--gold); margin-bottom:6px;">All Around the World 5K</div>
+      <div style="font-size:10px; color:#666; letter-spacing:2px; text-transform:uppercase;">Track your progress at jackiiechan.github.io/atw5k-tracker</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
