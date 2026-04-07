@@ -69,6 +69,68 @@ body {
   letter-spacing: 2px; text-transform: uppercase;
 }
 .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── HAMBURGER (mobile only) ── */
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  border: 2px solid #333;
+  border-radius: 6px;
+  color: #ccc;
+  padding: 6px 13px;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  transition: border-color 0.15s, color 0.15s;
+}
+.hamburger-btn:hover { border-color: var(--t-accent); color: var(--t-accent); }
+.hamburger-btn.open { border-color: var(--t-accent); color: var(--t-accent); }
+
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  background: #141414;
+  border-top: 2px solid var(--t-accent);
+  border-bottom: 1px solid #2a2a2a;
+  z-index: 999;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+}
+.mobile-menu.open { display: block; }
+.mobile-menu .mob-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 22px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #222;
+  color: #bbb;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+.mobile-menu .mob-tab-btn:last-child { border-bottom: none; }
+.mobile-menu .mob-tab-btn:hover,
+.mobile-menu .mob-tab-btn.active { background: rgba(212,175,55,0.08); color: var(--t-accent); }
+.mobile-menu .mob-tab-btn .mob-tab-icon { font-size: 18px; min-width: 24px; }
+
+@media (max-width: 767px) {
+  .nav-inner { padding: 10px 14px; }
+  .nav-tabs { display: none; }
+  .hamburger-btn { display: block; }
+  .nav-title { font-size: 13px; }
+  .nav-dest { font-size: 9px; }
+  .nav-mascot { font-size: 22px; }
+}
+
 .tab-btn {
   padding: 7px 14px;
   border: 2px solid #333;
@@ -879,9 +941,160 @@ body {
    UTILITIES
    ═══════════════════════════════════════════════════════════ */
 .empty-state { text-align: center; padding: 40px; color: #aaa; font-size: 14px; }
+
+/* ═══════════════════════════════════════════════════════════
+   AGENT KOALA TUTORIAL OVERLAY
+   ═══════════════════════════════════════════════════════════ */
+.kt-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(8,12,20,0.93);
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.kt-overlay.open { display: flex; }
+
+.kt-card {
+  background: linear-gradient(160deg, #1a1208 0%, #0d0d1a 100%);
+  border: 2px solid var(--t-accent);
+  border-radius: 20px;
+  box-shadow: 0 0 60px rgba(232,160,32,0.25), 0 0 0 1px rgba(232,160,32,0.1);
+  width: min(540px, 94vw);
+  padding: 36px 32px 28px;
+  position: relative;
+  text-align: center;
+}
+
+/* animated koala */
+@keyframes kt-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45%       { transform: translateY(-14px) scale(1.06); }
+}
+@keyframes kt-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(232,160,32,0.3)); }
+  50%       { filter: drop-shadow(0 0 28px rgba(232,160,32,0.85)); }
+}
+.kt-koala {
+  font-size: 76px; line-height: 1;
+  display: inline-block;
+  animation: kt-bounce 2.2s ease-in-out infinite, kt-glow 2.2s ease-in-out infinite;
+  margin-bottom: 8px;
+}
+
+/* transmission header */
+.kt-transmission {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--t-accent); font-weight: 700; margin-bottom: 4px;
+}
+.kt-step-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 900;
+  color: #fff; margin-bottom: 16px; min-height: 28px;
+}
+
+/* speech bubble */
+.kt-bubble {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(232,160,32,0.25);
+  border-radius: 14px;
+  padding: 18px 20px;
+  font-size: 15px; line-height: 1.65;
+  color: #ddd;
+  min-height: 80px;
+  text-align: left;
+  position: relative;
+  margin-bottom: 24px;
+}
+.kt-bubble::before {
+  content: '';
+  position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid rgba(232,160,32,0.25);
+}
+
+/* progress dots */
+.kt-dots {
+  display: flex; gap: 7px; justify-content: center; margin-bottom: 20px;
+}
+.kt-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.3s, transform 0.3s;
+}
+.kt-dot.active { background: var(--t-accent); transform: scale(1.3); }
+.kt-dot.done   { background: rgba(232,160,32,0.4); }
+
+/* buttons */
+.kt-btns { display: flex; gap: 10px; justify-content: center; }
+.kt-btn-next {
+  background: var(--t-accent); color: #1a0e00;
+  border: none; border-radius: 10px;
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+  padding: 12px 28px; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.kt-btn-next:hover { transform: scale(1.04); box-shadow: 0 4px 18px rgba(232,160,32,0.4); }
+.kt-btn-prev {
+  background: transparent; color: #888;
+  border: 1px solid #333; border-radius: 10px;
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 12px 20px; cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.kt-btn-prev:hover { color: #ccc; border-color: #555; }
+
+/* skip / voice toggle */
+.kt-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 16px;
+}
+.kt-skip { font-size: 12px; color: #555; cursor: pointer; text-decoration: underline; }
+.kt-skip:hover { color: #888; }
+.kt-voice-btn {
+  font-size: 12px; color: #666; cursor: pointer;
+  background: transparent; border: 1px solid #333; border-radius: 6px;
+  padding: 4px 10px; font-family: 'Nunito', sans-serif; font-weight: 700;
+}
+.kt-voice-btn:hover { border-color: #555; color: #999; }
+.kt-voice-btn.muted { opacity: 0.45; }
+
+/* nav tutorial button */
+.kt-nav-btn {
+  background: transparent;
+  border: 1px solid rgba(232,160,32,0.4);
+  border-radius: 8px;
+  color: var(--t-accent);
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+  padding: 6px 12px; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.kt-nav-btn:hover { background: rgba(232,160,32,0.1); border-color: var(--t-accent); }
 </style>
 </head>
 <body>
+
+<!-- ── AGENT KOALA TUTORIAL OVERLAY ────────────────────── -->
+<div class="kt-overlay" id="kt-overlay">
+  <div class="kt-card">
+    <div class="kt-transmission">🛰 Agent Koala · Secure Transmission</div>
+    <div class="kt-koala">🐨</div>
+    <div class="kt-step-title" id="kt-title">Incoming Transmission…</div>
+    <div class="kt-bubble">
+      <span id="kt-bubble-text"></span>
+    </div>
+    <div class="kt-dots" id="kt-dots"></div>
+    <div class="kt-btns">
+      <button class="kt-btn-prev" id="kt-prev" onclick="ktPrev()">← Back</button>
+      <button class="kt-btn-next" id="kt-next" onclick="ktNext()">Next →</button>
+    </div>
+    <div class="kt-footer">
+      <span class="kt-skip" onclick="closeKoalaTutorial()">Skip Briefing</span>
+      <button class="kt-voice-btn" id="kt-voice-btn" onclick="ktToggleVoice()">🔊 Voice On</button>
+    </div>
+  </div>
+</div>
 
 <div class="airmail-stripe"></div>
 
@@ -903,6 +1116,17 @@ body {
       <button class="tab-btn" onclick="switchTab('history',this)">📖 History</button>
       <button class="tab-btn" onclick="switchTab('admin',this)">⚙ Admin</button>
     </div>
+    <button class="kt-nav-btn" onclick="openKoalaTutorial()">📋 Briefing</button>
+    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mob-tab-btn active" onclick="switchTab('mission',null)"><span class="mob-tab-icon">🐨</span> Mission</button>
+    <button class="mob-tab-btn" onclick="switchTab('map',null)"><span class="mob-tab-icon">🗺</span> Track</button>
+    <button class="mob-tab-btn" onclick="switchTab('leaderboard',null)"><span class="mob-tab-icon">🏆</span> Board</button>
+    <button class="mob-tab-btn" onclick="switchTab('session',null)"><span class="mob-tab-icon">⚡</span> Session</button>
+    <button class="mob-tab-btn" onclick="switchTab('history',null)"><span class="mob-tab-icon">📖</span> History</button>
+    <button class="mob-tab-btn" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
+    <button class="mob-tab-btn" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
   </div>
 </nav>
 
@@ -1362,11 +1586,34 @@ function applyTheme(dest) {
 // ╔═══════════════════════════════════════════════════════════════════╗
 // ║                    TAB SWITCHING                                 ║
 // ╚═══════════════════════════════════════════════════════════════════╝
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const hamburger = document.getElementById('hamburger-btn');
+  const isOpen = menu.classList.toggle('open');
+  hamburger.classList.toggle('open', isOpen);
+  hamburger.textContent = isOpen ? '✕' : '☰';
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const hamburger = document.getElementById('hamburger-btn');
+  menu.classList.remove('open');
+  hamburger.classList.remove('open');
+  hamburger.textContent = '☰';
+}
+
 function switchTab(tab, btn) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mob-tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('view-'+tab).classList.add('active');
   if (btn) btn.classList.add('active');
+  // sync mobile menu active state
+  const tabNames = ['mission','map','leaderboard','session','history','admin'];
+  const idx = tabNames.indexOf(tab);
+  const mobBtns = document.querySelectorAll('.mob-tab-btn');
+  if (idx >= 0 && mobBtns[idx]) mobBtns[idx].classList.add('active');
+  closeMobileMenu();
   if (tab === 'mission')     renderMission();
   if (tab === 'leaderboard') renderLeaderboard();
   if (tab === 'map')         renderMap();
@@ -1745,6 +1992,8 @@ function savePrices() {
   // Refresh the economy reference card text
   const ref = document.querySelector('#view-admin .admin-card:last-child p');
   if (ref) ref.innerHTML = economyReferenceHtml();
+  // Re-render leaderboard so open modals reflect new prices immediately
+  renderLeaderboard();
 }
 
 function economyReferenceHtml() {
@@ -1890,17 +2139,20 @@ function renderShopTab(s) {
   const today = todayStr();
   const stamped = (s.stampDates || []).includes(today);
 
+  const braceletCost = CFG.SHOP.find(i => i.id === 'bracelet')?.cost ?? 30;
+  const stampCost    = CFG.SHOP.find(i => i.id === 'stamp')?.cost ?? 5;
+
   const braceGate = s.hasBracelet
     ? `<span class="gate-action ga-owned">✓ Owned</span>`
-    : s.relics >= 30
-      ? `<button class="gate-action ga-buy" onclick="purchase('bracelet')">Buy — 30 ⬡</button>`
-      : `<button class="gate-action ga-locked" disabled>30 ⬡ needed</button>`;
+    : s.relics >= braceletCost
+      ? `<button class="gate-action ga-buy" onclick="purchase('bracelet')">Buy — ${braceletCost} ⬡</button>`
+      : `<button class="gate-action ga-locked" disabled>${braceletCost} ⬡ needed</button>`;
 
   const stampGate = stamped
     ? `<span class="gate-action ga-owned">✓ Done today</span>`
-    : s.relics >= 5
-      ? `<button class="gate-action ga-buy" onclick="purchase('stamp')">Buy — 5 ⬡</button>`
-      : `<button class="gate-action ga-locked" disabled>5 ⬡ needed</button>`;
+    : s.relics >= stampCost
+      ? `<button class="gate-action ga-buy" onclick="purchase('stamp')">Buy — ${stampCost} ⬡</button>`
+      : `<button class="gate-action ga-locked" disabled>${stampCost} ⬡ needed</button>`;
 
   let html = `<div class="gate-block">
     <div class="gate-row">
@@ -2544,6 +2796,138 @@ function floatRelics(anchor, text) {
   el.style.top  = (rect.top - 10) + 'px';
   document.body.appendChild(el);
   el.addEventListener('animationend', () => el.remove());
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    AGENT KOALA TUTORIAL                          ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const KT_STEPS = [
+  {
+    title: 'Incoming Transmission…',
+    text: 'Greetings, Runner. I\'m Agent Koala — your mission guide. You\'ve been selected for a global running challenge. Welcome to All Around the World.'
+  },
+  {
+    title: 'Your Mission',
+    text: 'Your goal is to run a 5K — that\'s 3.1 miles, or 15 laps around the track. Along the way, you\'ll travel through 11 destinations across the globe. Every lap you run moves you forward on the map.'
+  },
+  {
+    title: 'How You Earn Relics',
+    text: 'Every mile you run earns you Relics — the currency of this mission. Relics are proof that you showed up and did the work. The more you run, the more you earn. It\'s that simple.'
+  },
+  {
+    title: 'Your Guides Are the Key',
+    text: 'Here\'s the intel most runners miss: your Guides hold the highest reward multipliers. Runners who stay in formation, hold their assigned pace, and listen to their Guide earn the most Relics. Going rogue costs you points. Stay sharp, stay together.'
+  },
+  {
+    title: 'The Traveler\'s Stamp',
+    text: 'Once you\'ve earned enough Relics, head to the Shop and claim your Traveler\'s Stamp. That\'s your official passport proof — your record of completing this destination. Every great explorer carries one.'
+  },
+  {
+    title: 'The Shop',
+    text: 'Relics don\'t just sit there. Spend them in the Shop to unlock custom avatars, background scenes, and titles that appear on your Runner Profile. The harder you run, the more you unlock. Some items are rare — start earning early.'
+  },
+  {
+    title: 'Briefing Complete.',
+    text: 'That\'s everything, Agent. Stay in formation. Trust your Guides. Run your pace. The world is waiting — and your first stamp is within reach. Now get out there.'
+  }
+];
+
+let ktStep = 0;
+let ktVoiceEnabled = true;
+let ktTypewriterTimer = null;
+let ktSpeechTimer = null;
+
+function openKoalaTutorial() {
+  ktStep = 0;
+  document.getElementById('kt-overlay').classList.add('open');
+  ktRenderStep();
+}
+
+function closeKoalaTutorial() {
+  document.getElementById('kt-overlay').classList.remove('open');
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  clearTimeout(ktTypewriterTimer);
+}
+
+function ktRenderStep() {
+  const step = KT_STEPS[ktStep];
+  const total = KT_STEPS.length;
+
+  // title
+  document.getElementById('kt-title').textContent = step.title;
+
+  // dots
+  const dotsEl = document.getElementById('kt-dots');
+  dotsEl.innerHTML = KT_STEPS.map((_, i) =>
+    `<div class="kt-dot ${i === ktStep ? 'active' : i < ktStep ? 'done' : ''}"></div>`
+  ).join('');
+
+  // next button label
+  const nextBtn = document.getElementById('kt-next');
+  nextBtn.textContent = ktStep === total - 1 ? 'Start Running →' : 'Next →';
+
+  // prev button
+  document.getElementById('kt-prev').style.visibility = ktStep === 0 ? 'hidden' : 'visible';
+
+  // typewriter
+  ktTypewrite(step.text, document.getElementById('kt-bubble-text'), () => {});
+
+  // voice
+  if (ktVoiceEnabled) ktSpeak(step.text);
+}
+
+function ktTypewrite(text, el, onDone) {
+  el.textContent = '';
+  let i = 0;
+  clearTimeout(ktTypewriterTimer);
+  function next() {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      ktTypewriterTimer = setTimeout(next, 22);
+    } else { onDone(); }
+  }
+  next();
+}
+
+function ktSpeak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  // Small delay — Chrome needs voices loaded
+  clearTimeout(ktSpeechTimer);
+  ktSpeechTimer = setTimeout(() => {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.88;
+    utter.pitch = 1.15;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v =>
+      v.name.includes('Samantha') || v.name.includes('Karen') ||
+      v.name.includes('Moira')    || v.name.includes('Fiona') ||
+      (v.lang === 'en-US' && v.localService)
+    );
+    if (preferred) utter.voice = preferred;
+    window.speechSynthesis.speak(utter);
+  }, 120);
+}
+
+function ktNext() {
+  if (ktStep >= KT_STEPS.length - 1) { closeKoalaTutorial(); return; }
+  ktStep++;
+  ktRenderStep();
+}
+
+function ktPrev() {
+  if (ktStep === 0) return;
+  ktStep--;
+  ktRenderStep();
+}
+
+function ktToggleVoice() {
+  ktVoiceEnabled = !ktVoiceEnabled;
+  const btn = document.getElementById('kt-voice-btn');
+  btn.textContent = ktVoiceEnabled ? '🔊 Voice On' : '🔇 Voice Off';
+  btn.classList.toggle('muted', !ktVoiceEnabled);
+  if (!ktVoiceEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+  else if (ktVoiceEnabled) ktSpeak(KT_STEPS[ktStep].text);
 }
 
 // ╔═══════════════════════════════════════════════════════════════════╗
