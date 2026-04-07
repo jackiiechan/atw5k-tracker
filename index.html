@@ -1704,6 +1704,26 @@ function switchTab(tab, btn) {
 // ╚═══════════════════════════════════════════════════════════════════╝
 let missionDay = 'Tuesday';
 
+// Parse workout sets string into total laps
+// Handles: "2–3–4–3–2 laps", "1×1 + 3×2 laps", "5×1 lap", "2+2+3+2+2 laps"
+function parseSetsToLaps(sets) {
+  let s = sets.replace(/\s*laps?\s*$/i, '').trim();
+  // Split on + or – (en dash) or - (hyphen), but not inside ×
+  const terms = s.split(/\s*[+\u2013]\s*/).flatMap(t => t.split(/\s*(?<![\d])[-](?![\d×x])\s*/i));
+  let total = 0;
+  for (const term of terms) {
+    const t = term.trim();
+    if (!t) continue;
+    if (/[×x]/i.test(t)) {
+      const parts = t.split(/[×x]/i);
+      total += (parseInt(parts[0]) || 0) * (parseInt(parts[1]) || 0);
+    } else {
+      total += parseInt(t) || 0;
+    }
+  }
+  return total;
+}
+
 function renderMission() {
   const dest = getDestination(STATE.currentWeek);
   document.getElementById('ms-flag').textContent = dest.flag;
@@ -1729,14 +1749,23 @@ function renderMission() {
     html += `<div class="workout-empty">Workout details coming — upload the plan to update.</div>`;
   } else {
     plan.groups.forEach(g => {
+      const totalLaps = parseSetsToLaps(g.sets);
+      const potentialMiles = totalLaps * CFG.LAP_MILES;
+      const potentialRelics = Math.round(potentialMiles * CFG.RELICS_PER_MILE);
+      const numSets = g.sets.replace(/\s*laps?\s*$/i, '').trim().split(/\s*[+\u2013–-]\s*/).length;
+
       html += `<div class="workout-group-row">
-        <div>
+        <div style="min-width:140px;">
           <div class="workout-group-label">${g.label}</div>
-          <div class="workout-group-rest">${g.rest}</div>
+          <div class="workout-group-rest">${numSets} sets · ${g.rest} rest</div>
         </div>
-        <div>
-          <div class="workout-group-sets">${g.sets}</div>
-          ${g.members && g.members.length ? `<div class="workout-group-members" style="margin-top:4px">${g.members.map(m => m.split(' ')[0]).join(' · ')}</div>` : ''}
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;justify-content:flex-end;">
+            <span style="font-size:24px;font-weight:900;color:var(--t-accent);font-family:'Playfair Display',serif;">${potentialRelics} ⬡</span>
+            <span style="font-size:12px;color:#888;">on the line</span>
+          </div>
+          <div style="text-align:right;font-size:12px;color:#666;margin-top:2px;">${totalLaps} laps · ${potentialMiles.toFixed(1)} mi</div>
+          ${g.members && g.members.length ? `<div class="workout-group-members" style="margin-top:6px;text-align:right;">${g.members.map(m => m.split(' ')[0]).join(' · ')}</div>` : ''}
         </div>
       </div>`;
     });
