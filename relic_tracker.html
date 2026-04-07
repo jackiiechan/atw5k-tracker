@@ -716,6 +716,7 @@ body {
   font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 900;
 }
 .workout-notes { font-size: 11px; opacity: 0.75; font-style: italic; }
+.workout-card { margin-top: 16px; }
 .workout-group-row {
   display: grid; grid-template-columns: 110px 1fr 80px;
   gap: 12px; align-items: start;
@@ -723,10 +724,10 @@ body {
   font-size: 13px;
 }
 .workout-group-row:last-child { border-bottom: none; }
-.workout-group-label { font-weight: 800; color: var(--t-primary); font-size: 12px; }
-.workout-group-sets { color: var(--t-text); font-weight: 700; }
-.workout-group-members { font-size: 11px; color: #888; line-height: 1.5; }
-.workout-group-rest { font-size: 11px; color: #888; font-weight: 700; text-align: right; }
+.workout-group-label { font-weight: 800; color: var(--t-primary); font-size: 17px; }
+.workout-group-sets { color: var(--t-text); font-weight: 700; font-size: 16px; }
+.workout-group-members { font-size: 14px; color: #888; line-height: 1.6; }
+.workout-group-rest { font-size: 13px; color: #888; font-weight: 700; text-align: right; }
 .workout-empty {
   padding: 18px; text-align: center; color: #aaa; font-size: 13px; font-style: italic;
 }
@@ -1353,45 +1354,45 @@ const CFG = {
   ],
 
   DESTINATIONS: [
-    { week:1,  name:'Training Hub',   flag:'🌍', mascot:'🐨', subtitle:'Where every journey begins',
-      missionTue:"Agent Koala here. The Training Hub is live. Lace up and prove you belong.",
-      missionThu:"Last session at the Hub. Push harder than Tuesday. The world is waiting.",
+    { week:1,  name:'Training Hub',   flag:'🌍', mascot:'🐨', subtitle:'Where Every Journey Begins',
+      missionTue:"Welcome, Runner. Every great journey starts with one step. The most important thing today isn't how fast you go — it's that you showed up. Today, we begin.",
+      missionThu:"You came back. That's called consistency — and it's the most powerful habit you'll ever build. Bring the same energy you brought on Tuesday, and then add a little more.",
       theme:{ primary:'#1E3550', secondary:'#8B6914', bg:'#f5e6c8', cardBg:'#fffdf5', accent:'#D4AF37', text:'#2a1800', border:'#c4a868' }},
     { week:3,  name:'Austin, TX',     flag:'🇺🇸', mascot:'🦔', subtitle:'The Hill Country Challenge',
-      missionTue:"This is Austin, Texas. The Hill Country Runners don't believe you're ready. Every lap today is your answer.",
-      missionThu:"Final run in Texas. The Lone Star checkpoint only stamps passports for runners who finish strong.",
+      missionTue:"Welcome to Austin, Texas. The best runners don't sprint and burn out — they pace themselves. Today's life lesson: find your rhythm and trust it. A steady pace always beats a fast start.",
+      missionThu:"Your last session in Texas. In running and in life, finishing what you start is what separates you. Don't save anything — leave it all on the course.",
       theme:{ primary:'#C45100', secondary:'#1B7A8A', bg:'#fdf0dc', cardBg:'#fff8ee', accent:'#E8A020', text:'#2a1200', border:'#c4a020' }},
     { week:4,  name:'London, UK',     flag:'🇬🇧', mascot:'🐕', subtitle:'Royal Routes',
-      missionTue:"You've landed in London. The Queen's Guards run these streets every morning before breakfast. Keep up.",
-      missionThu:"Final push through London. Big Ben only rings for runners who finish. Make it count.",
+      missionTue:"You've landed in London. The greatest runners in history didn't become great alone — they trained with teammates who pushed them. Today, run for your group, not just yourself.",
+      missionThu:"Final push through London. Discipline means doing the right thing when no one is watching. Run your pace even when the Guide isn't next to you. That's real strength.",
       theme:{ primary:'#9B1B1B', secondary:'#003580', bg:'#f5f0e8', cardBg:'#fff5f5', accent:'#C4A020', text:'#1a0a0a', border:'#9b1b1b' }},
     { week:5,  name:'Tokyo, Japan',   flag:'🇯🇵', mascot:'🦊', subtitle:'Fast & Focused',
-      missionTue:"Konnichiwa. Tokyo runners train before the sakura bloom. Move like the wind through the cherry trees.",
-      missionThu:"Ninja Training Thursday. No noise. No slowing. Smooth, controlled speed. Go.",
+      missionTue:"Konnichiwa. In Japan, there's a word: kaizen — it means getting a little better every single day. You don't need to be perfect today. Just better than last time.",
+      missionThu:"Focus is a superpower. The runner who controls their mind controls their race. No distractions today. Smooth, steady, purposeful speed.",
       theme:{ primary:'#C41E3A', secondary:'#1a1a2e', bg:'#fdf0f5', cardBg:'#fff5f8', accent:'#E8207A', text:'#1a0010', border:'#c41e3a' }},
     { week:6,  name:'China',          flag:'🇨🇳', mascot:'🐼', subtitle:"The Dragon's Route",
-      missionTue:"China's runners train through mountains and mist. Today you train with them.",
-      missionThu:"The Great Wall was built by people who didn't stop. Neither will you.",
+      missionTue:"The Great Wall wasn't built in a day — it was built one brick at a time. Every lap you run today is a brick in your wall. Keep stacking.",
+      missionThu:"Patience is the hardest skill in running and in life. The runners who learn to be patient with themselves always go the furthest. Trust the process today.",
       theme:{ primary:'#AA0000', secondary:'#2a0000', bg:'#fff5e8', cardBg:'#fff8f0', accent:'#D4AF37', text:'#1a0000', border:'#aa0000' }},
     { week:7,  name:'San Francisco',  flag:'🇺🇸', mascot:'🦁', subtitle:'Golden Gate Miles',
-      missionTue:"The Golden Gate fog doesn't slow SF runners. Nothing slows you down today either.",
-      missionThu:"Final crossing. The Bay is watching. Finish strong.",
+      missionTue:"San Francisco is built on hills. In life, the hills don't go away — you just get stronger at climbing them. Today, we climb.",
+      missionThu:"Courage isn't the absence of being scared — it's running forward anyway. Cross today's finish line like you mean it.",
       theme:{ primary:'#C46A00', secondary:'#2D6A8A', bg:'#f5f0e5', cardBg:'#fff8ee', accent:'#E8A020', text:'#1a0800', border:'#c46a00' }},
     { week:8,  name:'Kenya',          flag:'🇰🇪', mascot:'🦁', subtitle:'The Savanna Sprint',
-      missionTue:"Kenya produces the fastest distance runners on Earth. Today you train like them.",
-      missionThu:"The savanna has no easy route. Every mile here is earned.",
+      missionTue:"Kenya produces the fastest distance runners on Earth. Their secret isn't speed — it's that they run together. Your team is your strength. Lean on them today.",
+      missionThu:"In the savanna, every animal earns its way. Nothing is given. Every Relic you've earned is proof that you showed up and put in the work. Keep earning.",
       theme:{ primary:'#8B6914', secondary:'#2D5A1B', bg:'#fdf5e0', cardBg:'#fff8e8', accent:'#D4AF37', text:'#1a1000', border:'#8b6914' }},
     { week:9,  name:'Dubai',          flag:'🇦🇪', mascot:'🐪', subtitle:'Desert Elite',
-      missionTue:"Dubai runners train at 100 degrees. You have no excuse.",
-      missionThu:"Final sprint through the desert. The finish line is gold. So is your effort.",
+      missionTue:"Dubai was built in the desert where nothing grew. When people said it was impossible, they built it anyway. What feels impossible for you today? Go prove it wrong.",
+      missionThu:"Grit is what you have when talent runs out. Today, find out what you're made of. The answer might surprise you.",
       theme:{ primary:'#B8860B', secondary:'#1B5E3A', bg:'#fdf8e8', cardBg:'#fffaee', accent:'#DAA520', text:'#1a0e00', border:'#b8860b' }},
     { week:10, name:'Brazil',         flag:'🇧🇷', mascot:'🦜', subtitle:'Carnival Miles',
-      missionTue:"Brazil runs with music in its heart. Find your rhythm and don't let it go.",
-      missionThu:"Last destination before the Final Route. Leave everything on the course.",
+      missionTue:"Brazil runs with joy in its heart. Remember why you started. Not for Relics, not for stamps — because running makes you stronger. Find your joy in the effort today.",
+      missionThu:"This is your last destination before the Final Route. Look how far you've come. You are not the same runner who started at the Training Hub. You've earned this.",
       theme:{ primary:'#009639', secondary:'#002776', bg:'#f0fce8', cardBg:'#f5fff0', accent:'#FEDD00', text:'#001a00', border:'#009639' }},
     { week:11, name:'Final Route 🏁', flag:'🏁', mascot:'🏆', subtitle:'Race Week — June 6, 2026',
-      missionTue:"This is it. Every lap you've run has led here. One last push.",
-      missionThu:"Race day is June 6. You are ready. You have always been ready. Go make history.",
+      missionTue:"This is it. Every lap you've run, every rest you've earned, every time you showed up when you didn't feel like it — it all led here. One final push.",
+      missionThu:"Race day. You've trained for this moment. Trust your pace, trust your team, trust yourself. Go make history.",
       theme:{ primary:'#1E3550', secondary:'#C45100', bg:'#f5f0e0', cardBg:'#fffef5', accent:'#D4AF37', text:'#0a0a0a', border:'#D4AF37' }},
   ],
 
@@ -1403,27 +1404,32 @@ const CFG = {
       Tuesday: {
         title: 'Hill Country Warmup', notes: '',
         groups: [
-          { label: 'Group A', sets: '1×1 + 3×2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Junning Zhang (Grace)','Nayel Bajwa'] },
-          { label: 'Group B', sets: '2×1 + 1×2 + 2×1 laps', rest: '60s', members: ['Reverie Stinson','Lucia Quimby','Caleb Chang','Emma Baklanova','Arthur Przybyl','Sabrina Yang'] },
-          { label: 'Group C', sets: '5×1 lap', rest: '75s', members: ['Sophie Yang','Molly Going','Mia Baklanova','Rexa Gupta','Hana Wong','Graham Gattegno','Annalise Faheem','Sojourn Stinson','Cora Ishaq','Lauren Creelman'] },
+          { label: '🤘 Longhorns', sets: '1×1 + 3×2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Junning Zhang (Grace)','Nayel Bajwa'] },
+          { label: '🏃 Roadrunners', sets: '2×1 + 1×2 + 2×1 laps', rest: '60s', members: ['Reverie Stinson','Lucia Quimby','Caleb Chang','Emma Baklanova','Arthur Przybyl','Sabrina Yang'] },
+          { label: '🐺 Coyotes', sets: '5×1 lap', rest: '75s', members: ['Sophie Yang','Molly Going','Mia Baklanova','Rexa Gupta','Hana Wong','Graham Gattegno','Annalise Faheem','Sojourn Stinson','Cora Ishaq','Lauren Creelman'] },
         ]
       },
       Thursday: {
-        title: 'Lone Star Push', notes: 'Set 3 challenge ★ for Groups A & C',
+        title: 'Lone Star Push', notes: 'Set 3 challenge ★ for Longhorns & Coyotes',
         groups: [
-          { label: 'Group A', sets: '2+2+3+2+2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Junning Zhang (Grace)','Nayel Bajwa'] },
-          { label: 'Group B', sets: '1+2+2+2+2 laps', rest: '60s', members: ['Reverie Stinson','Lucia Quimby','Caleb Chang','Emma Baklanova','Arthur Przybyl','Sabrina Yang'] },
-          { label: 'Group C', sets: '1+1+2+2+1 laps', rest: '75s', members: ['Sophie Yang','Molly Going','Mia Baklanova','Rexa Gupta','Hana Wong','Graham Gattegno','Annalise Faheem','Sojourn Stinson','Cora Ishaq','Lauren Creelman'] },
+          { label: '🤘 Longhorns', sets: '2+2+3+2+2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Junning Zhang (Grace)','Nayel Bajwa'] },
+          { label: '🏃 Roadrunners', sets: '1+2+2+2+2 laps', rest: '60s', members: ['Reverie Stinson','Lucia Quimby','Caleb Chang','Emma Baklanova','Arthur Przybyl','Sabrina Yang'] },
+          { label: '🐺 Coyotes', sets: '1+1+2+2+1 laps', rest: '75s', members: ['Sophie Yang','Molly Going','Mia Baklanova','Rexa Gupta','Hana Wong','Graham Gattegno','Annalise Faheem','Sojourn Stinson','Cora Ishaq','Lauren Creelman'] },
         ]
       },
     },
     3: {
       Tuesday: {
-        title: 'Austin Ladder', notes: 'Upload Week 3 workout plan to update',
-        groups: []
+        title: 'Austin Ladder', notes: 'First session with new groups — find your rhythm, trust your pace',
+        groups: [
+          { label: '🤘 Longhorns', sets: '2–3–4–3–2 laps', rest: '45s', members: ['Ari Faheem','Audrey Going','Cameron Creelman','Lorenzo Di Rocco','Olivia Wojtowicz','Nathaniel Kelly','Nayel Bajwa'] },
+          { label: '🏃 Roadrunners', sets: '2–2–3–2–2 laps', rest: '55s', members: ['Reverie Stinson','Lucia Quimby','Emma Baklanova','Arthur Przybyl','Junning Zhang (Grace)','Molly Going'] },
+          { label: '🐺 Coyotes', sets: '1–2–2–1 laps', rest: '75s', members: ['Caleb Chang','Sabrina Yang','Sophie Yang','Hana Wong','Cora Ishaq','Graham Gattegno','Mia Baklanova','Lauren Creelman'] },
+          { label: '🐴 Mustangs', sets: '1–2–2–2–1 laps', rest: '65s', members: ['Annalise Faheem','Sojourn Stinson','Rexa Gupta'] },
+        ]
       },
       Thursday: {
-        title: 'Hill Country Finish', notes: 'Upload Week 3 workout plan to update',
+        title: 'Hill Country Finish', notes: 'Thursday plan — to be uploaded',
         groups: []
       },
     },
