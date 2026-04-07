@@ -1518,7 +1518,7 @@ function initState() {
             s.equippedBg = 'austin';
             s.ownedAvatars = ['koala','eagle','lion','panda'];
             s.ownedBgs = ['parchment','austin','london'];
-            s.title = 'Head Guide';
+            s.title = null;
           }
           parsed.students[def.id] = s;
         } else {
@@ -2018,6 +2018,44 @@ function savePrices() {
   renderLeaderboard();
 }
 
+// ── CUSTOM SHOP ITEMS ──────────────────────────────────
+const CUSTOM_ITEMS_KEY = 'atw5k_custom_items';
+
+function loadCustomItems() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_ITEMS_KEY);
+    if (!raw) return;
+    JSON.parse(raw).forEach(item => {
+      if (!CFG.SHOP.find(i => i.id === item.id)) {
+        CFG.SHOP.push(item);
+      }
+    });
+  } catch(e) {}
+}
+
+function addCustomItem() {
+  const icon = document.getElementById('new-item-icon').value.trim() || '🎁';
+  const name = document.getElementById('new-item-name').value.trim();
+  const cost = parseInt(document.getElementById('new-item-cost').value);
+  const desc = document.getElementById('new-item-desc').value.trim() || '';
+
+  if (!name) { showToast('Item needs a name', 'error'); return; }
+  if (isNaN(cost) || cost < 1) { showToast('Set a price (min 1 Relic)', 'error'); return; }
+
+  const id = 'custom_' + Date.now();
+  const item = { id, name, icon, desc, cost, cat: 'item' };
+  CFG.SHOP.push(item);
+
+  // Persist custom items
+  const raw = localStorage.getItem(CUSTOM_ITEMS_KEY);
+  const items = raw ? JSON.parse(raw) : [];
+  items.push(item);
+  localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify(items));
+
+  showToast(`${icon} ${name} added to shop — ${cost} ⬡`, 'success');
+  renderAdmin();
+}
+
 function economyReferenceHtml() {
   const s = n => CFG.SHOP.find(i => i.id === n)?.cost ?? '?';
   const a = n => CFG.AVATARS.find(i => i.id === n)?.cost ?? '?';
@@ -2052,6 +2090,19 @@ function renderPriceEditor() {
   CFG.BACKGROUNDS.filter(b => b.cost > 0).forEach(b => { html += priceRow('bg', b.id, '🖼', b.name + ' BG', b.cost); });
 
   html += `</div><button class="price-save-btn" onclick="savePrices()">💾 Save Prices</button>`;
+
+  // Add custom item form
+  html += `<div style="margin-top:20px;padding-top:16px;border-top:1px solid #333;">
+    <div style="font-size:14px;font-weight:800;color:var(--t-accent);margin-bottom:10px;">➕ Add New Shop Item</div>
+    <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:8px;margin-bottom:8px;">
+      <input id="new-item-icon" type="text" placeholder="🎁" maxlength="4" style="font-size:20px;text-align:center;padding:6px;border-radius:6px;border:1px solid #333;background:#111;color:white;">
+      <input id="new-item-name" type="text" placeholder="Item name" style="padding:8px 10px;border-radius:6px;border:1px solid #333;background:#111;color:white;font-family:Nunito,sans-serif;font-size:13px;">
+      <input id="new-item-cost" type="number" min="1" max="9999" placeholder="Cost ⬡" style="padding:8px 10px;border-radius:6px;border:1px solid #333;background:#111;color:white;font-family:Nunito,sans-serif;font-size:13px;">
+    </div>
+    <input id="new-item-desc" type="text" placeholder="Short description" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid #333;background:#111;color:white;font-family:Nunito,sans-serif;font-size:13px;margin-bottom:8px;">
+    <button class="price-save-btn" onclick="addCustomItem()" style="background:#1a9e53;">➕ Add to Shop</button>
+  </div>`;
+
   el.innerHTML = html;
 }
 
@@ -2953,6 +3004,7 @@ function ktToggleVoice() {
 // ║                    INIT                                          ║
 // ╚═══════════════════════════════════════════════════════════════════╝
 (function init() {
+  loadCustomItems();          // merge any custom shop items into CFG before rendering
   loadPriceOverrides();       // apply any saved price overrides before anything renders
   const dest = getDestination(STATE.currentWeek);
   applyTheme(dest);
