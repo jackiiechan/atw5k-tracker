@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set Completion Cards — ATW 5K</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #0a0e14;
+  color: white;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Group selector tabs */
+.group-tabs {
+  display: flex;
+  background: #111;
+  border-bottom: 2px solid #222;
+}
+.group-tab {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  background: transparent;
+  color: #555;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.group-tab.active {
+  color: var(--g-color, #E8A020);
+  border-bottom: 3px solid var(--g-color, #E8A020);
+  background: rgba(255,255,255,0.03);
+}
+
+/* Card area */
+.card-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 56px);
+  padding: 24px;
+  position: relative;
+}
+
+/* The card itself */
+.set-card {
+  width: min(600px, 92vw);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 0 80px rgba(0,0,0,0.5);
+  text-align: center;
+  animation: cardPop 0.4s ease-out;
+  position: relative;
+}
+@keyframes cardPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.03); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Card states */
+.set-card.ready {
+  background: linear-gradient(160deg, #1a1a2e, #0d1b2a);
+  border: 2px solid #333;
+}
+.set-card.complete {
+  border: 2px solid var(--g-color, #E8A020);
+}
+.set-card.all-done {
+  border: 3px solid #FFD700;
+  box-shadow: 0 0 60px rgba(255,215,0,0.3), 0 0 120px rgba(255,215,0,0.1);
+}
+
+.card-header {
+  padding: 28px 24px 16px;
+}
+.card-emoji {
+  font-size: 56px;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+.card-group-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--g-color, #E8A020);
+}
+
+.card-body {
+  padding: 20px 24px 32px;
+}
+
+/* Ready state */
+.ready-label {
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 8px;
+}
+.ready-set-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 64px;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+}
+.ready-laps {
+  font-size: 22px;
+  font-weight: 800;
+  color: #aaa;
+  margin-top: 8px;
+}
+.ready-relics-preview {
+  font-size: 16px;
+  color: var(--g-color, #E8A020);
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+/* Complete state */
+.complete-label {
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 4px;
+}
+.complete-msg {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+.complete-relics {
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--g-color, #E8A020);
+  font-family: 'Playfair Display', serif;
+  line-height: 1;
+}
+.complete-relics-label {
+  font-size: 14px;
+  color: #888;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Progress bar */
+.progress-wrap {
+  padding: 16px 24px 20px;
+  background: rgba(0,0,0,0.3);
+}
+.progress-bar-bg {
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: var(--g-color, #E8A020);
+  transition: width 0.6s ease;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+  font-weight: 700;
+}
+.progress-earned {
+  color: var(--g-color, #E8A020);
+  font-weight: 900;
+}
+
+/* Tap zone */
+.tap-btn {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  border: none;
+  background: var(--g-color, #E8A020);
+  color: #0a0a0a;
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  letter-spacing: 0.5px;
+}
+.tap-btn:hover { opacity: 0.85; }
+.tap-btn.reset-btn {
+  background: #1a9e53;
+  color: white;
+}
+
+/* All done celebration */
+.all-done-emoji {
+  font-size: 72px;
+  margin-bottom: 12px;
+  display: inline-block;
+  animation: celebrate 0.6s ease-in-out infinite alternate;
+}
+@keyframes celebrate {
+  0% { transform: scale(1) rotate(-3deg); }
+  100% { transform: scale(1.1) rotate(3deg); }
+}
+.all-done-msg {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: #FFD700;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.all-done-sub {
+  font-size: 18px;
+  color: #aaa;
+  font-weight: 600;
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall 2.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 999;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="group-tabs" id="group-tabs"></div>
+<div class="card-stage" id="card-stage"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  WORKOUT DATA — Week 3 Tuesday: Austin Ladder
+// ═══════════════════════════════════════════════════════
+const RELICS_PER_LAP = 3; // 0.20 mi × 15 relics/mi
+
+const GROUPS = [
+  {
+    id: 'longhorns',
+    name: 'Longhorns',
+    emoji: '🤘',
+    color: '#C45100',
+    sets: [2, 3, 4, 3, 2]
+  },
+  {
+    id: 'roadrunners',
+    name: 'Roadrunners',
+    emoji: '🏃',
+    color: '#1B7A8A',
+    sets: [2, 2, 3, 2, 2]
+  },
+  {
+    id: 'coyotes',
+    name: 'Coyotes',
+    emoji: '🐺',
+    color: '#8B6914',
+    sets: [1, 2, 2, 3, 1]
+  },
+  {
+    id: 'mustangs',
+    name: 'Mustangs',
+    emoji: '🐴',
+    color: '#6B3FA0',
+    sets: [1, 2, 2, 2, 1]
+  }
+];
+
+let activeGroup = 0;
+// Track state per group: which set they're on and whether the current set is 'ready' or 'complete'
+let groupState = GROUPS.map(g => ({ currentSet: 0, phase: 'ready' }));
+// phase: 'ready' (about to run set), 'complete' (just finished set), 'done' (all sets finished)
+
+function init() {
+  renderTabs();
+  renderCard();
+}
+
+function renderTabs() {
+  const el = document.getElementById('group-tabs');
+  el.innerHTML = GROUPS.map((g, i) =>
+    `<button class="group-tab ${i === activeGroup ? 'active' : ''}"
+      style="--g-color:${g.color}" onclick="switchGroup(${i})">
+      ${g.emoji} ${g.name}
+    </button>`
+  ).join('');
+}
+
+function switchGroup(i) {
+  activeGroup = i;
+  renderTabs();
+  renderCard();
+}
+
+function renderCard() {
+  const g = GROUPS[activeGroup];
+  const st = groupState[activeGroup];
+  const stage = document.getElementById('card-stage');
+  const totalLaps = g.sets.reduce((a, b) => a + b, 0);
+  const totalRelics = totalLaps * RELICS_PER_LAP;
+
+  // Relics earned so far
+  const earnedLaps = g.sets.slice(0, st.phase === 'complete' || st.phase === 'done' ? st.currentSet + 1 : st.currentSet).reduce((a, b) => a + b, 0);
+  const earnedRelics = earnedLaps * RELICS_PER_LAP;
+  const progressPct = (earnedRelics / totalRelics * 100).toFixed(1);
+
+  document.body.style.setProperty('--g-color', g.color);
+
+  if (st.phase === 'done') {
+    // All sets complete!
+    stage.innerHTML = `
+      <div class="set-card all-done" style="--g-color:${g.color}">
+        <div class="card-header">
+          <div class="all-done-emoji">${g.emoji}</div>
+        </div>
+        <div class="card-body">
+          <div class="all-done-msg">WORKOUT COMPLETE!</div>
+          <div class="complete-relics">${totalRelics} ⬡</div>
+          <div class="complete-relics-label">Total Relics Earned</div>
+          <div class="all-done-sub" style="margin-top:16px;">${g.name} crushed it. ${totalLaps} laps. All ${g.sets.length} sets.</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:100%"></div></div>
+          <div class="progress-label">
+            <span>All ${g.sets.length} sets complete</span>
+            <span class="progress-earned">${totalRelics} / ${totalRelics} ⬡</span>
+          </div>
+        </div>
+        <button class="tap-btn reset-btn" onclick="resetGroup()">↻ Reset ${g.name}</button>
+      </div>`;
+    return;
+  }
+
+  const setIdx = st.currentSet;
+  const setLaps = g.sets[setIdx];
+  const setRelics = setLaps * RELICS_PER_LAP;
+  const setNum = setIdx + 1;
+
+  if (st.phase === 'ready') {
+    // About to run this set
+    stage.innerHTML = `
+      <div class="set-card ready" style="--g-color:${g.color}">
+        <div class="card-header">
+          <div class="card-emoji">${g.emoji}</div>
+          <div class="card-group-name">${g.name}</div>
+        </div>
+        <div class="card-body">
+          <div class="ready-label">Up Next</div>
+          <div class="ready-set-num">Set ${setNum}</div>
+          <div class="ready-laps">${setLaps} lap${setLaps > 1 ? 's' : ''}</div>
+          <div class="ready-relics-preview">${setRelics} ⬡ on the line</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progressPct}%"></div></div>
+          <div class="progress-label">
+            <span>Set ${setNum} of ${g.sets.length}</span>
+            <span class="progress-earned">${earnedRelics} / ${totalRelics} ⬡</span>
+          </div>
+        </div>
+        <button class="tap-btn" style="--g-color:${g.color}" onclick="completeSet()">✓ Set ${setNum} Complete — Award ${setRelics} ⬡</button>
+      </div>`;
+  } else if (st.phase === 'complete') {
+    // Just finished this set — celebration
+    const newEarned = earnedRelics;
+    const messages = [
+      'Relics earned!',
+      'Strong work!',
+      'Keep building!',
+      'That\'s how it\'s done!',
+      'Money in the bank!',
+    ];
+    const msg = messages[setIdx % messages.length];
+
+    stage.innerHTML = `
+      <div class="set-card complete" style="--g-color:${g.color}">
+        <div class="card-header">
+          <div class="card-emoji">${g.emoji}</div>
+          <div class="card-group-name">${g.name}</div>
+        </div>
+        <div class="card-body">
+          <div class="complete-label">Set ${setNum} Complete</div>
+          <div class="complete-msg">${msg}</div>
+          <div class="complete-relics">+${setRelics} ⬡</div>
+          <div class="complete-relics-label">Relics Earned This Set</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progressPct}%"></div></div>
+          <div class="progress-label">
+            <span>Set ${setNum} of ${g.sets.length} done</span>
+            <span class="progress-earned">${newEarned} / ${totalRelics} ⬡</span>
+          </div>
+        </div>
+        <button class="tap-btn" style="--g-color:${g.color}" onclick="nextSet()">${setIdx < g.sets.length - 1 ? `Next → Set ${setNum + 1} (${g.sets[setIdx + 1]} lap${g.sets[setIdx + 1] > 1 ? 's' : ''})` : 'Finish Workout →'}</button>
+      </div>`;
+  }
+}
+
+function completeSet() {
+  const st = groupState[activeGroup];
+  st.phase = 'complete';
+  renderCard();
+  burstConfetti();
+}
+
+function nextSet() {
+  const g = GROUPS[activeGroup];
+  const st = groupState[activeGroup];
+  if (st.currentSet >= g.sets.length - 1) {
+    st.phase = 'done';
+    burstConfetti();
+    burstConfetti();
+  } else {
+    st.currentSet++;
+    st.phase = 'ready';
+  }
+  renderCard();
+}
+
+function resetGroup() {
+  groupState[activeGroup] = { currentSet: 0, phase: 'ready' };
+  renderCard();
+}
+
+// Confetti burst
+function burstConfetti() {
+  const g = GROUPS[activeGroup];
+  const colors = [g.color, '#FFD700', '#fff', '#E8A020', '#1a9e53', '#ff6b6b'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animationDelay = (Math.random() * 0.5) + 's';
+    el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+    el.style.width = (6 + Math.random() * 8) + 'px';
+    el.style.height = (6 + Math.random() * 8) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
