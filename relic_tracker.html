@@ -2808,7 +2808,7 @@ const KT_STEPS = [
   },
   {
     title: 'Your Mission',
-    text: 'Your goal is to run a 5K — that\'s 3.1 miles, or 15 laps around the track. Along the way, you\'ll travel through 11 destinations across the globe. Every lap you run moves you forward on the map.'
+    text: 'Your goal is to run a 5K — that\'s 3.1 miles. Along the way, you\'ll travel through 11 destinations across the globe. Every lap you run moves you forward on the map.'
   },
   {
     title: 'How You Earn Relics',
@@ -2833,9 +2833,16 @@ const KT_STEPS = [
 ];
 
 let ktStep = 0;
-let ktVoiceEnabled = true;
+let ktMuted = false;
 let ktTypewriterTimer = null;
-let ktSpeechTimer = null;
+let ktAudio = null;
+
+// Preload all audio clips
+const KT_AUDIO = KT_STEPS.map((_, i) => {
+  const a = new Audio(`koala_${i + 1}.mp3`);
+  a.preload = 'auto';
+  return a;
+});
 
 function openKoalaTutorial() {
   ktStep = 0;
@@ -2845,35 +2852,40 @@ function openKoalaTutorial() {
 
 function closeKoalaTutorial() {
   document.getElementById('kt-overlay').classList.remove('open');
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  ktStopAudio();
   clearTimeout(ktTypewriterTimer);
+}
+
+function ktStopAudio() {
+  if (ktAudio) {
+    ktAudio.pause();
+    ktAudio.currentTime = 0;
+    ktAudio = null;
+  }
 }
 
 function ktRenderStep() {
   const step = KT_STEPS[ktStep];
   const total = KT_STEPS.length;
 
-  // title
   document.getElementById('kt-title').textContent = step.title;
 
-  // dots
   const dotsEl = document.getElementById('kt-dots');
   dotsEl.innerHTML = KT_STEPS.map((_, i) =>
     `<div class="kt-dot ${i === ktStep ? 'active' : i < ktStep ? 'done' : ''}"></div>`
   ).join('');
 
-  // next button label
-  const nextBtn = document.getElementById('kt-next');
-  nextBtn.textContent = ktStep === total - 1 ? 'Start Running →' : 'Next →';
-
-  // prev button
+  document.getElementById('kt-next').textContent = ktStep === total - 1 ? 'Start Running →' : 'Next →';
   document.getElementById('kt-prev').style.visibility = ktStep === 0 ? 'hidden' : 'visible';
 
-  // typewriter
   ktTypewrite(step.text, document.getElementById('kt-bubble-text'), () => {});
 
-  // voice
-  if (ktVoiceEnabled) ktSpeak(step.text);
+  ktStopAudio();
+  if (!ktMuted) {
+    ktAudio = KT_AUDIO[ktStep];
+    ktAudio.currentTime = 0;
+    ktAudio.play().catch(() => {});
+  }
 }
 
 function ktTypewrite(text, el, onDone) {
@@ -2889,26 +2901,6 @@ function ktTypewrite(text, el, onDone) {
   next();
 }
 
-function ktSpeak(text) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  // Small delay — Chrome needs voices loaded
-  clearTimeout(ktSpeechTimer);
-  ktSpeechTimer = setTimeout(() => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 0.88;
-    utter.pitch = 1.15;
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      v.name.includes('Samantha') || v.name.includes('Karen') ||
-      v.name.includes('Moira')    || v.name.includes('Fiona') ||
-      (v.lang === 'en-US' && v.localService)
-    );
-    if (preferred) utter.voice = preferred;
-    window.speechSynthesis.speak(utter);
-  }, 120);
-}
-
 function ktNext() {
   if (ktStep >= KT_STEPS.length - 1) { closeKoalaTutorial(); return; }
   ktStep++;
@@ -2922,12 +2914,17 @@ function ktPrev() {
 }
 
 function ktToggleVoice() {
-  ktVoiceEnabled = !ktVoiceEnabled;
+  ktMuted = !ktMuted;
   const btn = document.getElementById('kt-voice-btn');
-  btn.textContent = ktVoiceEnabled ? '🔊 Voice On' : '🔇 Voice Off';
-  btn.classList.toggle('muted', !ktVoiceEnabled);
-  if (!ktVoiceEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
-  else if (ktVoiceEnabled) ktSpeak(KT_STEPS[ktStep].text);
+  btn.textContent = ktMuted ? '🔇 Voice Off' : '🔊 Voice On';
+  btn.classList.toggle('muted', ktMuted);
+  if (ktMuted) {
+    ktStopAudio();
+  } else {
+    ktAudio = KT_AUDIO[ktStep];
+    ktAudio.currentTime = 0;
+    ktAudio.play().catch(() => {});
+  }
 }
 
 // ╔═══════════════════════════════════════════════════════════════════╗
