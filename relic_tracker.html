@@ -943,6 +943,34 @@ body {
    ═══════════════════════════════════════════════════════════ */
 .empty-state { text-align: center; padding: 40px; color: #aaa; font-size: 14px; }
 
+/* Quick Input */
+.qi-mode-btn, .qi-day-btn {
+  padding: 6px 14px; border-radius: 6px; border: 1px solid #333;
+  background: #111; color: #888;
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.qi-mode-btn.active, .qi-day-btn.active {
+  background: var(--t-accent); color: #0a0a0a; border-color: var(--t-accent);
+}
+.qi-preview-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-radius: 8px; margin-bottom: 4px;
+  font-size: 14px; font-weight: 600;
+}
+.qi-preview-row.match { background: rgba(26,158,51,0.12); color: #8f8; border: 1px solid rgba(26,158,51,0.25); }
+.qi-preview-row.miss  { background: rgba(204,68,68,0.12); color: #f88; border: 1px solid rgba(204,68,68,0.25); }
+.qi-preview-row .qi-name { flex: 1; }
+.qi-preview-row .qi-val  { font-weight: 800; color: var(--t-accent); margin-left: 12px; }
+.qi-preview-row .qi-relics { font-size: 12px; color: #888; margin-left: 8px; }
+.qi-submit-btn {
+  margin-top: 10px; padding: 12px 24px; border-radius: 10px; border: none;
+  background: #1a9e53; color: white;
+  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
+  cursor: pointer; transition: opacity 0.15s; width: 100%;
+}
+.qi-submit-btn:hover { opacity: 0.85; }
+
 /* ═══════════════════════════════════════════════════════════
    AGENT KOALA TUTORIAL OVERLAY
    ═══════════════════════════════════════════════════════════ */
@@ -1224,6 +1252,25 @@ body {
 <div class="view" id="view-admin">
   <div class="section-label">Admin Settings</div>
   <div class="admin-grid">
+    <!-- QUICK INPUT — full width, top of admin -->
+    <div class="admin-card" style="grid-column: 1 / -1">
+      <div class="admin-card-title">⚡ Quick Session Input</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;gap:4px;">
+          <button class="qi-mode-btn active" id="qi-mode-laps" onclick="setQiMode('laps')">Laps</button>
+          <button class="qi-mode-btn" id="qi-mode-miles" onclick="setQiMode('miles')">Miles</button>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <button class="qi-day-btn active" id="qi-day-tue" onclick="setQiDay('Tuesday')">Tuesday</button>
+          <button class="qi-day-btn" id="qi-day-thu" onclick="setQiDay('Thursday')">Thursday</button>
+        </div>
+        <span style="font-size:12px;color:#666;">Week <strong id="qi-week-label">3</strong></span>
+      </div>
+      <textarea id="qi-input" rows="8" placeholder="Paste session data — one runner per line:&#10;&#10;Ari 5&#10;Audrey 4&#10;Cameron 6&#10;Lorenzo 0.4 mi&#10;&#10;First names only. Works with laps or miles." style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0a0a0a;color:#ddd;font-family:'Nunito',sans-serif;font-size:14px;resize:vertical;"></textarea>
+      <button class="price-save-btn" onclick="previewQuickInput()" style="margin-top:8px;background:var(--t-secondary);">👁 Preview</button>
+      <div id="qi-preview" style="margin-top:12px;"></div>
+    </div>
+
     <div class="admin-card">
       <div class="admin-card-title">📍 Active Destination (Week)</div>
       <div class="week-grid" id="week-grid"></div>
@@ -2016,6 +2063,158 @@ function savePrices() {
   if (ref) ref.innerHTML = economyReferenceHtml();
   // Re-render leaderboard so open modals reflect new prices immediately
   renderLeaderboard();
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                    QUICK SESSION INPUT                           ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+let qiMode = 'laps';   // 'laps' or 'miles'
+let qiDay  = 'Tuesday';
+let qiParsed = [];      // last parsed results for submit
+
+function setQiMode(mode) {
+  qiMode = mode;
+  document.getElementById('qi-mode-laps').classList.toggle('active', mode === 'laps');
+  document.getElementById('qi-mode-miles').classList.toggle('active', mode === 'miles');
+}
+
+function setQiDay(day) {
+  qiDay = day;
+  document.getElementById('qi-day-tue').classList.toggle('active', day === 'Tuesday');
+  document.getElementById('qi-day-thu').classList.toggle('active', day === 'Thursday');
+}
+
+function parseQuickInput(text) {
+  // Split on newlines or commas
+  const lines = text.split(/[\n]+/).map(l => l.trim()).filter(Boolean);
+  const roster = Object.values(STATE.students);
+  const results = [];
+  const missed = [];
+
+  for (const line of lines) {
+    // Try to extract: name (words) + number + optional unit
+    const match = line.match(/^([a-zA-Z][a-zA-Z\s]*?)\s*[-–:·]?\s*([\d]+\.?\d*)\s*(laps?|mi(?:les?)?|l|m)?\s*$/i);
+    if (!match) {
+      // Try reverse: number first
+      const rev = line.match(/^([\d]+\.?\d*)\s*(laps?|mi(?:les?)?|l|m)?\s*[-–:·]?\s*([a-zA-Z][a-zA-Z\s]*?)\s*$/i);
+      if (rev) {
+        match[1] = rev[3]; match[2] = rev[1]; match[3] = rev[2];
+      }
+    }
+    if (!match) { missed.push(line); continue; }
+
+    const nameInput = match[1].trim().toLowerCase();
+    const value     = parseFloat(match[2]);
+    const unit      = (match[3] || '').toLowerCase();
+
+    // Fuzzy match: first name, partial, or nickname
+    const student = roster.find(s => {
+      const first = s.name.split(' ')[0].toLowerCase();
+      const full  = s.name.toLowerCase();
+      return first === nameInput || full.startsWith(nameInput) || first.startsWith(nameInput);
+    });
+
+    if (!student) { missed.push(line); continue; }
+
+    let laps, miles;
+    const isMiles = qiMode === 'miles' || unit.startsWith('mi') || unit === 'm';
+
+    if (isMiles) {
+      miles = parseFloat(value.toFixed(3));
+      laps  = Math.round(value / CFG.LAP_MILES);
+    } else {
+      laps  = Math.round(value);
+      miles = parseFloat((laps * CFG.LAP_MILES).toFixed(3));
+    }
+
+    const relics = Math.round(miles * CFG.RELICS_PER_MILE);
+    results.push({ id: student.id, name: student.name, laps, miles, relics });
+  }
+
+  return { results, missed };
+}
+
+function previewQuickInput() {
+  const text = document.getElementById('qi-input').value.trim();
+  const container = document.getElementById('qi-preview');
+
+  if (!text) {
+    container.innerHTML = '<div style="color:#666;font-size:13px;">Paste session data above and click Preview.</div>';
+    return;
+  }
+
+  const { results, missed } = parseQuickInput(text);
+  qiParsed = results;
+
+  let html = '';
+
+  if (results.length > 0) {
+    const totalLaps   = results.reduce((a, r) => a + r.laps, 0);
+    const totalRelics = results.reduce((a, r) => a + r.relics, 0);
+    html += `<div style="font-size:12px;color:#888;margin-bottom:8px;">${results.length} runners matched · ${totalLaps} total laps · ${totalRelics} ⬡ total</div>`;
+
+    results.forEach(r => {
+      html += `<div class="qi-preview-row match">
+        <span class="qi-name">${r.name}</span>
+        <span class="qi-val">${r.laps} laps · ${r.miles.toFixed(2)} mi</span>
+        <span class="qi-relics">+${r.relics} ⬡</span>
+      </div>`;
+    });
+  }
+
+  if (missed.length > 0) {
+    html += `<div style="font-size:12px;color:#c44;margin:8px 0 4px;">Could not match:</div>`;
+    missed.forEach(m => {
+      html += `<div class="qi-preview-row miss">${m}</div>`;
+    });
+  }
+
+  if (results.length > 0) {
+    html += `<button class="qi-submit-btn" onclick="submitQuickInput()">⚡ Award ${results.reduce((a,r) => a+r.relics, 0)} Relics to ${results.length} runners (${qiDay})</button>`;
+  }
+
+  container.innerHTML = html;
+
+  // Update week label
+  const wl = document.getElementById('qi-week-label');
+  if (wl) wl.textContent = STATE.currentWeek;
+}
+
+function submitQuickInput() {
+  if (!qiParsed.length) return;
+  if (!confirm(`Award Relics to ${qiParsed.length} runners for Week ${STATE.currentWeek} ${qiDay}?`)) return;
+
+  const date = todayStr();
+  const week = STATE.currentWeek;
+  const entries = [];
+
+  qiParsed.forEach(r => {
+    const s = STATE.students[r.id];
+    if (!s) return;
+    s.relics    += r.relics;
+    s.totalLaps += r.laps;
+    s.totalMiles = parseFloat((s.totalMiles + r.miles).toFixed(3));
+    s.sessionLog.push({ date, week, day: qiDay, laps: r.laps, miles: r.miles, relics: r.relics });
+    entries.push({ name: s.name, laps: r.laps, miles: r.miles, relics: r.relics });
+  });
+
+  // Add to global session log
+  STATE.sessions = STATE.sessions || [];
+  STATE.sessions.push({ date, week, day: qiDay, entries });
+
+  save();
+
+  const totalRelics = qiParsed.reduce((a, r) => a + r.relics, 0);
+  showToast(`${qiParsed.length} runners awarded ${totalRelics} ⬡ — ${qiDay} W${week}`, 'success');
+
+  // Clear
+  document.getElementById('qi-input').value = '';
+  document.getElementById('qi-preview').innerHTML = '<div style="color:#1a9e53;font-weight:700;font-size:14px;padding:12px;">✅ Session logged successfully!</div>';
+  qiParsed = [];
+
+  renderLeaderboard();
+  renderMap();
+  renderHistory();
 }
 
 // ── CUSTOM SHOP ITEMS ──────────────────────────────────
