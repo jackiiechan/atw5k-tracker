@@ -1992,6 +1992,8 @@ function savePrices() {
   // Refresh the economy reference card text
   const ref = document.querySelector('#view-admin .admin-card:last-child p');
   if (ref) ref.innerHTML = economyReferenceHtml();
+  // Re-render leaderboard so open modals reflect new prices immediately
+  renderLeaderboard();
 }
 
 function economyReferenceHtml() {
@@ -2137,17 +2139,20 @@ function renderShopTab(s) {
   const today = todayStr();
   const stamped = (s.stampDates || []).includes(today);
 
+  const braceletCost = CFG.SHOP.find(i => i.id === 'bracelet')?.cost ?? 30;
+  const stampCost    = CFG.SHOP.find(i => i.id === 'stamp')?.cost ?? 5;
+
   const braceGate = s.hasBracelet
     ? `<span class="gate-action ga-owned">✓ Owned</span>`
-    : s.relics >= 30
-      ? `<button class="gate-action ga-buy" onclick="purchase('bracelet')">Buy — 30 ⬡</button>`
-      : `<button class="gate-action ga-locked" disabled>30 ⬡ needed</button>`;
+    : s.relics >= braceletCost
+      ? `<button class="gate-action ga-buy" onclick="purchase('bracelet')">Buy — ${braceletCost} ⬡</button>`
+      : `<button class="gate-action ga-locked" disabled>${braceletCost} ⬡ needed</button>`;
 
   const stampGate = stamped
     ? `<span class="gate-action ga-owned">✓ Done today</span>`
-    : s.relics >= 5
-      ? `<button class="gate-action ga-buy" onclick="purchase('stamp')">Buy — 5 ⬡</button>`
-      : `<button class="gate-action ga-locked" disabled>5 ⬡ needed</button>`;
+    : s.relics >= stampCost
+      ? `<button class="gate-action ga-buy" onclick="purchase('stamp')">Buy — ${stampCost} ⬡</button>`
+      : `<button class="gate-action ga-locked" disabled>${stampCost} ⬡ needed</button>`;
 
   let html = `<div class="gate-block">
     <div class="gate-row">
