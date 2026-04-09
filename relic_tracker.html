@@ -1125,6 +1125,27 @@ body {
   </div>
 </div>
 
+<!-- ── OPERATION LAP WARS BRIEFING OVERLAY ─────────────── -->
+<div class="kt-overlay" id="olw-overlay">
+  <div class="kt-card">
+    <div class="kt-transmission">🛰 Agent Koala · Priority One · Operation Lap Wars</div>
+    <div class="kt-koala">🐨</div>
+    <div class="kt-step-title" id="olw-title">Incoming Transmission…</div>
+    <div class="kt-bubble">
+      <span id="olw-bubble-text"></span>
+    </div>
+    <div class="kt-dots" id="olw-dots"></div>
+    <div class="kt-btns">
+      <button class="kt-btn-prev" id="olw-prev" onclick="olwPrev()">← Back</button>
+      <button class="kt-btn-next" id="olw-next" onclick="olwNext()">Next →</button>
+    </div>
+    <div class="kt-footer">
+      <span class="kt-skip" onclick="closeLapWarsBriefing()">Skip Briefing</span>
+      <button class="kt-voice-btn" id="olw-voice-btn" onclick="olwToggleVoice()">🔊 Voice On</button>
+    </div>
+  </div>
+</div>
+
 <div class="airmail-stripe"></div>
 
 <!-- ── NAV ─────────────────────────────────────────────── -->
@@ -1146,6 +1167,7 @@ body {
       <button class="tab-btn" onclick="switchTab('admin',this)">⚙ Admin</button>
     </div>
     <button class="kt-nav-btn" onclick="openKoalaTutorial()">📋 Briefing</button>
+    <button class="kt-nav-btn" onclick="openLapWarsBriefing()" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Lap Wars</button>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
   </div>
   <div class="mobile-menu" id="mobile-menu">
@@ -1156,6 +1178,7 @@ body {
     <button class="mob-tab-btn" onclick="switchTab('history',null)"><span class="mob-tab-icon">📖</span> History</button>
     <button class="mob-tab-btn" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
     <button class="mob-tab-btn" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
+    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">🎯</span> Lap Wars</button>
   </div>
 </nav>
 
@@ -3225,6 +3248,132 @@ function ktToggleVoice() {
     ktAudio = KT_AUDIO[ktStep];
     ktAudio.currentTime = 0;
     ktAudio.play().catch(() => {});
+  }
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║              OPERATION LAP WARS · MISSION BRIEFING               ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const OLW_STEPS = [
+  {
+    title: 'Incoming Transmission…',
+    text: "Agents. Stand by. This is Agent Koala with a Priority One transmission. Today's mission is unlike anything you've run before. Listen carefully."
+  },
+  {
+    title: 'Operation Lap Wars',
+    text: "Your mission is called Operation Lap Wars. You will be divided into squads. Every lap you complete feeds your squad's supply line. The squad with the most laps at the end of the mission wins the day. But here's the catch — I'm not telling you your squad yet. You'll find out at the field."
+  },
+  {
+    title: 'The Pacing Secret',
+    text: "Listen closely, Agent. This is the part most runners get wrong. If you sprint at the start, you will burn out by lap three and your squad will lose ground. If you jog steady — smell the flower, blow out the candle — you will run farther. Far, far farther. A jogger who never stops will always beat a sprinter who has to walk. Always."
+  },
+  {
+    title: 'Run Your Pace, Not Theirs',
+    text: "Do not chase the fastest runner. Do not match the slowest. Find YOUR pace — the one where you can breathe, where your legs feel strong, where you could keep going for one more lap, and then one more after that. That is your mission pace. Guard it."
+  },
+  {
+    title: 'Every Lap Counts the Same',
+    text: "Here is something important. On Operation Lap Wars, every lap you complete is worth the same as every other runner's lap. The fastest lap and the slowest lap — same value. Same points. Your squad does not need a hero. Your squad needs every single agent contributing. Miss a lap, and your squad feels it."
+  },
+  {
+    title: 'Briefing Complete.',
+    text: "Your orders: show up today ready to run long, not fast. Steady legs. Quiet breathing. Eyes forward. Squads will be revealed at the field. Trust your Guides. Trust your pace. The world is watching. Agent Koala — out."
+  }
+];
+
+let olwStep = 0;
+let olwMuted = false;
+let olwTypewriterTimer = null;
+let olwAudio = null;
+
+// Preload audio clips if they exist (filenames: lapwars_1.mp3 … lapwars_6.mp3)
+// Silently falls back to text-only if audio files are missing.
+const OLW_AUDIO = OLW_STEPS.map((_, i) => {
+  const a = new Audio(`lapwars_${i + 1}.mp3`);
+  a.preload = 'auto';
+  return a;
+});
+
+function openLapWarsBriefing() {
+  olwStep = 0;
+  document.getElementById('olw-overlay').classList.add('open');
+  olwRenderStep();
+}
+
+function closeLapWarsBriefing() {
+  document.getElementById('olw-overlay').classList.remove('open');
+  olwStopAudio();
+  clearTimeout(olwTypewriterTimer);
+}
+
+function olwStopAudio() {
+  if (olwAudio) {
+    olwAudio.pause();
+    olwAudio.currentTime = 0;
+    olwAudio = null;
+  }
+}
+
+function olwRenderStep() {
+  const step = OLW_STEPS[olwStep];
+  const total = OLW_STEPS.length;
+
+  document.getElementById('olw-title').textContent = step.title;
+
+  const dotsEl = document.getElementById('olw-dots');
+  dotsEl.innerHTML = OLW_STEPS.map((_, i) =>
+    `<div class="kt-dot ${i === olwStep ? 'active' : i < olwStep ? 'done' : ''}"></div>`
+  ).join('');
+
+  document.getElementById('olw-next').textContent = olwStep === total - 1 ? 'Report to Field →' : 'Next →';
+  document.getElementById('olw-prev').style.visibility = olwStep === 0 ? 'hidden' : 'visible';
+
+  olwTypewrite(step.text, document.getElementById('olw-bubble-text'), () => {});
+
+  olwStopAudio();
+  if (!olwMuted) {
+    olwAudio = OLW_AUDIO[olwStep];
+    olwAudio.currentTime = 0;
+    olwAudio.play().catch(() => {});
+  }
+}
+
+function olwTypewrite(text, el, onDone) {
+  el.textContent = '';
+  let i = 0;
+  clearTimeout(olwTypewriterTimer);
+  function next() {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      olwTypewriterTimer = setTimeout(next, 22);
+    } else { onDone(); }
+  }
+  next();
+}
+
+function olwNext() {
+  if (olwStep >= OLW_STEPS.length - 1) { closeLapWarsBriefing(); return; }
+  olwStep++;
+  olwRenderStep();
+}
+
+function olwPrev() {
+  if (olwStep === 0) return;
+  olwStep--;
+  olwRenderStep();
+}
+
+function olwToggleVoice() {
+  olwMuted = !olwMuted;
+  const btn = document.getElementById('olw-voice-btn');
+  btn.textContent = olwMuted ? '🔇 Voice Off' : '🔊 Voice On';
+  btn.classList.toggle('muted', olwMuted);
+  if (olwMuted) {
+    olwStopAudio();
+  } else {
+    olwAudio = OLW_AUDIO[olwStep];
+    olwAudio.currentTime = 0;
+    olwAudio.play().catch(() => {});
   }
 }
 
