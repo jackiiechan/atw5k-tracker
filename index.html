@@ -1381,6 +1381,7 @@ const CFG = {
     { id: 'teammate',   label: 'Positive Teammate',          relics: 5,  icon: '🤝' },
     { id: 'pr',         label: 'Personal Distance Record',   relics: 10, icon: '📈' },
     { id: 'pacing',     label: 'Pacing Legend (No Walking)', relics: 12, icon: '🏃' },
+    { id: 'winner',     label: 'Lap Wars Winner',            relics: 10, icon: '🏆' },
   ],
 
   TITLES: [
@@ -1392,35 +1393,35 @@ const CFG = {
 
   SHOP: [
     { id:'stamp',    name:'Passport Stamp',    icon:'📋', cost:5,   cat:'gate',     desc:'Required each session — opens the shop', isStamp:true },
-    { id:'bracelet', name:"Runner's Bracelet", icon:'⌚', cost:30,  cat:'gate',     desc:'Fitness tracker — permanently unlocks the full shop', isBracelet:true },
-    { id:'sticker',  name:'Passport Sticker',  icon:'✦',  cost:10,  cat:'item',     desc:'A custom sticker for your runner passport' },
-    { id:'song',     name:'Pick Warm-Up Song', icon:'🎵', cost:25,  cat:'item',     desc:'Choose the music for the next session' },
-    { id:'fuel',     name:'Fuel Point',        icon:'⚡', cost:35,  cat:'item',     desc:'Extra snack — earned through distance, not given' },
-    { id:'laces',    name:'Custom Shoelaces',  icon:'👟', cost:50,  cat:'item',     desc:'Pick your color, own your look' },
-    { id:'title',    name:'Leaderboard Title', icon:'🏅', cost:75,  cat:'cosmetic', desc:'Pick your runner title — shown on the leaderboard', isTitle:true },
-    { id:'leadwu',   name:'Lead the Warm-Up', icon:'👑', cost:100, cat:'item',     desc:'You run the whole session warm-up' },
+    { id:'bracelet', name:"Runner's Bracelet", icon:'⌚', cost:45,  cat:'gate',     desc:'Fitness tracker — permanently unlocks the full shop', isBracelet:true },
+    { id:'sticker',  name:'Passport Sticker',  icon:'✦',  cost:15,  cat:'item',     desc:'A custom sticker for your runner passport' },
+    { id:'song',     name:'Pick Warm-Up Song', icon:'🎵', cost:40,  cat:'item',     desc:'Choose the music for the next session' },
+    { id:'fuel',     name:'Fuel Point',        icon:'⚡', cost:55,  cat:'item',     desc:'Extra snack — earned through distance, not given' },
+    { id:'laces',    name:'Custom Shoelaces',  icon:'👟', cost:75,  cat:'item',     desc:'Pick your color, own your look' },
+    { id:'title',    name:'Leaderboard Title', icon:'🏅', cost:115, cat:'cosmetic', desc:'Pick your runner title — shown on the leaderboard', isTitle:true },
+    { id:'leadwu',   name:'Lead the Warm-Up', icon:'👑', cost:150, cat:'item',     desc:'You run the whole session warm-up' },
   ],
 
   AVATARS: [
     { id:'koala',  emoji:'🐨', name:'Koala Scout',     cost:0  },
-    { id:'lion',   emoji:'🦁', name:'Safari Lion',     cost:40 },
-    { id:'panda',  emoji:'🐼', name:'Panda Explorer',  cost:40 },
-    { id:'fox',    emoji:'🦊', name:'Fox Ranger',      cost:40 },
-    { id:'rabbit', emoji:'🐰', name:'Bunny Guide',     cost:40 },
-    { id:'bear',   emoji:'🐻', name:'Bear Adventurer', cost:40 },
-    { id:'tiger',  emoji:'🐯', name:'Tokyo Tiger',     cost:40 },
-    { id:'eagle',  emoji:'🦅', name:'Eagle Legend',    cost:60 },
+    { id:'lion',   emoji:'🦁', name:'Safari Lion',     cost:60 },
+    { id:'panda',  emoji:'🐼', name:'Panda Explorer',  cost:60 },
+    { id:'fox',    emoji:'🦊', name:'Fox Ranger',      cost:60 },
+    { id:'rabbit', emoji:'🐰', name:'Bunny Guide',     cost:60 },
+    { id:'bear',   emoji:'🐻', name:'Bear Adventurer', cost:60 },
+    { id:'tiger',  emoji:'🐯', name:'Tokyo Tiger',     cost:60 },
+    { id:'eagle',  emoji:'🦅', name:'Eagle Legend',    cost:90 },
   ],
 
   BACKGROUNDS: [
     { id:'parchment', name:'Parchment',       cost:0,  css:'linear-gradient(135deg,#f5e6c8,#e8d0a0)' },
-    { id:'austin',    name:'Austin Sunset',   cost:50, css:'linear-gradient(135deg,#C45100,#1B7A8A)' },
-    { id:'london',    name:'London Royal',    cost:50, css:'linear-gradient(135deg,#003580,#9B1B1B)' },
-    { id:'tokyo',     name:'Tokyo Blossom',   cost:50, css:'linear-gradient(135deg,#ffb7c5,#C41E3A)' },
-    { id:'china',     name:'China Dynasty',   cost:50, css:'linear-gradient(135deg,#AA0000,#D4AF37)' },
-    { id:'kenya',     name:'Safari Gold',     cost:50, css:'linear-gradient(135deg,#8B6914,#2D5A1B)' },
-    { id:'dubai',     name:'Dubai Dunes',     cost:50, css:'linear-gradient(135deg,#B8860B,#1B5E3A)' },
-    { id:'brazil',    name:'Brazil Carnival', cost:50, css:'linear-gradient(135deg,#009639,#002776)' },
+    { id:'austin',    name:'Austin Sunset',   cost:75, css:'linear-gradient(135deg,#C45100,#1B7A8A)' },
+    { id:'london',    name:'London Royal',    cost:75, css:'linear-gradient(135deg,#003580,#9B1B1B)' },
+    { id:'tokyo',     name:'Tokyo Blossom',   cost:75, css:'linear-gradient(135deg,#ffb7c5,#C41E3A)' },
+    { id:'china',     name:'China Dynasty',   cost:75, css:'linear-gradient(135deg,#AA0000,#D4AF37)' },
+    { id:'kenya',     name:'Safari Gold',     cost:75, css:'linear-gradient(135deg,#8B6914,#2D5A1B)' },
+    { id:'dubai',     name:'Dubai Dunes',     cost:75, css:'linear-gradient(135deg,#B8860B,#1B5E3A)' },
+    { id:'brazil',    name:'Brazil Carnival', cost:75, css:'linear-gradient(135deg,#009639,#002776)' },
   ],
 
   DESTINATIONS: [
@@ -1909,7 +1910,7 @@ function renderLeaderboard() {
       };
     }
     return s;
-  }).sort((a,b) => b.relics - a.relics || b.totalMiles - a.totalMiles);
+  }).sort((a,b) => b.totalLaps - a.totalLaps || b.totalMiles - a.totalMiles || b.relics - a.relics);
 
   const grid = document.getElementById('lb-grid');
   grid.innerHTML = students.map((s, i) => {
