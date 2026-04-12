@@ -3472,10 +3472,10 @@ let olwMuted = false;
 let olwTypewriterTimer = null;
 let olwAudio = null;
 
-// Preload audio clips if they exist (filenames: lapwars_1.mp3 … lapwars_6.mp3)
+// Preload audio clips (filenames: london_1.mp3 … london_6.mp3)
 // Silently falls back to text-only if audio files are missing.
 const OLW_AUDIO = OLW_STEPS.map((_, i) => {
-  const a = new Audio(`lapwars_${i + 1}.mp3`);
+  const a = new Audio(`london_${i + 1}.mp3`);
   a.preload = 'auto';
   return a;
 });
