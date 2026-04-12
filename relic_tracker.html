@@ -736,58 +736,88 @@ body {
    CAMPAIGN TERRITORY MAP
    ═══════════════════════════════════════════════════════════ */
 .campaign-card {
-  background: #0f1319; border: 1px solid #2a2e38; border-radius: 14px;
-  padding: 20px 18px 16px; margin-top: 18px;
+  background: #0a0e14; border: 1px solid #1e2530; border-radius: 14px;
+  padding: 22px 18px 16px; margin-top: 18px;
+  background-image: radial-gradient(circle at 20% 50%, rgba(30,40,60,0.4) 0%, transparent 60%),
+                    radial-gradient(circle at 80% 30%, rgba(20,35,55,0.3) 0%, transparent 50%);
 }
 .campaign-header {
   font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900;
-  color: var(--t-accent); margin-bottom: 14px; letter-spacing: 0.5px;
+  color: var(--t-accent); margin-bottom: 16px; letter-spacing: 0.5px;
 }
 .campaign-track {
-  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px;
   scrollbar-width: thin; scrollbar-color: #333 transparent;
+  align-items: flex-end;
 }
 .campaign-node {
-  flex: 0 0 auto; min-width: 100px; padding: 10px 8px;
-  border-radius: 10px; background: #181c24; border: 2px solid #2a2e38;
+  flex: 0 0 auto; width: 90px; padding: 8px 4px 6px;
+  border-radius: 10px; background: #111620; border: 2px solid #1e2530;
   text-align: center; position: relative; transition: all 0.3s ease;
+  cursor: default;
 }
-.campaign-node.conquered {
-  border-color: var(--t-accent); background: #1a1710;
+.campaign-node svg {
+  width: 60px; height: 55px; display: block; margin: 0 auto 4px;
+  transition: all 0.3s ease;
 }
-.campaign-node.active {
-  border-color: #dc2626; background: #1a1114;
-  animation: campaign-pulse 2s ease-in-out infinite;
+.campaign-node .territory-fill {
+  fill: #1e2530; stroke: #3a4050; stroke-width: 1.5;
+  transition: fill 0.5s ease, stroke 0.5s ease;
+}
+.campaign-node.conquered .territory-fill {
+  stroke-width: 2;
+}
+.campaign-node.active .territory-fill {
+  fill: rgba(220,38,38,0.12); stroke: #dc2626; stroke-width: 2;
+  animation: territory-glow 2s ease-in-out infinite;
 }
 .campaign-node.future {
-  opacity: 0.35; border-style: dashed;
+  opacity: 0.3;
+}
+.campaign-node.future .territory-fill {
+  fill: #111620; stroke: #222; stroke-dasharray: 3 2;
+}
+@keyframes territory-glow {
+  0%, 100% { stroke: #dc2626; filter: drop-shadow(0 0 3px rgba(220,38,38,0.3)); }
+  50% { stroke: #f87171; filter: drop-shadow(0 0 8px rgba(220,38,38,0.6)); }
 }
 @keyframes campaign-pulse {
-  0%, 100% { border-color: #dc2626; box-shadow: 0 0 6px rgba(220,38,38,0.3); }
-  50% { border-color: #f87171; box-shadow: 0 0 14px rgba(220,38,38,0.5); }
+  0%, 100% { border-color: #dc2626; box-shadow: 0 0 4px rgba(220,38,38,0.2); }
+  50% { border-color: #f87171; box-shadow: 0 0 12px rgba(220,38,38,0.45); }
 }
-.campaign-flag { font-size: 26px; margin-bottom: 4px; }
-.campaign-city { font-size: 11px; font-weight: 700; color: #ccc; white-space: nowrap; }
+.campaign-node.active {
+  border-color: #dc2626; animation: campaign-pulse 2s ease-in-out infinite;
+}
+.campaign-city {
+  font-size: 10px; font-weight: 700; color: #999; white-space: nowrap;
+  letter-spacing: 0.3px; margin-top: 2px;
+}
+.campaign-node.conquered .campaign-city { color: #ddd; }
+.campaign-node.active .campaign-city { color: #f87171; }
 .campaign-badge {
-  font-size: 10px; font-weight: 700; margin-top: 5px; padding: 2px 6px;
-  border-radius: 6px; display: inline-block;
+  font-size: 9px; font-weight: 700; margin-top: 3px; padding: 2px 5px;
+  border-radius: 5px; display: inline-block;
 }
 .campaign-node.conquered .campaign-badge {
-  background: rgba(232,160,32,0.15); color: var(--t-accent);
+  background: rgba(255,255,255,0.06); color: #ddd; font-weight: 800;
 }
 .campaign-node.active .campaign-badge {
   background: rgba(220,38,38,0.15); color: #f87171;
 }
 .campaign-node.future .campaign-badge {
-  color: #555;
+  color: #444; font-size: 8px;
 }
 .campaign-conquerors {
-  font-size: 9px; color: #888; margin-top: 4px; line-height: 1.3;
+  font-size: 8px; color: #777; margin-top: 3px; line-height: 1.2;
 }
 .campaign-summary {
-  margin-top: 12px; font-size: 12px; color: #888; letter-spacing: 0.5px;
+  margin-top: 14px; font-size: 12px; color: #777; letter-spacing: 0.5px;
 }
 .campaign-summary strong { color: var(--t-accent); font-weight: 700; }
+.campaign-connector {
+  flex: 0 0 auto; display: flex; align-items: center; color: #2a3040; font-size: 14px;
+  align-self: center; margin: 0 -2px;
+}
 
 /* ═══════════════════════════════════════════════════════════
    TRACK MAP VIEW
@@ -1808,28 +1838,39 @@ function parseSetsToLaps(sets) {
 }
 
 // ── Campaign Territory Map ──────────────────────────────────
+// Simplified SVG silhouettes for each destination region
+const TERRITORY_SHAPES = {
+  hub: 'M30,48 L50,10 L70,48 Z M25,48 L75,48 L75,52 L25,52 Z',
+  texas: 'M25,8 L55,8 L55,14 L62,14 L65,20 L68,28 L60,42 L52,50 L40,52 L32,46 L28,38 L22,34 L18,26 L20,18 L25,12 Z',
+  uk: 'M38,6 L42,6 L44,10 L48,8 L52,10 L54,16 L52,22 L56,20 L58,24 L54,28 L50,26 L48,30 L52,34 L50,40 L46,44 L42,48 L38,52 L36,48 L34,42 L30,40 L28,36 L32,30 L30,24 L34,18 L32,14 L36,10 Z M22,14 L28,12 L30,16 L26,20 L22,18 Z',
+  japan: 'M44,6 L48,10 L50,16 L48,22 L52,28 L50,34 L46,38 L42,44 L38,50 L36,46 L38,40 L40,34 L38,28 L40,22 L38,16 L40,10 Z M54,18 L58,22 L56,28 L52,26 Z',
+  china: 'M18,14 L30,10 L42,8 L54,10 L62,14 L68,20 L72,28 L70,36 L64,40 L58,44 L50,48 L42,50 L34,48 L26,44 L20,38 L16,30 L14,22 Z',
+  california: 'M32,6 L36,6 L38,12 L40,20 L42,28 L46,34 L50,38 L54,44 L50,48 L44,52 L40,50 L36,44 L32,36 L28,28 L26,20 L28,14 Z',
+  kenya: 'M30,10 L50,8 L58,14 L62,22 L60,32 L56,40 L50,46 L42,50 L34,48 L28,42 L24,34 L22,24 L26,16 Z',
+  uae: 'M20,24 L34,20 L48,18 L62,20 L72,24 L68,30 L60,34 L50,36 L38,38 L28,36 L22,32 Z',
+  brazil: 'M36,6 L50,8 L60,12 L66,20 L68,30 L64,40 L58,48 L48,54 L38,52 L30,46 L24,38 L20,28 L22,18 L28,10 Z',
+  finish: 'M28,8 L28,52 M28,8 L56,8 L56,20 L28,20 M32,12 L40,12 L40,16 L32,16 Z M44,12 L52,12 L52,16 L44,16 Z M32,24 L56,24 L56,36 L32,36 M36,28 L44,28 L44,32 L36,32 Z M48,28 L52,28 L52,32 L48,32 Z'
+};
+
 const CAMPAIGN = {
   territories: [
     {
-      week: 1, name: 'Training Hub', flag: '🏕',
+      week: 1, name: 'Training Hub', shape: 'hub',
       conquered: false, teamName: null, teamColor: null, conquerors: []
     },
     {
-      week: 3, name: 'Austin, TX', flag: '🇺🇸',
-      conquered: true, teamName: 'Team 3', teamColor: '#E8A020',
+      week: 3, name: 'Austin, TX', shape: 'texas',
+      conquered: true, teamName: 'Team 3', teamColor: '#dc2626',
       conquerors: ['Ari Faheem','Graham Gattegno','Nayel Bajwa','Lucia Quimby','Sojourn Stinson']
     },
-    {
-      week: 4, name: 'London, UK', flag: '🇬🇧',
-      conquered: false, active: true
-    },
-    { week: 5, name: 'Tokyo, JP', flag: '🇯🇵' },
-    { week: 6, name: 'Beijing, CN', flag: '🇨🇳' },
-    { week: 7, name: 'San Francisco', flag: '🇺🇸' },
-    { week: 8, name: 'Nairobi, KE', flag: '🇰🇪' },
-    { week: 9, name: 'Dubai, AE', flag: '🇦🇪' },
-    { week: 10, name: 'Rio, BR', flag: '🇧🇷' },
-    { week: 11, name: 'Final Route', flag: '🏁' },
+    { week: 4, name: 'London, UK', shape: 'uk', conquered: false, active: true },
+    { week: 5, name: 'Tokyo, JP', shape: 'japan' },
+    { week: 6, name: 'Beijing, CN', shape: 'china' },
+    { week: 7, name: 'San Francisco', shape: 'california' },
+    { week: 8, name: 'Nairobi, KE', shape: 'kenya' },
+    { week: 9, name: 'Dubai, AE', shape: 'uae' },
+    { week: 10, name: 'Rio, BR', shape: 'brazil' },
+    { week: 11, name: 'Final Route', shape: 'finish' },
   ]
 };
 
@@ -1844,14 +1885,16 @@ function renderCampaign() {
   const controlCount = conquered.length;
 
   let nodes = '';
-  CAMPAIGN.territories.forEach(t => {
+  CAMPAIGN.territories.forEach((t, idx) => {
     let cls = 'campaign-node';
     let badge = '';
     let conq = '';
+    let fillStyle = '';
 
     if (t.conquered) {
       cls += ' conquered';
       badge = `<div class="campaign-badge">🏆 ${t.teamName}</div>`;
+      fillStyle = `fill:${t.teamColor};stroke:${t.teamColor};opacity:0.85;`;
       if (t.conquerors && t.conquerors.length) {
         conq = `<div class="campaign-conquerors">${t.conquerors.map(n => n.split(' ')[0]).join(' · ')}</div>`;
       }
@@ -1863,8 +1906,16 @@ function renderCampaign() {
       badge = `<div class="campaign-badge">🔒</div>`;
     }
 
+    const shapePath = TERRITORY_SHAPES[t.shape] || TERRITORY_SHAPES.hub;
+    const svg = `<svg viewBox="0 0 80 58" xmlns="http://www.w3.org/2000/svg">
+      <path class="territory-fill" d="${shapePath}" ${fillStyle ? `style="${fillStyle}"` : ''} />
+    </svg>`;
+
+    // Add connector arrow between nodes (not before first)
+    if (idx > 0) nodes += `<div class="campaign-connector">›</div>`;
+
     nodes += `<div class="${cls}">
-      <div class="campaign-flag">${t.flag}</div>
+      ${svg}
       <div class="campaign-city">${t.name}</div>
       ${badge}${conq}
     </div>`;
