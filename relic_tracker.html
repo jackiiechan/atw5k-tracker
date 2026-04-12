@@ -733,6 +733,63 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   CAMPAIGN TERRITORY MAP
+   ═══════════════════════════════════════════════════════════ */
+.campaign-card {
+  background: #0f1319; border: 1px solid #2a2e38; border-radius: 14px;
+  padding: 20px 18px 16px; margin-top: 18px;
+}
+.campaign-header {
+  font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900;
+  color: var(--t-accent); margin-bottom: 14px; letter-spacing: 0.5px;
+}
+.campaign-track {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
+  scrollbar-width: thin; scrollbar-color: #333 transparent;
+}
+.campaign-node {
+  flex: 0 0 auto; min-width: 100px; padding: 10px 8px;
+  border-radius: 10px; background: #181c24; border: 2px solid #2a2e38;
+  text-align: center; position: relative; transition: all 0.3s ease;
+}
+.campaign-node.conquered {
+  border-color: var(--t-accent); background: #1a1710;
+}
+.campaign-node.active {
+  border-color: #dc2626; background: #1a1114;
+  animation: campaign-pulse 2s ease-in-out infinite;
+}
+.campaign-node.future {
+  opacity: 0.35; border-style: dashed;
+}
+@keyframes campaign-pulse {
+  0%, 100% { border-color: #dc2626; box-shadow: 0 0 6px rgba(220,38,38,0.3); }
+  50% { border-color: #f87171; box-shadow: 0 0 14px rgba(220,38,38,0.5); }
+}
+.campaign-flag { font-size: 26px; margin-bottom: 4px; }
+.campaign-city { font-size: 11px; font-weight: 700; color: #ccc; white-space: nowrap; }
+.campaign-badge {
+  font-size: 10px; font-weight: 700; margin-top: 5px; padding: 2px 6px;
+  border-radius: 6px; display: inline-block;
+}
+.campaign-node.conquered .campaign-badge {
+  background: rgba(232,160,32,0.15); color: var(--t-accent);
+}
+.campaign-node.active .campaign-badge {
+  background: rgba(220,38,38,0.15); color: #f87171;
+}
+.campaign-node.future .campaign-badge {
+  color: #555;
+}
+.campaign-conquerors {
+  font-size: 9px; color: #888; margin-top: 4px; line-height: 1.3;
+}
+.campaign-summary {
+  margin-top: 12px; font-size: 12px; color: #888; letter-spacing: 0.5px;
+}
+.campaign-summary strong { color: var(--t-accent); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════
    TRACK MAP VIEW
    ═══════════════════════════════════════════════════════════ */
 .map-header {
@@ -1128,7 +1185,7 @@ body {
 <!-- ── OPERATION LAP WARS BRIEFING OVERLAY ─────────────── -->
 <div class="kt-overlay" id="olw-overlay">
   <div class="kt-card">
-    <div class="kt-transmission">🛰 Agent Koala · Priority One · Operation Lap Wars</div>
+    <div class="kt-transmission">🛰 Agent Koala · The Campaign · London</div>
     <div class="kt-koala">🐨</div>
     <div class="kt-step-title" id="olw-title">Incoming Transmission…</div>
     <div class="kt-bubble">
@@ -1155,7 +1212,7 @@ body {
       <div class="nav-mascot" id="nav-mascot">🦔</div>
       <div>
         <div class="nav-title">All Around the World · 5K</div>
-        <div class="nav-dest" id="nav-dest-label">Week 3 — Austin, TX 🇺🇸</div>
+        <div class="nav-dest" id="nav-dest-label">Week 4 — London, UK 🇬🇧</div>
       </div>
     </div>
     <div class="nav-tabs">
@@ -1167,7 +1224,7 @@ body {
       <button class="tab-btn" onclick="switchTab('admin',this)">⚙ Admin</button>
     </div>
     <button class="kt-nav-btn" onclick="openKoalaTutorial()">📋 Briefing</button>
-    <button class="kt-nav-btn" onclick="openLapWarsBriefing()" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Lap Wars</button>
+    <button class="kt-nav-btn" onclick="openLapWarsBriefing()" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Campaign</button>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
   </div>
   <div class="mobile-menu" id="mobile-menu">
@@ -1178,7 +1235,7 @@ body {
     <button class="mob-tab-btn" onclick="switchTab('history',null)"><span class="mob-tab-icon">📖</span> History</button>
     <button class="mob-tab-btn" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
     <button class="mob-tab-btn" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
-    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">🎯</span> Lap Wars</button>
+    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">🎯</span> Campaign</button>
   </div>
 </nav>
 
@@ -1193,8 +1250,8 @@ body {
       </div>
     </div>
     <div class="mission-day-toggle">
-      <button class="mission-day-btn active" onclick="setMissionDay('Tuesday',this)">Tuesday</button>
-      <button class="mission-day-btn" onclick="setMissionDay('Thursday',this)">Thursday</button>
+      <button class="mission-day-btn active" onclick="setMissionDay('Tuesday',this)">Monday</button>
+      <button class="mission-day-btn" onclick="setMissionDay('Thursday',this)">Wednesday</button>
     </div>
     <div class="mission-koala-row">
       <div class="mission-koala">🐨</div>
@@ -1205,6 +1262,7 @@ body {
     </div>
     <button class="mission-fullscreen-btn" onclick="openBriefing()">⛶ Fullscreen Mode</button>
   </div>
+  <div id="campaign-territory"></div>
   <div id="mission-workout"></div>
 </div>
 
@@ -1284,8 +1342,8 @@ body {
           <button class="qi-mode-btn" id="qi-mode-miles" onclick="setQiMode('miles')">Miles</button>
         </div>
         <div style="display:flex;gap:4px;">
-          <button class="qi-day-btn active" id="qi-day-tue" onclick="setQiDay('Tuesday')">Tuesday</button>
-          <button class="qi-day-btn" id="qi-day-thu" onclick="setQiDay('Thursday')">Thursday</button>
+          <button class="qi-day-btn active" id="qi-day-tue" onclick="setQiDay('Tuesday')">Monday</button>
+          <button class="qi-day-btn" id="qi-day-thu" onclick="setQiDay('Thursday')">Wednesday</button>
         </div>
         <span style="font-size:12px;color:#666;">Week <strong id="qi-week-label">3</strong></span>
       </div>
@@ -1357,8 +1415,8 @@ body {
     <div class="briefing-from">Agent Koala · Mission Briefing</div>
     <div class="briefing-msg" id="br-msg">Loading mission...</div>
     <div class="briefing-day-toggle">
-      <button class="day-btn active" onclick="setBriefDay('Tuesday',this)">Tuesday</button>
-      <button class="day-btn" onclick="setBriefDay('Thursday',this)">Thursday</button>
+      <button class="day-btn active" onclick="setBriefDay('Tuesday',this)">Monday</button>
+      <button class="day-btn" onclick="setBriefDay('Thursday',this)">Wednesday</button>
     </div>
     <button class="briefing-close" onclick="closeBriefing()">Start Session →</button>
   </div>
@@ -1614,7 +1672,7 @@ function initState() {
     }
     students[def.id] = s;
   });
-  return { currentWeek: 3, students, sessions: [] };
+  return { currentWeek: 4, students, sessions: [] };
 }
 
 let STATE = initState();
@@ -1727,6 +1785,7 @@ function switchTab(tab, btn) {
 // ║                    MISSION TAB                                   ║
 // ╚═══════════════════════════════════════════════════════════════════╝
 let missionDay = 'Tuesday';
+const DAY_LABEL = { Tuesday: 'Monday', Thursday: 'Wednesday' };
 
 // Parse workout sets string into total laps
 // Handles: "2–3–4–3–2 laps", "1×1 + 3×2 laps", "5×1 lap", "2+2+3+2+2 laps"
@@ -1748,6 +1807,76 @@ function parseSetsToLaps(sets) {
   return total;
 }
 
+// ── Campaign Territory Map ──────────────────────────────────
+const CAMPAIGN = {
+  territories: [
+    {
+      week: 1, name: 'Training Hub', flag: '🏕',
+      conquered: false, teamName: null, teamColor: null, conquerors: []
+    },
+    {
+      week: 3, name: 'Austin, TX', flag: '🇺🇸',
+      conquered: true, teamName: 'Team 3', teamColor: '#E8A020',
+      conquerors: ['Ari Faheem','Graham Gattegno','Nayel Bajwa','Lucia Quimby','Sojourn Stinson']
+    },
+    {
+      week: 4, name: 'London, UK', flag: '🇬🇧',
+      conquered: false, active: true
+    },
+    { week: 5, name: 'Tokyo, JP', flag: '🇯🇵' },
+    { week: 6, name: 'Beijing, CN', flag: '🇨🇳' },
+    { week: 7, name: 'San Francisco', flag: '🇺🇸' },
+    { week: 8, name: 'Nairobi, KE', flag: '🇰🇪' },
+    { week: 9, name: 'Dubai, AE', flag: '🇦🇪' },
+    { week: 10, name: 'Rio, BR', flag: '🇧🇷' },
+    { week: 11, name: 'Final Route', flag: '🏁' },
+  ]
+};
+
+function renderCampaign() {
+  const el = document.getElementById('campaign-territory');
+  if (!el) return;
+
+  const conquered = CAMPAIGN.territories.filter(t => t.conquered);
+  const total = CAMPAIGN.territories.length;
+  const remaining = total - conquered.length;
+  const winnerName = conquered.length ? conquered[conquered.length - 1].teamName : 'No one';
+  const controlCount = conquered.length;
+
+  let nodes = '';
+  CAMPAIGN.territories.forEach(t => {
+    let cls = 'campaign-node';
+    let badge = '';
+    let conq = '';
+
+    if (t.conquered) {
+      cls += ' conquered';
+      badge = `<div class="campaign-badge">🏆 ${t.teamName}</div>`;
+      if (t.conquerors && t.conquerors.length) {
+        conq = `<div class="campaign-conquerors">${t.conquerors.map(n => n.split(' ')[0]).join(' · ')}</div>`;
+      }
+    } else if (t.active) {
+      cls += ' active';
+      badge = `<div class="campaign-badge">⚔ CONTESTED</div>`;
+    } else {
+      cls += ' future';
+      badge = `<div class="campaign-badge">🔒</div>`;
+    }
+
+    nodes += `<div class="${cls}">
+      <div class="campaign-flag">${t.flag}</div>
+      <div class="campaign-city">${t.name}</div>
+      ${badge}${conq}
+    </div>`;
+  });
+
+  el.innerHTML = `<div class="campaign-card">
+    <div class="campaign-header">🗺 The Campaign — Territory Map</div>
+    <div class="campaign-track">${nodes}</div>
+    <div class="campaign-summary"><strong>${winnerName}</strong> controls ${controlCount} territor${controlCount === 1 ? 'y' : 'ies'}. ${remaining} zones remain.</div>
+  </div>`;
+}
+
 function renderMission() {
   const dest = getDestination(STATE.currentWeek);
   document.getElementById('ms-flag').textContent = dest.flag;
@@ -1761,12 +1890,12 @@ function renderMission() {
   const plan = wk ? wk[missionDay] : null;
   const container = document.getElementById('mission-workout');
   if (!plan) {
-    container.innerHTML = `<div class="workout-card"><div class="workout-empty">No workout plan uploaded for Week ${STATE.currentWeek} ${missionDay} yet.</div></div>`;
+    container.innerHTML = `<div class="workout-card"><div class="workout-empty">No workout plan uploaded for Week ${STATE.currentWeek} ${DAY_LABEL[missionDay]} yet.</div></div>`;
     return;
   }
   let html = `<div class="workout-card">
     <div class="workout-card-head">
-      <div class="workout-title">${plan.title || missionDay + ' Workout'}</div>
+      <div class="workout-title">${plan.title || (DAY_LABEL[missionDay] || missionDay) + ' Workout'}</div>
       ${plan.notes ? `<div class="workout-notes">${plan.notes}</div>` : ''}
     </div>`;
   if (!plan.groups || plan.groups.length === 0) {
@@ -1796,6 +1925,9 @@ function renderMission() {
   }
   html += '</div>';
   container.innerHTML = html;
+
+  // Campaign territory map
+  renderCampaign();
 }
 
 function setMissionDay(day, btn) {
@@ -2223,7 +2355,7 @@ function previewQuickInput() {
   }
 
   if (results.length > 0) {
-    html += `<button class="qi-submit-btn" onclick="submitQuickInput()">⚡ Award ${results.reduce((a,r) => a+r.relics, 0)} Relics to ${results.length} runners (${qiDay})</button>`;
+    html += `<button class="qi-submit-btn" onclick="submitQuickInput()">⚡ Award ${results.reduce((a,r) => a+r.relics, 0)} Relics to ${results.length} runners (${DAY_LABEL[qiDay] || qiDay})</button>`;
   }
 
   container.innerHTML = html;
@@ -2235,7 +2367,7 @@ function previewQuickInput() {
 
 function submitQuickInput() {
   if (!qiParsed.length) return;
-  if (!confirm(`Award Relics to ${qiParsed.length} runners for Week ${STATE.currentWeek} ${qiDay}?`)) return;
+  if (!confirm(`Award Relics to ${qiParsed.length} runners for Week ${STATE.currentWeek} ${DAY_LABEL[qiDay] || qiDay}?`)) return;
 
   const date = todayStr();
   const week = STATE.currentWeek;
@@ -2258,7 +2390,7 @@ function submitQuickInput() {
   save();
 
   const totalRelics = qiParsed.reduce((a, r) => a + r.relics, 0);
-  showToast(`${qiParsed.length} runners awarded ${totalRelics} ⬡ — ${qiDay} W${week}`, 'success');
+  showToast(`${qiParsed.length} runners awarded ${totalRelics} ⬡ — ${DAY_LABEL[qiDay] || qiDay} W${week}`, 'success');
 
   // Clear
   document.getElementById('qi-input').value = '';
@@ -2983,8 +3115,8 @@ function openBriefing() {
   document.getElementById('br-subtitle').textContent = dest.subtitle;
   // Sync to whichever day is selected in the Mission tab
   briefDay = missionDay;
-  document.querySelectorAll('.day-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === missionDay);
+  document.querySelectorAll('.day-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && missionDay === 'Tuesday') || (i === 1 && missionDay === 'Thursday'));
   });
   setBriefDay(briefDay, null);
   document.getElementById('briefing-overlay').classList.add('open');
@@ -3253,32 +3385,32 @@ function ktToggleVoice() {
 }
 
 // ╔═══════════════════════════════════════════════════════════════════╗
-// ║              OPERATION LAP WARS · MISSION BRIEFING               ║
+// ║              THE CAMPAIGN · MISSION BRIEFING                     ║
 // ╚═══════════════════════════════════════════════════════════════════╝
 const OLW_STEPS = [
   {
     title: 'Incoming Transmission…',
-    text: "Agents. Stand by. This is Agent Koala with a Priority One transmission. Today's mission is unlike anything you've run before. Listen carefully."
+    text: "Agents. Austin is behind you. Team Three claimed that territory — 51 laps. It's on the map. It's theirs. But the Campaign is just getting started. London is waiting. And London does not care who won last week."
   },
   {
-    title: 'Operation Lap Wars',
-    text: "Your mission is called Operation Lap Wars. You will be divided into squads. Every lap you complete feeds your squad's supply line. The squad with the most laps at the end of the mission wins the day. But here's the catch — I'm not telling you your squad yet. You'll find out at the field."
+    title: 'The Campaign',
+    text: "One session was Operation Lap Wars. What comes next is bigger. Every destination we visit is a contested zone. The squad that wins the day plants their flag on the map. By race day, the squad with the most flags wins the Campaign. Austin already has a flag. London is unclaimed. That changes today."
   },
   {
-    title: 'The Pacing Secret',
-    text: "Listen closely, Agent. This is the part most runners get wrong. If you sprint at the start, you will burn out by lap three and your squad will lose ground. If you jog steady — smell the flower, blow out the candle — you will run farther. Far, far farther. A jogger who never stops will always beat a sprinter who has to walk. Always."
+    title: 'London. Week 4.',
+    text: "The greatest distance runners in the world train through cold, through rain, through pressure. London does not reward the fastest starter. London rewards the runner who is still moving when everyone else has stopped. Your mission today: run long, run steady, and do not let your squad down when it gets hard."
   },
   {
-    title: 'Run Your Pace, Not Theirs',
-    text: "Do not chase the fastest runner. Do not match the slowest. Find YOUR pace — the one where you can breathe, where your legs feel strong, where you could keep going for one more lap, and then one more after that. That is your mission pace. Guard it."
+    title: 'New Squads. Same Mission.',
+    text: "Your squads have been rebalanced. Every team is within one lap of each other on paper. The only thing that separates you today is how much each agent contributes."
   },
   {
-    title: 'Every Lap Counts the Same',
-    text: "Here is something important. On Operation Lap Wars, every lap you complete is worth the same as every other runner's lap. The fastest lap and the slowest lap — same value. Same points. Your squad does not need a hero. Your squad needs every single agent contributing. Miss a lap, and your squad feels it."
+    title: 'The Comeback Clause',
+    text: "New rule. The squad that finishes last today receives a classified mission for Wednesday. Complete it — and your squad earns bonus laps added to your Campaign total. Losing today is not the end. It is the setup. The question is whether your squad has the grit to respond."
   },
   {
-    title: 'Briefing Complete.',
-    text: "Your orders: show up today ready to run long, not fast. Steady legs. Quiet breathing. Eyes forward. Squads will be revealed at the field. Trust your Guides. Trust your pace. The world is watching. Agent Koala — out."
+    title: 'One Last Order.',
+    text: "When we get to the field, you will have 30 minutes to complete this mission. How many laps will you contribute for your team? Strive for one more lap than your previous best. Stay on target. I believe in you, Agent! Agent Koala — out."
   }
 ];
 
@@ -3326,7 +3458,7 @@ function olwRenderStep() {
     `<div class="kt-dot ${i === olwStep ? 'active' : i < olwStep ? 'done' : ''}"></div>`
   ).join('');
 
-  document.getElementById('olw-next').textContent = olwStep === total - 1 ? 'Report to Field →' : 'Next →';
+  document.getElementById('olw-next').textContent = olwStep === total - 1 ? 'Claim London →' : 'Next →';
   document.getElementById('olw-prev').style.visibility = olwStep === 0 ? 'hidden' : 'visible';
 
   olwTypewrite(step.text, document.getElementById('olw-bubble-text'), () => {});
