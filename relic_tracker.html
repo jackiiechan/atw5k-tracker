@@ -1665,6 +1665,8 @@ function initState() {
         }
         if (!s.manualAdjustments) s.manualAdjustments = [];
       });
+      // ── MIGRATION: bump to Week 4 (London) ──
+      if ((parsed.currentWeek || 0) < 4) parsed.currentWeek = 4;
       // ── Add any new roster students not yet in saved state ──
       CFG.STUDENTS.forEach(def => {
         if (!parsed.students[def.id]) {
@@ -1936,6 +1938,9 @@ function renderMission() {
   document.getElementById('ms-msg').textContent =
     missionDay === 'Tuesday' ? dest.missionTue : dest.missionThu;
 
+  // Campaign territory map (render before workout so early returns don't skip it)
+  renderCampaign();
+
   // Workout plan
   const wk = CFG.WORKOUTS[STATE.currentWeek];
   const plan = wk ? wk[missionDay] : null;
@@ -1976,9 +1981,6 @@ function renderMission() {
   }
   html += '</div>';
   container.innerHTML = html;
-
-  // Campaign territory map
-  renderCampaign();
 }
 
 function setMissionDay(day, btn) {
