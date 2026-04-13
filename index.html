@@ -3116,6 +3116,9 @@ function purchase(itemId) {
   s.purchases.push({ itemId, itemName: item.name, cost: item.cost, date: todayStr() });
 
   save();
+  if (item.isBracelet) playSfx('bracelet');
+  else if (item.isStamp) playSfx('stamp');
+  else playSfx('purchase');
   showToast(`✦ ${item.name} purchased!`, 'success');
   floatRelics(document.getElementById('modal'), `-${item.cost} ⬡`);
   renderModal();
@@ -3130,6 +3133,7 @@ function buyAvatar(avId) {
   s.equippedAvatar = avId;
   s.purchases.push({ itemId:'avatar_'+avId, itemName: av.name+' Avatar', cost: av.cost, date: todayStr() });
   save();
+  playSfx('purchase');
   showToast(`${av.emoji} ${av.name} unlocked & equipped!`, 'success');
   renderModal();
 }
@@ -3143,6 +3147,7 @@ function buyBg(bgId) {
   s.equippedBg = bgId;
   s.purchases.push({ itemId:'bg_'+bgId, itemName: bg.name+' Background', cost: bg.cost, date: todayStr() });
   save();
+  playSfx('purchase');
   showToast(`✦ ${bg.name} background unlocked!`, 'success');
   renderModal();
 }
@@ -3465,12 +3470,14 @@ function ktTypewrite(text, el, onDone) {
 function ktNext() {
   if (ktStep >= KT_STEPS.length - 1) { closeKoalaTutorial(); return; }
   ktStep++;
+  playSfx('click');
   ktRenderStep();
 }
 
 function ktPrev() {
   if (ktStep === 0) return;
   ktStep--;
+  playSfx('click');
   ktRenderStep();
 }
 
@@ -3530,6 +3537,23 @@ const OLW_AUDIO = OLW_STEPS.map((_, i) => {
   a.preload = 'auto';
   return a;
 });
+
+// ── Sound Effects ──────────────────────────────────────────
+const SFX = {
+  purchase:   new Audio('sfx_cashregister.wav'),
+  stamp:      new Audio('sfx_magicalchime_1.wav'),
+  bracelet:   new Audio('sfx_magicalchime_2.wav'),
+  fuelpoint:  new Audio('sfx_shimmer.wav'),
+  click:      new Audio('sfx_mouseclick.wav'),
+};
+Object.values(SFX).forEach(a => { a.preload = 'auto'; });
+
+function playSfx(key) {
+  const a = SFX[key];
+  if (!a) return;
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
 
 function openLapWarsBriefing() {
   olwStep = 0;
@@ -3591,6 +3615,7 @@ function olwTypewrite(text, el, onDone) {
 function openFuelPoint() {
   closeLapWarsBriefing();
   document.getElementById('fp-overlay').classList.add('open');
+  playSfx('fuelpoint');
 }
 
 function closeFuelPoint() {
@@ -3600,12 +3625,14 @@ function closeFuelPoint() {
 function olwNext() {
   if (olwStep >= OLW_STEPS.length - 1) { openFuelPoint(); return; }
   olwStep++;
+  playSfx('click');
   olwRenderStep();
 }
 
 function olwPrev() {
   if (olwStep === 0) return;
   olwStep--;
+  playSfx('click');
   olwRenderStep();
 }
 
