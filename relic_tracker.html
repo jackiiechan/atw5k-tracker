@@ -820,6 +820,47 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   FUEL POINT REVEAL
+   ═══════════════════════════════════════════════════════════ */
+.fp-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center;
+  flex-direction: column; opacity: 0; pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.fp-overlay.open { opacity: 1; pointer-events: auto; }
+.fp-image-wrap {
+  animation: fp-bob 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 40px rgba(232,160,32,0.5)) drop-shadow(0 0 80px rgba(232,160,32,0.2));
+}
+.fp-image-wrap img {
+  width: 320px; max-width: 80vw; border-radius: 12px;
+}
+@keyframes fp-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-14px) scale(1.02); }
+}
+.fp-title {
+  font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900;
+  color: #E8A020; margin-top: 20px; text-align: center;
+  text-shadow: 0 0 20px rgba(232,160,32,0.5), 0 0 40px rgba(232,160,32,0.2);
+  animation: fp-glow 2s ease-in-out infinite alternate;
+}
+@keyframes fp-glow {
+  0% { text-shadow: 0 0 20px rgba(232,160,32,0.4), 0 0 40px rgba(232,160,32,0.15); }
+  100% { text-shadow: 0 0 30px rgba(232,160,32,0.7), 0 0 60px rgba(232,160,32,0.3); }
+}
+.fp-subtitle {
+  font-size: 14px; color: #aaa; margin-top: 8px; letter-spacing: 1px; text-align: center;
+}
+.fp-dismiss {
+  margin-top: 28px; padding: 12px 32px; border: 2px solid #E8A020; border-radius: 10px;
+  background: rgba(232,160,32,0.1); color: #E8A020; font-size: 15px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s ease;
+}
+.fp-dismiss:hover { background: rgba(232,160,32,0.2); transform: scale(1.04); }
+
+/* ═══════════════════════════════════════════════════════════
    TRACK MAP VIEW
    ═══════════════════════════════════════════════════════════ */
 .map-header {
@@ -1231,6 +1272,16 @@ body {
       <button class="kt-voice-btn" id="olw-voice-btn" onclick="olwToggleVoice()">🔊 Voice On</button>
     </div>
   </div>
+</div>
+
+<!-- ── FUEL POINT REVEAL ──────────────────────────────── -->
+<div class="fp-overlay" id="fp-overlay">
+  <div class="fp-image-wrap">
+    <img src="fuel_point.png" alt="Fuel Point">
+  </div>
+  <div class="fp-title">THE WINNING SQUAD EARNS A FUEL POINT</div>
+  <div class="fp-subtitle">Plant your flag. Fuel the Campaign.</div>
+  <button class="fp-dismiss" onclick="closeFuelPoint()">Claim London →</button>
 </div>
 
 <div class="airmail-stripe"></div>
@@ -3537,8 +3588,17 @@ function olwTypewrite(text, el, onDone) {
   next();
 }
 
+function openFuelPoint() {
+  closeLapWarsBriefing();
+  document.getElementById('fp-overlay').classList.add('open');
+}
+
+function closeFuelPoint() {
+  document.getElementById('fp-overlay').classList.remove('open');
+}
+
 function olwNext() {
-  if (olwStep >= OLW_STEPS.length - 1) { closeLapWarsBriefing(); return; }
+  if (olwStep >= OLW_STEPS.length - 1) { openFuelPoint(); return; }
   olwStep++;
   olwRenderStep();
 }
