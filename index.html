@@ -1505,6 +1505,10 @@ body {
 
 <div class="toast" id="toast"></div>
 
+<!-- Firebase CDN (compat mode for single-file apps) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <script>
 // ╔═══════════════════════════════════════════════════════════════════╗
 // ║               ★  CONFIGURATION  ★                                ║
@@ -1682,6 +1686,19 @@ const CFG = {
 // ╚═══════════════════════════════════════════════════════════════════╝
 const STORE_KEY = 'atw5k_v2';
 
+// ── Firebase Realtime Database ─────────────────────────────
+const fbApp = firebase.initializeApp({
+  apiKey: "AIzaSyC_fDFcgGBSYfjRvgJGyvpMmL0JFRIH11I",
+  authDomain: "all-around-the-world-5k.firebaseapp.com",
+  databaseURL: "https://all-around-the-world-5k-default-rtdb.firebaseio.com",
+  projectId: "all-around-the-world-5k",
+  storageBucket: "all-around-the-world-5k.firebasestorage.app",
+  messagingSenderId: "655253908955",
+  appId: "1:655253908955:web:59492f9a0019874c050bfe"
+});
+const fbDb = firebase.database();
+const fbRef = fbDb.ref('state');
+
 function makeStudent({ id, name }) {
   return {
     id,
@@ -1759,7 +1776,75 @@ function initState() {
 }
 
 let STATE = initState();
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(STATE)); }
+let fbReady = false;
+let fbSuppressSync = false; // prevent echo loops
+
+function save() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(STATE));
+  // Push to Firebase (non-blocking, fire-and-forget)
+  if (fbReady && !fbSuppressSync) {
+    fbRef.set(STATE).catch(e => console.warn('Firebase write failed:', e));
+  }
+}
+
+// ── Firebase: load once on startup, then listen for live changes ──
+fbRef.once('value').then(snap => {
+  const remote = snap.val();
+  if (remote && remote.students) {
+    // Remote data exists — use it (it's the shared source of truth)
+    const localTs = STATE.sessions ? STATE.sessions.length : 0;
+    const remoteTs = remote.sessions ? remote.sessions.length : 0;
+    if (remoteTs >= localTs) {
+      // Run migrations on remote data too
+      if ((remote.currentWeek || 0) < 4) remote.currentWeek = 4;
+      Object.values(remote.students || {}).forEach(s => {
+        if (!s.stampDates) { s.stampDates = []; }
+        if (!s.manualAdjustments) s.manualAdjustments = [];
+      });
+      CFG.STUDENTS.forEach(def => {
+        if (!remote.students[def.id]) {
+          remote.students[def.id] = makeStudent(def);
+        } else {
+          remote.students[def.id].name = def.name;
+        }
+      });
+      STATE = remote;
+      localStorage.setItem(STORE_KEY, JSON.stringify(STATE));
+      refreshUI();
+    }
+  } else {
+    // No remote data — push local state as seed
+    fbRef.set(STATE).catch(() => {});
+  }
+  fbReady = true;
+}).catch(() => { fbReady = true; /* offline — localStorage only */ });
+
+// Live sync: when another device writes, pull changes
+fbRef.on('value', snap => {
+  if (!fbReady) return;
+  const remote = snap.val();
+  if (!remote || !remote.students) return;
+  // Suppress save() echo from our own writes
+  fbSuppressSync = true;
+  STATE = remote;
+  localStorage.setItem(STORE_KEY, JSON.stringify(STATE));
+  refreshUI();
+  setTimeout(() => { fbSuppressSync = false; }, 500);
+});
+
+function refreshUI() {
+  // Re-render whatever tab is currently active
+  const activeTab = document.querySelector('.tab-btn.active');
+  if (activeTab) {
+    const tabName = activeTab.textContent.includes('Mission') ? 'mission'
+      : activeTab.textContent.includes('Track') ? 'map'
+      : activeTab.textContent.includes('Board') ? 'leaderboard'
+      : activeTab.textContent.includes('Session') ? 'session'
+      : activeTab.textContent.includes('History') ? 'history'
+      : activeTab.textContent.includes('Admin') ? 'admin' : 'mission';
+    switchTab(tabName, activeTab);
+  }
+}
 
 function getDestination(week) {
   return CFG.DESTINATIONS.find(d => d.week === week) || CFG.DESTINATIONS[0];
