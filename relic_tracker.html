@@ -3586,27 +3586,35 @@ function ktToggleVoice() {
 const OLW_STEPS = [
   {
     title: 'Incoming Transmission…',
-    text: "Agents. Welcome to London. Week four takes us to the United Kingdom — castles, cobblestone, and some of the toughest runners on Earth. The Campaign moves forward."
+    text: "Agents. Final transmission before spring break. This is it. Your last mission before we go dark for one week."
   },
   {
-    title: 'The Campaign',
-    text: "Every new destination is a contested zone. Win the day, plant your flag. By race day, the squad with the most flags wins. Austin has a flag. London is unclaimed. That changes today."
+    title: 'London Bridge',
+    text: "London Bridge stands in front of you. Five checkpoints. Every 2 laps, you earn a band. Collect all 5 — and you cross the bridge."
   },
   {
-    title: 'The One-Lap Rule',
-    text: "Champions are not born. They are built — one lap at a time. If you ran eight, go for nine. If you ran nine, go for ten. That is growth. Not giant leaps. Small steps that add up. Your only mission: be one lap better than last time."
+    title: 'The Warning',
+    text: "But hear me clearly. The bridge does not care how fast you start. It cares whether you finish."
   },
   {
-    title: 'What Grit Looks Like',
-    text: "Grit is not about being the fastest. Grit is when your legs are tired, your lungs are burning, and you keep moving anyway. Today you will hit that moment. When it comes, do not stop. That is where growth lives — on the other side of hard."
+    title: 'What I Have Seen',
+    text: "I have watched agents sprint the first 2 laps, grab one band, and collapse. They never see the gold band. They never cross."
   },
   {
-    title: 'The Comeback Clause',
-    text: "The squad that finishes last receives a classified recovery mission Wednesday. Complete it and earn Bonus Relics. Losing today is not the end. It is the setup. Come back stronger. That is grit in action."
+    title: 'The Secret',
+    text: "The agents who cross? They start slow. They stay steady. They keep moving — even when it hurts, even when they want to stop."
+  },
+  {
+    title: 'Permission Granted',
+    text: "Walk if you have to. But do not stand still. A walking agent beats a standing one every single time."
+  },
+  {
+    title: 'Your Mission',
+    text: "Your mission: 10 laps. 5 bands. Cross the bridge."
   },
   {
     title: 'One Last Order.',
-    text: "Your only opponent today is the runner you were last session. Beat them by one lap. That is growth. That is grit. That is how you earn London. I believe in you. All of you. Agent Koala — out."
+    text: "Then enjoy your break knowing you earned it. Agent Koala — out."
   }
 ];
 
@@ -3615,7 +3623,7 @@ let olwMuted = false;
 let olwTypewriterTimer = null;
 let olwAudio = null;
 
-// Preload audio clips (filenames: london_1.mp3 … london_6.mp3)
+// Preload audio clips (filenames: london_1.mp3 … london_8.mp3)
 // Silently falls back to text-only if audio files are missing.
 const OLW_AUDIO = OLW_STEPS.map((_, i) => {
   const a = new Audio(`london_${i + 1}.mp3`);
