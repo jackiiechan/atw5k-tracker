@@ -69,6 +69,16 @@ body {
   letter-spacing: 2px; text-transform: uppercase;
 }
 .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+/* Firebase sync dot */
+.fb-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #444; margin-left: 5px; vertical-align: middle;
+  flex-shrink: 0; transition: background 0.5s, box-shadow 0.5s;
+  cursor: default;
+}
+.fb-dot.connected { background: #22c55e; box-shadow: 0 0 6px #22c55e99; }
+.fb-dot.connecting { background: #f59e0b; }
+.fb-dot.offline { background: #555; }
 
 /* ── HAMBURGER (mobile only) ── */
 .hamburger-btn {
@@ -1290,7 +1300,10 @@ body {
       <div class="nav-mascot" id="nav-mascot">🦔</div>
       <div>
         <div class="nav-title">All Around the World · 5K</div>
-        <div class="nav-dest" id="nav-dest-label">Week 4 — London, UK 🇬🇧</div>
+        <div class="nav-dest" style="display:flex;align-items:center;gap:0;">
+          <span id="nav-dest-label">Week 4 — London, UK 🇬🇧</span>
+          <span id="fb-dot" class="fb-dot connecting" title="Sync: connecting…"></span>
+        </div>
       </div>
     </div>
     <div class="nav-tabs">
@@ -1777,6 +1790,7 @@ let fbReady = false;
 let fbSuppressSync = false; // prevent echo loops
 
 function save() {
+  STATE.lastModified = Date.now(); // timestamp for conflict resolution
   localStorage.setItem(STORE_KEY, JSON.stringify(STATE));
   // Push to Firebase (non-blocking, fire-and-forget)
   if (fbReady && !fbSuppressSync) {
@@ -1821,12 +1835,28 @@ fbRef.on('value', snap => {
   if (!fbReady) return;
   const remote = snap.val();
   if (!remote || !remote.students) return;
-  // Suppress save() echo from our own writes
+  // Only apply if remote is strictly newer — prevents stale echoes from overwriting fresh local data
+  const remoteTs = remote.lastModified || 0;
+  const localTs  = STATE.lastModified  || 0;
+  if (remoteTs <= localTs) return;
   fbSuppressSync = true;
   STATE = remote;
   localStorage.setItem(STORE_KEY, JSON.stringify(STATE));
   refreshUI();
   setTimeout(() => { fbSuppressSync = false; }, 500);
+});
+
+// ── Firebase: connection status dot ──
+fbDb.ref('.info/connected').on('value', snap => {
+  const dot = document.getElementById('fb-dot');
+  if (!dot) return;
+  if (snap.val() === true) {
+    dot.className = 'fb-dot connected';
+    dot.title = 'Sync: live ✓';
+  } else {
+    dot.className = 'fb-dot offline';
+    dot.title = 'Sync: offline';
+  }
 });
 
 function refreshUI() {
