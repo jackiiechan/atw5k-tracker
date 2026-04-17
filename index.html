@@ -539,22 +539,35 @@ body {
 .shop-buy-btn:disabled { background: #222; color: #555; cursor: not-allowed; }
 
 /* Shop Catalog tab */
+#view-shop {
+  background: #f8f8f6; border-radius: 12px; min-height: 400px; color: #111;
+}
+#view-shop * { color: #111; }
+#view-shop .shop-item { background: #fff; border-color: #e0e0e0; }
+#view-shop .shop-item:hover { border-color: #bbb; }
+#view-shop .shop-item-desc { color: #555 !important; }
+#view-shop .shop-cat-heading { color: #888 !important; }
+#view-shop .shop-catalog-sub { color: #666 !important; }
+#view-shop .shop-price-badge { color: #b8860b !important; }
+#view-shop .shop-price-badge.free { color: #16a34a !important; }
+#view-shop .cosmetic-item { background: #fff; border-color: #ddd; }
+#view-shop .cosmetic-item-cost { color: #b8860b !important; }
 .shop-catalog-header {
   text-align: center; padding: 28px 0 20px;
-  border-bottom: 1px solid #1a2a3a; margin-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;
 }
-.shop-catalog-title { font-size: 26px; font-weight: 900; color: var(--t-accent); letter-spacing: 1px; }
-.shop-catalog-sub { font-size: 13px; color: #999; margin-top: 6px; letter-spacing: 0.5px; }
+.shop-catalog-title { font-size: 26px; font-weight: 900; color: #111; letter-spacing: 1px; }
+.shop-catalog-sub { font-size: 13px; color: #666; margin-top: 6px; letter-spacing: 0.5px; }
 .shop-cat-block { margin-bottom: 28px; }
 .shop-cat-heading {
   font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-  color: #777; font-weight: 800; margin-bottom: 10px;
-  padding-bottom: 6px; border-bottom: 1px solid #1a2a3a;
+  color: #888; font-weight: 800; margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid #e0e0e0;
 }
 .shop-price-badge {
-  font-size: 18px; font-weight: 900; color: var(--t-accent); white-space: nowrap;
+  font-size: 18px; font-weight: 900; color: #b8860b; white-space: nowrap;
 }
-.shop-price-badge.free { color: #22c55e; font-size: 14px; }
+.shop-price-badge.free { color: #16a34a; font-size: 14px; }
 .shop-bg-swatch {
   width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0; margin-right: 14px;
 }
@@ -2136,7 +2149,7 @@ function renderShop() {
   const titleItem = CFG.SHOP.find(i => i.id === 'title');
   const titleTags = CFG.TITLES.map(t =>
     `<span style="display:inline-block;padding:3px 9px;margin:3px 3px 0 0;border-radius:12px;
-      border:1px solid #222;font-size:11px;color:#888;">${t}</span>`
+      border:1px solid #ccc;font-size:11px;color:#444;background:#f0f0f0;">${t}</span>`
   ).join('');
   const titleExtra = `<div style="margin-top:8px;">${titleTags}</div>`;
 
