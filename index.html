@@ -760,6 +760,18 @@ body {
   margin-top: 10px;
 }
 .mission-fullscreen-btn:hover { border-color: var(--t-accent); color: var(--t-accent); }
+@keyframes transmission-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.mission-transmission-btn {
+  border-color: rgba(220,38,38,0.5); color: #fca5a5;
+  animation: transmission-bob 1.8s ease-in-out infinite;
+}
+.mission-transmission-btn:hover {
+  border-color: rgba(220,38,38,0.9); color: #fca5a5;
+  animation-play-state: paused;
+}
 
 /* Workout plan table */
 .workout-card {
@@ -1365,7 +1377,6 @@ body {
       <button class="tab-btn guide-only" onclick="switchTab('admin',this)">⚙ Admin</button>
     </div>
     <button class="kt-nav-btn" onclick="openKoalaTutorial()">📋 Briefing</button>
-    <button class="kt-nav-btn" onclick="openLapWarsBriefing()" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Campaign</button>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
   </div>
   <div class="mobile-menu" id="mobile-menu">
@@ -1377,7 +1388,7 @@ body {
     <button class="mob-tab-btn" onclick="switchTab('history',null)"><span class="mob-tab-icon">📖</span> History</button>
     <button class="mob-tab-btn guide-only" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
     <button class="mob-tab-btn" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
-    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">🎯</span> Campaign</button>
+    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">📡</span> Incoming Transmission</button>
   </div>
 </nav>
 <div class="parent-banner">Parent View &nbsp;·&nbsp; Live Updates &nbsp;·&nbsp; Read Only</div>
@@ -1404,7 +1415,7 @@ body {
       </div>
     </div>
     <button class="mission-fullscreen-btn" onclick="openBriefing()">⛶ Fullscreen Mode</button>
-    <button class="mission-fullscreen-btn" onclick="openLapWarsBriefing()" style="border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Campaign</button>
+    <button class="mission-fullscreen-btn mission-transmission-btn" onclick="openLapWarsBriefing()">📡 Incoming Transmission</button>
   </div>
   <div id="campaign-territory"></div>
   <div id="mission-workout"></div>
@@ -3864,7 +3875,7 @@ function olwRenderStep() {
     `<div class="kt-dot ${i === olwStep ? 'active' : i < olwStep ? 'done' : ''}"></div>`
   ).join('');
 
-  document.getElementById('olw-next').textContent = olwStep === total - 1 ? 'Claim London →' : 'Next →';
+  document.getElementById('olw-next').textContent = olwStep === total - 1 ? 'View Reward →' : 'Next →';
   document.getElementById('olw-prev').style.visibility = olwStep === 0 ? 'hidden' : 'visible';
 
   olwTypewrite(step.text, document.getElementById('olw-bubble-text'), () => {});
