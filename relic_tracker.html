@@ -80,6 +80,21 @@ body {
 .fb-dot.connecting { background: #f59e0b; }
 .fb-dot.offline { background: #555; }
 
+/* ── PARENT VIEW ── */
+.parent-banner {
+  display: none;
+  background: rgba(99,102,241,0.1);
+  border-bottom: 1px solid rgba(99,102,241,0.25);
+  padding: 5px 20px;
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: #a5b4fc; text-align: center; font-weight: 700;
+}
+.parent-mode .parent-banner { display: block; }
+.parent-mode .guide-only { display: none !important; }
+.parent-mode .shop-buy-btn,
+.parent-mode .gate-action,
+.parent-mode .relic-adj-btn { display: none !important; }
+
 /* ── HAMBURGER (mobile only) ── */
 .hamburger-btn {
   display: none;
@@ -1310,25 +1325,26 @@ body {
       <button class="tab-btn active" onclick="switchTab('mission',this)">🐨 Mission</button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Track</button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏆 Board</button>
-      <button class="tab-btn" onclick="switchTab('session',this)">⚡ Session</button>
+      <button class="tab-btn guide-only" onclick="switchTab('session',this)">⚡ Session</button>
       <button class="tab-btn" onclick="switchTab('history',this)">📖 History</button>
-      <button class="tab-btn" onclick="switchTab('admin',this)">⚙ Admin</button>
+      <button class="tab-btn guide-only" onclick="switchTab('admin',this)">⚙ Admin</button>
     </div>
-    <button class="kt-nav-btn" onclick="openKoalaTutorial()">📋 Briefing</button>
-    <button class="kt-nav-btn" onclick="openLapWarsBriefing()" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Campaign</button>
+    <button class="kt-nav-btn guide-only" onclick="openKoalaTutorial()">📋 Briefing</button>
+    <button class="kt-nav-btn guide-only" onclick="openLapWarsBriefing()" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.5);color:#fca5a5;">🎯 Campaign</button>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
   </div>
   <div class="mobile-menu" id="mobile-menu">
     <button class="mob-tab-btn active" onclick="switchTab('mission',null)"><span class="mob-tab-icon">🐨</span> Mission</button>
     <button class="mob-tab-btn" onclick="switchTab('map',null)"><span class="mob-tab-icon">🗺</span> Track</button>
     <button class="mob-tab-btn" onclick="switchTab('leaderboard',null)"><span class="mob-tab-icon">🏆</span> Board</button>
-    <button class="mob-tab-btn" onclick="switchTab('session',null)"><span class="mob-tab-icon">⚡</span> Session</button>
+    <button class="mob-tab-btn guide-only" onclick="switchTab('session',null)"><span class="mob-tab-icon">⚡</span> Session</button>
     <button class="mob-tab-btn" onclick="switchTab('history',null)"><span class="mob-tab-icon">📖</span> History</button>
-    <button class="mob-tab-btn" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
-    <button class="mob-tab-btn" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
-    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">🎯</span> Campaign</button>
+    <button class="mob-tab-btn guide-only" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
+    <button class="mob-tab-btn guide-only" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
+    <button class="mob-tab-btn guide-only" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">🎯</span> Campaign</button>
   </div>
 </nav>
+<div class="parent-banner">👁 Parent View &nbsp;·&nbsp; Live Updates &nbsp;·&nbsp; Read Only</div>
 
 <!-- ── MISSION ──────────────────────────────────────── -->
 <div class="view active" id="view-mission" style="max-width:1200px;margin:0 auto;padding:20px;">
@@ -1696,6 +1712,10 @@ const CFG = {
 // ╚═══════════════════════════════════════════════════════════════════╝
 const STORE_KEY = 'atw5k_v2';
 
+// ── Parent View: ?parent in URL = read-only mode ──
+const PARENT_MODE = new URLSearchParams(window.location.search).has('parent');
+if (PARENT_MODE) document.body.classList.add('parent-mode');
+
 // ── Firebase Realtime Database ─────────────────────────────
 const fbApp = firebase.initializeApp({
   apiKey: "AIzaSyC_fDFcgGBSYfjRvgJGyvpMmL0JFRIH11I",
@@ -2028,7 +2048,7 @@ const CAMPAIGN = {
       conquered: true, teamName: 'Team 3', teamColor: '#dc2626',
       conquerors: ['Ari Faheem','Graham Gattegno','Nayel Bajwa','Lucia Quimby','Sojourn Stinson']
     },
-    { week: 4, name: 'London, UK', shape: 'uk', conquered: false, active: true },
+    { week: 4, name: 'London, UK', shape: 'uk', conquered: true, active: true, teamName: 'Team Red', teamColor: '#dc2626', conquerors: [] },
     { week: 5, name: 'Tokyo, JP', shape: 'japan' },
     { week: 6, name: 'Beijing, CN', shape: 'china' },
     { week: 7, name: 'San Francisco', shape: 'california' },
