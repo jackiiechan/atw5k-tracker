@@ -1287,6 +1287,63 @@ body {
 .kt-voice-btn:hover { border-color: #555; color: #999; }
 .kt-voice-btn.muted { opacity: 0.45; }
 
+/* ── PACE BRIEFING VISUAL EMBED ── */
+.pace-vis-embed {
+  display: none; margin: 4px 0 10px; text-align: left;
+}
+.pv-goal-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
+}
+@media (max-width: 400px) { .pv-goal-row { grid-template-columns: 1fr; } }
+.pv-goal-card {
+  border-radius: 10px; padding: 14px 12px; text-align: center; position: relative; padding-top: 20px;
+}
+.pv-goal-card.workshop { background: linear-gradient(135deg,#1A25E6,#4D7CFF); border: 2px solid #4D7CFF; }
+.pv-goal-card.race     { background: rgba(0,200,255,0.08); border: 2px solid #00C8FF; }
+.pv-badge {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  font-size: 8px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 10px; border-radius: 20px; white-space: nowrap;
+}
+.pv-goal-card.workshop .pv-badge { background: #FFD700; color: #0a0e1a; }
+.pv-goal-card.race     .pv-badge { background: #00C8FF; color: #0a0e1a; }
+.pv-number { font-size: 30px; font-weight: 900; line-height: 1; margin: 6px 0 2px; }
+.pv-goal-card.workshop .pv-number { color: #fff; }
+.pv-goal-card.race     .pv-number { color: #00C8FF; }
+.pv-unit { font-size: 10px; color: #D0D8F0; margin-bottom: 8px; }
+.pv-desc {
+  font-size: 10px; color: #D0D8F0; line-height: 1.4;
+  border-top: 1px solid rgba(255,255,255,0.12); padding-top: 8px;
+}
+.pv-table-label {
+  font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8FF; margin-bottom: 8px; text-align: center;
+}
+.pv-grade-table {
+  width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden;
+  font-size: 11px;
+}
+.pv-grade-table th {
+  background: rgba(26,37,230,0.6); color: #F0F2FA;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 7px 8px; text-align: center;
+}
+.pv-grade-table td {
+  padding: 8px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06); color: #F0F2FA;
+}
+.pv-grade-table tr:last-child td { border-bottom: none; }
+.pv-grade-table tr:nth-child(odd)  td { background: rgba(255,255,255,0.04); }
+.pv-grade-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.pv-grade-table .pv-wval { color: #FFD700; font-weight: 700; }
+.pv-grade-table .pv-tval { color: #00C8FF; font-weight: 700; }
+.pv-status {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 9px; font-weight: 700;
+}
+.pv-status.nearly    { background: rgba(0,200,255,0.15); color: #00C8FF; }
+.pv-status.milestone { background: rgba(255,215,0,0.15);  color: #FFD700; }
+
 /* nav tutorial button */
 .kt-nav-btn {
   background: transparent;
@@ -1345,6 +1402,76 @@ body {
   </div>
 </div>
 
+<!-- ── MONDAY PACE BRIEFING OVERLAY ──────────────────── -->
+<div class="kt-overlay" id="pace-overlay">
+  <div class="kt-card">
+    <div class="kt-transmission">🛰 Agent Koala · Monday Mission Briefing</div>
+    <div class="kt-koala">🐨</div>
+    <div class="kt-step-title" id="pace-title">Incoming Transmission…</div>
+    <div class="kt-bubble" id="pace-bubble-wrap">
+      <span id="pace-bubble-text"></span>
+    </div>
+
+    <!-- VISUAL SLIDE — shown only on hasVisual step -->
+    <div class="pace-vis-embed" id="pace-vis">
+      <div class="pv-goal-row">
+        <div class="pv-goal-card workshop">
+          <div class="pv-badge">Today's Goal</div>
+          <div class="pv-number">10:00</div>
+          <div class="pv-unit">minutes · 4 laps · no walking</div>
+          <div class="pv-desc">Hit this and earn 10 Relics. Up to 3 sets = up to 30 Relics today.</div>
+        </div>
+        <div class="pv-goal-card race">
+          <div class="pv-badge">Race Day Goal</div>
+          <div class="pv-number">T2P</div>
+          <div class="pv-unit">your cut-off · 15 laps · June 6</div>
+          <div class="pv-desc">Complete 3.0 miles inside your grade-level cut-off. This is what we're building toward.</div>
+        </div>
+      </div>
+      <div class="pv-table-label">How Today Connects to Race Day</div>
+      <table class="pv-grade-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">Group</th>
+            <th>10-Min Pace</th>
+            <th>T2P Pace</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:left;color:#4CAF50;font-weight:700;">🟢 LL (K & 1st)</td>
+            <td class="pv-wval">12:30/mi</td>
+            <td class="pv-tval">12:40/mi</td>
+            <td><span class="pv-status nearly">Almost there</span></td>
+          </tr>
+          <tr>
+            <td style="text-align:left;color:#4D7CFF;font-weight:700;">🔵 L1 (2nd & 3rd)</td>
+            <td class="pv-wval">12:30/mi</td>
+            <td class="pv-tval">11:40/mi</td>
+            <td><span class="pv-status milestone">First milestone</span></td>
+          </tr>
+          <tr>
+            <td style="text-align:left;color:#FFD700;font-weight:700;">🟡 L2 (4th & 5th)</td>
+            <td class="pv-wval">12:30/mi</td>
+            <td class="pv-tval">11:20/mi</td>
+            <td><span class="pv-status milestone">First milestone</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="kt-dots" id="pace-dots"></div>
+    <div class="kt-btns">
+      <button class="kt-btn-prev" id="pace-prev" onclick="pacePrev()">← Back</button>
+      <button class="kt-btn-next" id="pace-next" onclick="paceNext()">Next →</button>
+    </div>
+    <div class="kt-footer">
+      <span class="kt-skip" onclick="closePaceBriefing()">Skip Briefing</span>
+    </div>
+  </div>
+</div>
+
 <!-- ── FUEL POINT REVEAL ──────────────────────────────── -->
 <div class="fp-overlay" id="fp-overlay">
   <div class="fp-title">CROSS THE BRIDGE. EARN 10 ALPHA BUCKS.</div>
@@ -1388,7 +1515,7 @@ body {
     <button class="mob-tab-btn" onclick="switchTab('history',null)"><span class="mob-tab-icon">📖</span> History</button>
     <button class="mob-tab-btn guide-only" onclick="switchTab('admin',null)"><span class="mob-tab-icon">⚙</span> Admin</button>
     <button class="mob-tab-btn" onclick="closeMobileMenu();openKoalaTutorial()"><span class="mob-tab-icon">📋</span> Briefing</button>
-    <button class="mob-tab-btn" onclick="closeMobileMenu();openLapWarsBriefing()"><span class="mob-tab-icon">📡</span> Incoming Transmission</button>
+    <button class="mob-tab-btn" onclick="closeMobileMenu();openPaceBriefing()"><span class="mob-tab-icon">📡</span> Incoming Transmission</button>
   </div>
 </nav>
 <div class="parent-banner">Parent View &nbsp;·&nbsp; Live Updates &nbsp;·&nbsp; Read Only</div>
@@ -1415,7 +1542,7 @@ body {
       </div>
     </div>
     <button class="mission-fullscreen-btn" onclick="openBriefing()">⛶ Fullscreen Mode</button>
-    <button class="mission-fullscreen-btn mission-transmission-btn" onclick="openLapWarsBriefing()">📡 Incoming Transmission</button>
+    <button class="mission-fullscreen-btn mission-transmission-btn" onclick="openPaceBriefing()">📡 Incoming Transmission</button>
   </div>
   <div id="campaign-territory"></div>
   <div id="mission-workout"></div>
@@ -3923,6 +4050,115 @@ function olwPrev() {
   olwStep--;
   playSfx('click');
   olwRenderStep();
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║            MONDAY PACE BRIEFING — Agent Koala                    ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const PACE_STEPS = [
+  {
+    title: 'Incoming Transmission…',
+    text: "Agents. Monday briefing. Lock in. Today you are not just running — you are learning what your race pace actually feels like. Pay attention."
+  },
+  {
+    title: "Today's Challenge",
+    text: "Four laps. Under ten minutes. No walking. Complete one set and you earn 10 Relics. Hit three sets today and you walk away with 30. The clock does not lie. Neither do I."
+  },
+  {
+    title: 'Why 10 Minutes?',
+    text: "Ten minutes for four laps means you are holding 12 minutes and 30 seconds per mile. That is not sprint pace. That is sustainable pace — the pace you can actually hold when it gets hard. Find it today. Own it."
+  },
+  {
+    title: 'Two Targets. One Race.',
+    text: "Study this. Your 10-minute goal is your first checkpoint. Your T2P cut-off is where this program is taking you by race day.",
+    hasVisual: true
+  },
+  {
+    title: 'Know Your Group',
+    text: "Green group — you are already within ten seconds of your race pace. Today is about proving you can hold it for a full set. Blue and Gold — your race pace is faster. The 10-minute goal is your foundation. Once you own it, we push from there."
+  },
+  {
+    title: 'The Reward',
+    text: "Every set you complete — four laps, under ten minutes, no walking — earns you 10 Relics. Three sets are on the table. That is 30 Relics available today alone. No one is handing them out. You earn each one on the track."
+  },
+  {
+    title: 'Agent Koala — Out.',
+    text: "Start at a pace you can keep. Not too fast. Controlled. Stay there. Finish strong. Now moving to your mission briefing. Agent Koala — out."
+  }
+];
+
+let paceStep = 0;
+let paceTypewriterTimer = null;
+
+function openPaceBriefing() {
+  paceStep = 0;
+  document.getElementById('pace-overlay').classList.add('open');
+  paceRenderStep();
+}
+
+function closePaceBriefing() {
+  document.getElementById('pace-overlay').classList.remove('open');
+  clearTimeout(paceTypewriterTimer);
+}
+
+function paceRenderStep() {
+  const step = PACE_STEPS[paceStep];
+  const total = PACE_STEPS.length;
+
+  document.getElementById('pace-title').textContent = step.title;
+
+  // Show/hide visual vs text bubble
+  const bubbleWrap = document.getElementById('pace-bubble-wrap');
+  const visEl = document.getElementById('pace-vis');
+  if (step.hasVisual) {
+    bubbleWrap.style.display = 'none';
+    visEl.style.display = 'block';
+  } else {
+    bubbleWrap.style.display = '';
+    visEl.style.display = 'none';
+    paceTypewrite(step.text, document.getElementById('pace-bubble-text'));
+  }
+
+  // Dots
+  const dotsEl = document.getElementById('pace-dots');
+  dotsEl.innerHTML = PACE_STEPS.map((_, i) =>
+    `<div class="kt-dot ${i === paceStep ? 'active' : i < paceStep ? 'done' : ''}"></div>`
+  ).join('');
+
+  document.getElementById('pace-next').textContent = paceStep === total - 1 ? 'Mission Briefing →' : 'Next →';
+  document.getElementById('pace-prev').style.visibility = paceStep === 0 ? 'hidden' : 'visible';
+
+  // Play click SFX on step advance (skip step 0)
+  if (paceStep > 0) playSfx('click');
+}
+
+function paceTypewrite(text, el) {
+  el.textContent = '';
+  let i = 0;
+  clearTimeout(paceTypewriterTimer);
+  function next() {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      paceTypewriterTimer = setTimeout(next, 22);
+    }
+  }
+  next();
+}
+
+function paceNext() {
+  if (paceStep >= PACE_STEPS.length - 1) {
+    closePaceBriefing();
+    openLapWarsBriefing(); // hand off to existing campaign briefing
+    return;
+  }
+  paceStep++;
+  paceRenderStep();
+}
+
+function pacePrev() {
+  if (paceStep === 0) return;
+  paceStep--;
+  paceRenderStep();
 }
 
 function olwToggleVoice() {
