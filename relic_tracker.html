@@ -1679,6 +1679,10 @@ body {
       <div class="week-grid" id="week-grid"></div>
     </div>
     <div class="admin-card">
+      <div class="admin-card-title">🗺 Territory Unlocker</div>
+      <div id="territory-unlock-grid" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+    <div class="admin-card">
       <div class="admin-card-title">💾 Data Backup</div>
       <button class="admin-btn" onclick="exportJSON()">⬇ Export JSON Backup</button>
       <button class="admin-btn" onclick="exportCSV()">📊 Export CSV (Google Sheets / Excel)</button>
@@ -1980,6 +1984,8 @@ function initState() {
       });
       // ── MIGRATION: bump to Week 4 (London) ──
       if ((parsed.currentWeek || 0) < 4) parsed.currentWeek = 4;
+      // ── MIGRATION: add campaignActive (Tokyo unlock) ──
+      if (!parsed.campaignActive) parsed.campaignActive = 5;
       // ── Add any new roster students not yet in saved state ──
       CFG.STUDENTS.forEach(def => {
         if (!parsed.students[def.id]) {
@@ -2017,7 +2023,7 @@ function initState() {
     }
     students[def.id] = s;
   });
-  return { currentWeek: 4, students, sessions: [] };
+  return { currentWeek: 4, campaignActive: 5, students, sessions: [] };
 }
 
 let STATE = initState();
@@ -2264,7 +2270,7 @@ const CAMPAIGN = {
       conquered: true, teamName: 'Team 3', teamColor: '#dc2626',
       conquerors: ['Ari Faheem','Graham Gattegno','Nayel Bajwa','Lucia Quimby','Sojourn Stinson']
     },
-    { week: 4, name: 'London, UK', shape: 'uk', conquered: true, active: true, teamName: 'Team Red', teamColor: '#dc2626', conquerors: [] },
+    { week: 4, name: 'London, UK', shape: 'uk', conquered: true, teamName: 'Team Red', teamColor: '#dc2626', conquerors: [] },
     { week: 5, name: 'Tokyo, JP', shape: 'japan' },
     { week: 6, name: 'Beijing, CN', shape: 'china' },
     { week: 7, name: 'San Francisco', shape: 'california' },
@@ -2396,7 +2402,7 @@ function renderCampaign() {
       if (t.conquerors && t.conquerors.length) {
         conq = `<div class="campaign-conquerors">${t.conquerors.map(n => n.split(' ')[0]).join(' · ')}</div>`;
       }
-    } else if (t.active) {
+    } else if (t.week === STATE.campaignActive) {
       cls += ' active';
       badge = `<div class="campaign-badge">⚔ CONTESTED</div>`;
     } else {
@@ -2426,6 +2432,44 @@ function renderCampaign() {
   </div>`;
 }
 
+function renderTerritoryUnlocker() {
+  const el = document.getElementById('territory-unlock-grid');
+  if (!el) return;
+  let html = '';
+  CAMPAIGN.territories.forEach(t => {
+    if (t.conquered) {
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);">
+        <span style="font-size:14px;">🏆</span>
+        <span style="flex:1;font-size:13px;color:#888;">W${t.week}: ${t.name}</span>
+        <span style="font-size:11px;color:#dc2626;font-weight:700;letter-spacing:0.05em;">CONQUERED · ${t.teamName}</span>
+      </div>`;
+    } else if (t.week === STATE.campaignActive) {
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(232,160,32,0.1);border:1px solid rgba(232,160,32,0.35);">
+        <span style="font-size:14px;">⚔</span>
+        <span style="flex:1;font-size:13px;color:#e8a020;font-weight:700;">W${t.week}: ${t.name}</span>
+        <span style="font-size:11px;color:#e8a020;letter-spacing:0.05em;">ACTIVE NOW</span>
+      </div>`;
+    } else {
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid #2a2a2a;">
+        <span style="font-size:14px;">🔒</span>
+        <span style="flex:1;font-size:13px;color:#888;">W${t.week}: ${t.name}</span>
+        <button class="admin-btn" style="padding:4px 12px;font-size:12px;margin:0;" onclick="unlockTerritory(${t.week})">Unlock →</button>
+      </div>`;
+    }
+  });
+  el.innerHTML = html;
+}
+
+function unlockTerritory(weekNum) {
+  const t = CAMPAIGN.territories.find(x => x.week === weekNum);
+  if (!t) return;
+  STATE.campaignActive = weekNum;
+  save();
+  renderCampaign();
+  renderTerritoryUnlocker();
+  showToast(`⚔ ${t.name} is now ACTIVE on the territory map.`);
+}
+
 function renderMission() {
   const dest = getDestination(STATE.currentWeek);
   document.getElementById('ms-flag').textContent = dest.flag;
@@ -2436,6 +2480,7 @@ function renderMission() {
 
   // Campaign territory map (render before workout so early returns don't skip it)
   renderCampaign();
+  renderTerritoryUnlocker();
 
   // Workout plan
   const wk = CFG.WORKOUTS[STATE.currentWeek];

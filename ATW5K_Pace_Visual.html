@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #0A0E6B;
+    color: #F0F2FA;
+    width: 800px;
+    padding: 40px;
+  }
+
+  .title-block {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .title-block .eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #00C8FF;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .title-block h1 {
+    font-size: 30px;
+    font-weight: 900;
+    color: #F0F2FA;
+    line-height: 1.1;
+  }
+  .title-block h1 span { color: #00C8FF; }
+  .title-block .sub {
+    font-size: 13px;
+    color: #D0D8F0;
+    margin-top: 8px;
+  }
+
+  /* ── TWO-COLUMN GOAL CARDS ── */
+  .goal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .goal-card {
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+  }
+  .goal-card.workshop {
+    background: linear-gradient(135deg, #1A25E6, #4D7CFF);
+    border: 2px solid #4D7CFF;
+  }
+  .goal-card.race {
+    background: rgba(0,200,255,0.08);
+    border: 2px solid #00C8FF;
+  }
+  .goal-card .tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .goal-card.workshop .tag { color: #FFD700; }
+  .goal-card.race .tag { color: #00C8FF; }
+  .goal-card .big-number {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .goal-card.workshop .big-number { color: #FFFFFF; }
+  .goal-card.race .big-number { color: #00C8FF; }
+  .goal-card .unit {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .goal-card.workshop .unit { color: #D0D8F0; }
+  .goal-card.race .unit { color: #D0D8F0; }
+  .goal-card .description {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #D0D8F0;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+  .goal-card .badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FFD700;
+    color: #0A0E6B;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 12px;
+    border-radius: 20px;
+  }
+  .goal-card.race .badge {
+    background: #00C8FF;
+    color: #0A0E6B;
+  }
+  .arrow-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #FFD700;
+    margin: 0 -8px;
+    align-self: center;
+  }
+
+  /* ── WHAT THIS MEANS ROW ── */
+  .means-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .means-card {
+    background: rgba(26, 37, 230, 0.25);
+    border: 1px solid rgba(77, 124, 255, 0.3);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .means-card .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #00C8FF;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .means-card .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #F0F2FA;
+    margin-bottom: 4px;
+  }
+  .means-card .context {
+    font-size: 11px;
+    color: #D0D8F0;
+    line-height: 1.4;
+  }
+
+  /* ── GRADE TABLE ── */
+  .grade-section {
+    margin-bottom: 32px;
+  }
+  .grade-section h2 {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #00C8FF;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .grade-table th {
+    background: rgba(26, 37, 230, 0.6);
+    color: #F0F2FA;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: center;
+  }
+  .grade-table td {
+    padding: 12px 14px;
+    font-size: 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .grade-table tr:last-child td { border-bottom: none; }
+  .grade-table tr:nth-child(odd) td { background: rgba(255,255,255,0.04); }
+  .grade-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .grade-table .group-name { font-weight: 700; text-align: left; }
+  .grade-table .workshop-val { color: #FFD700; font-weight: 700; }
+  .grade-table .t2p-val { color: #00C8FF; font-weight: 700; }
+  .grade-table .gap-val { color: #D0D8F0; font-size: 11px; }
+  .grade-table .status {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .status.milestone { background: rgba(255,215,0,0.15); color: #FFD700; }
+  .status.nearly { background: rgba(0,200,255,0.15); color: #00C8FF; }
+
+  /* ── PROGRESS BAR SECTION ── */
+  .progress-section {
+    background: rgba(26, 37, 230, 0.2);
+    border: 1px solid rgba(77, 124, 255, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .progress-section h2 {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #00C8FF;
+    margin-bottom: 20px;
+  }
+  .pace-bar-row {
+    margin-bottom: 18px;
+  }
+  .pace-bar-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #D0D8F0;
+    margin-bottom: 6px;
+  }
+  .pace-bar-header strong { color: #F0F2FA; font-size: 12px; }
+  .pace-bar-track {
+    height: 22px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 11px;
+    position: relative;
+    overflow: visible;
+  }
+  .pace-bar-fill {
+    height: 100%;
+    border-radius: 11px;
+    position: relative;
+  }
+  /* Marker for 10-min goal */
+  .marker-10min {
+    position: absolute;
+    top: -6px;
+    height: 34px;
+    width: 3px;
+    background: #FFD700;
+    border-radius: 2px;
+  }
+  .marker-label {
+    position: absolute;
+    top: -20px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #FFD700;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+  /* Marker for T2P */
+  .marker-t2p {
+    position: absolute;
+    top: -6px;
+    height: 34px;
+    width: 3px;
+    background: #00C8FF;
+    border-radius: 2px;
+  }
+  .marker-t2p-label {
+    position: absolute;
+    top: 30px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #00C8FF;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  /* ── BOTTOM CALLOUT ── */
+  .callout {
+    background: rgba(0,200,255,0.08);
+    border: 2px solid rgba(0,200,255,0.4);
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: center;
+  }
+  .callout .callout-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #00C8FF;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout .callout-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #F0F2FA;
+    line-height: 1.5;
+  }
+  .callout .callout-text span { color: #FFD700; }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <div class="eyebrow">All Around the World 5K · Alpha School</div>
+  <h1>Two Targets. <span>One Race.</span></h1>
+  <div class="sub">Here's what we're training toward — and what you can earn today.</div>
+</div>
+
+<!-- GOAL CARDS -->
+<div class="goal-row">
+  <div class="goal-card workshop">
+    <div class="badge">TODAY'S GOAL</div>
+    <span class="tag">Workshop Incentive</span>
+    <div class="big-number">10:00</div>
+    <div class="unit">minutes for 4 laps</div>
+    <div class="description">
+      Finish each set of 4 laps in under 10 minutes with no walking and earn a Passport Stamp. Up to 3 stamps available per session.
+    </div>
+  </div>
+  <div class="goal-card race">
+    <div class="badge">RACE DAY GOAL</div>
+    <span class="tag">Test2Pass Pace</span>
+    <div class="big-number">T2P</div>
+    <div class="unit">your cut-off time · 15 laps</div>
+    <div class="description">
+      Complete 3.0 miles (15 laps) inside your grade-level cut-off time on race day, June 6th. This is what we're building toward.
+    </div>
+  </div>
+</div>
+
+<!-- WHAT THIS MEANS -->
+<div class="means-row">
+  <div class="means-card">
+    <div class="label">10-Min Goal in Pace Terms</div>
+    <div class="value">12:30 / mile</div>
+    <div class="context">That is the pace you need to hold to finish 4 laps in exactly 10 minutes. Think of it as your first target pace to own.</div>
+  </div>
+  <div class="means-card">
+    <div class="label">Why Start Here</div>
+    <div class="value">Feel it first.</div>
+    <div class="context">Session 1 is about understanding what a sustainable pace feels like. Once you own 12:30/mile, we push toward your race pace.</div>
+  </div>
+</div>
+
+<!-- GRADE TABLE -->
+<div class="grade-section">
+  <h2>How the 10-Minute Goal Connects to Your Race Cut-Off</h2>
+  <table class="grade-table">
+    <thead>
+      <tr>
+        <th style="text-align:left">Group</th>
+        <th>10-Min Goal Pace</th>
+        <th>T2P Race Pace</th>
+        <th>Gap to Close</th>
+        <th>What It Means</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="group-name" style="color:#4CAF50;">Green · LL (K &amp; 1st)</td>
+        <td class="workshop-val">12:30/mi</td>
+        <td class="t2p-val">12:40/mi</td>
+        <td class="gap-val">10 sec/mi</td>
+        <td><span class="status nearly">Almost there</span></td>
+      </tr>
+      <tr>
+        <td class="group-name" style="color:#4D7CFF;">Blue · L1 (2nd &amp; 3rd)</td>
+        <td class="workshop-val">12:30/mi</td>
+        <td class="t2p-val">11:40/mi</td>
+        <td class="gap-val">50 sec/mi</td>
+        <td><span class="status milestone">First milestone</span></td>
+      </tr>
+      <tr>
+        <td class="group-name" style="color:#FFD700;">Gold · L2 (4th &amp; 5th)</td>
+        <td class="workshop-val">12:30/mi</td>
+        <td class="t2p-val">11:20/mi</td>
+        <td class="gap-val">70 sec/mi</td>
+        <td><span class="status milestone">First milestone</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PROGRESS BARS -->
+<div class="progress-section">
+  <h2>Journey from Where You Are → 10-Min Goal → Race Day</h2>
+
+  <!-- LL -->
+  <div class="pace-bar-row">
+    <div class="pace-bar-header">
+      <strong>Green (LL — K &amp; 1st)</strong>
+      <span>Slower pace ← — → Faster pace</span>
+    </div>
+    <div class="pace-bar-track">
+      <!-- Full bar = 15:00/mile (slowest), narrow = faster -->
+      <!-- Scale: 15:00 = 0%, 10:00 = 100% -->
+      <!-- Current ~13:53 = (13:53-10:00)/(15:00-10:00) from right = 3:53/5:00 = 77% from fast end = 23% filled -->
+      <div class="pace-bar-fill" style="width:23%; background: linear-gradient(90deg, #27AE60, #4CAF50);"></div>
+      <!-- 10-min goal marker: 12:30 = (15:00-12:30)/(15:00-10:00) = 2:30/5:00 = 50% -->
+      <div class="marker-10min" style="left:50%;">
+        <span class="marker-label">10-Min Goal</span>
+      </div>
+      <!-- T2P marker: 12:40 = (15:00-12:40)/(15:00-10:00) = 2:20/5:00 = 46.7% -->
+      <div class="marker-t2p" style="left:46.7%;">
+        <span class="marker-t2p-label">T2P Pace</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L1 -->
+  <div class="pace-bar-row" style="margin-top:28px;">
+    <div class="pace-bar-header">
+      <strong>Blue (L1 — 2nd &amp; 3rd)</strong>
+      <span>Slower pace ← — → Faster pace</span>
+    </div>
+    <div class="pace-bar-track">
+      <div class="pace-bar-fill" style="width:23%; background: linear-gradient(90deg, #1A25E6, #4D7CFF);"></div>
+      <!-- 10-min goal: 50% -->
+      <div class="marker-10min" style="left:50%;">
+        <span class="marker-label">10-Min Goal</span>
+      </div>
+      <!-- T2P: 11:40 = (15:00-11:40)/(5:00) = 3:20/5:00 = 66.7% -->
+      <div class="marker-t2p" style="left:66.7%;">
+        <span class="marker-t2p-label">T2P Pace</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2 -->
+  <div class="pace-bar-row" style="margin-top:28px;">
+    <div class="pace-bar-header">
+      <strong>Gold (L2 — 4th &amp; 5th)</strong>
+      <span>Slower pace ← — → Faster pace</span>
+    </div>
+    <div class="pace-bar-track">
+      <div class="pace-bar-fill" style="width:23%; background: linear-gradient(90deg, #B8860B, #FFD700);"></div>
+      <!-- 10-min goal: 50% -->
+      <div class="marker-10min" style="left:50%;">
+        <span class="marker-label">10-Min Goal</span>
+      </div>
+      <!-- T2P: 11:20 = (15:00-11:20)/(5:00) = 3:40/5:00 = 73.3% -->
+      <div class="marker-t2p" style="left:73.3%;">
+        <span class="marker-t2p-label">T2P Pace</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px; font-size:10px; color:#6B708D; display:flex; gap:20px; justify-content:center;">
+    <span>■ <span style="color:#F0F2FA;">Current avg pace (Week 4)</span></span>
+    <span style="color:#FFD700;">| = 10-Min Workshop Goal (12:30/mi)</span>
+    <span style="color:#00C8FF;">| = T2P Race Pace (varies by grade)</span>
+  </div>
+</div>
+
+<!-- CALLOUT -->
+<div class="callout">
+  <div class="callout-label">The Plan</div>
+  <div class="callout-text">
+    Session 1: learn what <span>sustainable pace</span> feels like.<br>
+    By Week 3: every student hits the <span>10-minute goal</span>.<br>
+    By Race Day: every student crosses at their <span>T2P cut-off</span>.
+  </div>
+</div>
+
+</body>
+</html>

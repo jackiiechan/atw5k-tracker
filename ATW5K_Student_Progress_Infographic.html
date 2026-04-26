@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATW5K Student Progress Infographic</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0A0E6B;
+    color: #F0F2FA;
+    width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0A0E6B 0%, #1A25E6 100%);
+    text-align: center;
+    padding: 48px 40px 36px;
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header h1 span { color: #00C8FF; }
+  .header .subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    color: #D0D8F0;
+    letter-spacing: 1px;
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .divider {
+    height: 4px;
+    background: linear-gradient(90deg, #00C8FF, #1A25E6, #00C8FF);
+  }
+
+  /* ── GROWTH SPOTLIGHTS ── */
+  .growth-section {
+    background: #0A0E6B;
+    padding: 36px 40px 40px;
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .section-subtitle {
+    font-size: 13px;
+    color: #D0D8F0;
+    margin-bottom: 24px;
+  }
+  .growth-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .growth-card {
+    background: rgba(26, 37, 230, 0.35);
+    border: 1px solid rgba(0, 200, 255, 0.25);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .growth-card .student-name {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #F0F2FA;
+  }
+  .growth-card .pct {
+    font-size: 28px;
+    font-weight: 900;
+    color: #00C8FF;
+    margin-bottom: 8px;
+  }
+  .growth-bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .growth-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00C8FF, #1A25E6);
+    border-radius: 3px;
+  }
+  .growth-card .laps {
+    font-size: 11px;
+    color: #D0D8F0;
+  }
+
+  /* ── WHERE THEY STARTED ── */
+  .started-section {
+    background: linear-gradient(135deg, #1A25E6 0%, #4D7CFF 100%);
+    padding: 36px 40px 40px;
+  }
+  .started-section .section-title { color: #F0F2FA; }
+  .started-section .section-subtitle { color: rgba(240,242,250,0.75); }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .stat-card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 20px 14px;
+    text-align: center;
+  }
+  .stat-card .stat-number {
+    font-size: 34px;
+    font-weight: 900;
+    color: #0A0E6B;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card .stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1A25E6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .stat-card .stat-desc {
+    font-size: 11px;
+    color: #6B708D;
+    line-height: 1.4;
+  }
+  .time-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    color: #F0F2FA;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* ── WHERE THEY ARE NOW ── */
+  .now-section {
+    background: #0A0E6B;
+    padding: 36px 40px 40px;
+  }
+  .now-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .now-card {
+    background: linear-gradient(135deg, #1A25E6, #4D7CFF);
+    border-radius: 10px;
+    padding: 20px 14px;
+    text-align: center;
+  }
+  .now-card .stat-number {
+    font-size: 34px;
+    font-weight: 900;
+    color: #00C8FF;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .now-card .stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #F0F2FA;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .now-card .stat-desc {
+    font-size: 11px;
+    color: #D0D8F0;
+    line-height: 1.4;
+  }
+  .key-insight {
+    background: rgba(0, 200, 255, 0.1);
+    border: 2px solid #00C8FF;
+    border-radius: 10px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .key-insight .insight-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #00C8FF;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .key-insight .insight-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #F0F2FA;
+    line-height: 1.5;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: linear-gradient(135deg, #1A25E6 0%, #0A0E6B 100%);
+    text-align: center;
+    padding: 24px 40px;
+    font-size: 13px;
+    color: #D0D8F0;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>All Around the World <span>5K</span></h1>
+  <h1 style="font-size:24px; font-weight:700; letter-spacing:3px; margin-top:2px;">Student Progress</h1>
+  <div class="subtitle">Alpha School &bull; Lake Forest, CA</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- GROWTH SPOTLIGHTS -->
+<div class="growth-section">
+  <div class="section-title">Growth Spotlights <span style="color:#00C8FF;">— Top 8</span></div>
+  <div class="section-subtitle">Highest improvement from Week 1 to Week 4</div>
+  <div class="growth-grid">
+    <div class="growth-card">
+      <div class="student-name">Caleb</div>
+      <div class="pct">+150%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:100%"></div></div>
+      <div class="laps">4 → 10 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Annalise</div>
+      <div class="pct">+100%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:67%"></div></div>
+      <div class="laps">5 → 10 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Graham</div>
+      <div class="pct">+67%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:45%"></div></div>
+      <div class="laps">6 → 10 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Hana</div>
+      <div class="pct">+43%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:29%"></div></div>
+      <div class="laps">7 → 10 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Sabrina</div>
+      <div class="pct">+43%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:29%"></div></div>
+      <div class="laps">7 → 10 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Arthur</div>
+      <div class="pct">+43%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:29%"></div></div>
+      <div class="laps">7 → 10 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Lorenzo</div>
+      <div class="pct">+40%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:27%"></div></div>
+      <div class="laps">10 → 14 laps</div>
+    </div>
+    <div class="growth-card">
+      <div class="student-name">Rexa</div>
+      <div class="pct">+38%</div>
+      <div class="growth-bar-track"><div class="growth-bar-fill" style="width:25%"></div></div>
+      <div class="laps">8 → 11 laps</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- WHERE THEY STARTED -->
+<div class="started-section">
+  <div class="section-title">Where They Started</div>
+  <span class="time-badge">Week 1 Baseline — 35 Minutes</span>
+  <div class="section-subtitle">22 students &bull; First timed session</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-number">7.9</div>
+      <div class="stat-label">Avg Laps</div>
+      <div class="stat-desc">22 students averaged nearly 8 laps</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">4</div>
+      <div class="stat-label">Lowest Laps</div>
+      <div class="stat-desc">Starting floor</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">11</div>
+      <div class="stat-label">Highest Laps</div>
+      <div class="stat-desc">Starting ceiling</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">1.58</div>
+      <div class="stat-label">Avg Miles</div>
+      <div class="stat-desc">Baseline distance</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- WHERE THEY ARE NOW -->
+<div class="now-section">
+  <div class="section-title">Where They Are Now</div>
+  <span class="time-badge" style="background:rgba(0,200,255,0.15); border:1px solid rgba(0,200,255,0.3);">Week 4 — 30 Minutes</span>
+  <div class="section-subtitle" style="color:#D0D8F0;">22 students &bull; 5 fewer minutes than baseline</div>
+  <div class="now-stat-grid">
+    <div class="now-card">
+      <div class="stat-number">10.8</div>
+      <div class="stat-label">Avg Laps</div>
+      <div class="stat-desc">Up from 7.9 — a 37% jump</div>
+    </div>
+    <div class="now-card">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Hit 10+ Laps</div>
+      <div class="stat-desc">Every single student</div>
+    </div>
+    <div class="now-card">
+      <div class="stat-number">237</div>
+      <div class="stat-label">Total Laps</div>
+      <div class="stat-desc">Combined class output</div>
+    </div>
+    <div class="now-card">
+      <div class="stat-number">2.15</div>
+      <div class="stat-label">Avg Miles</div>
+      <div class="stat-desc">Up from 1.58 miles</div>
+    </div>
+  </div>
+  <div class="key-insight">
+    <div class="insight-label">Key Insight</div>
+    <div class="insight-text">In 5 fewer minutes, every student hit double-digit laps.<br>That is not luck — that is training.</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  ALL AROUND THE WORLD 5K &bull; ALPHA SCHOOL &bull; 2026
+</div>
+
+</body>
+</html>
