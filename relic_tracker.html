@@ -4158,7 +4158,7 @@ function paceRenderStep() {
     `<div class="kt-dot ${i === paceStep ? 'active' : i < paceStep ? 'done' : ''}"></div>`
   ).join('');
 
-  document.getElementById('pace-next').textContent = paceStep === total - 1 ? 'Mission Briefing →' : 'Next →';
+  document.getElementById('pace-next').textContent = paceStep === total - 1 ? 'View Reward →' : 'Next →';
   document.getElementById('pace-prev').style.visibility = paceStep === 0 ? 'hidden' : 'visible';
 
   // Play click SFX on step advance (skip step 0)
@@ -4181,7 +4181,7 @@ function paceTypewrite(text, el) {
 function paceNext() {
   if (paceStep >= PACE_STEPS.length - 1) {
     closePaceBriefing();
-    openLapWarsBriefing(); // hand off to existing campaign briefing
+    openFuelPoint();
     return;
   }
   paceStep++;
