@@ -1315,34 +1315,41 @@ body {
   font-size: 10px; color: #D0D8F0; line-height: 1.4;
   border-top: 1px solid rgba(255,255,255,0.12); padding-top: 8px;
 }
-.pv-table-label {
+.pv-bars-label {
   font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
-  color: #00C8FF; margin-bottom: 8px; text-align: center;
+  color: #00C8FF; margin: 12px 0 14px; text-align: center;
 }
-.pv-grade-table {
-  width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden;
-  font-size: 11px;
+.pv-bar-row { margin-bottom: 22px; }
+.pv-bar-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10px; color: #D0D8F0; margin-bottom: 5px;
 }
-.pv-grade-table th {
-  background: rgba(26,37,230,0.6); color: #F0F2FA;
-  font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-  padding: 7px 8px; text-align: center;
+.pv-bar-header strong { color: #F0F2FA; font-size: 11px; }
+.pv-bar-track {
+  height: 16px; background: rgba(255,255,255,0.08);
+  border-radius: 8px; position: relative; overflow: visible;
 }
-.pv-grade-table td {
-  padding: 8px; text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.06); color: #F0F2FA;
+.pv-bar-fill { height: 100%; border-radius: 8px; }
+.pv-marker-goal {
+  position: absolute; top: -5px; height: 26px; width: 2px;
+  background: #FFD700; border-radius: 1px;
 }
-.pv-grade-table tr:last-child td { border-bottom: none; }
-.pv-grade-table tr:nth-child(odd)  td { background: rgba(255,255,255,0.04); }
-.pv-grade-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
-.pv-grade-table .pv-wval { color: #FFD700; font-weight: 700; }
-.pv-grade-table .pv-tval { color: #00C8FF; font-weight: 700; }
-.pv-status {
-  display: inline-block; padding: 2px 8px; border-radius: 10px;
-  font-size: 9px; font-weight: 700;
+.pv-marker-goal-lbl {
+  position: absolute; top: -15px; font-size: 8px; font-weight: 800;
+  color: #FFD700; white-space: nowrap; transform: translateX(-50%);
 }
-.pv-status.nearly    { background: rgba(0,200,255,0.15); color: #00C8FF; }
-.pv-status.milestone { background: rgba(255,215,0,0.15);  color: #FFD700; }
+.pv-marker-t2p {
+  position: absolute; top: -5px; height: 26px; width: 2px;
+  background: #00C8FF; border-radius: 1px;
+}
+.pv-marker-t2p-lbl {
+  position: absolute; bottom: -15px; font-size: 8px; font-weight: 800;
+  color: #00C8FF; white-space: nowrap; transform: translateX(-50%);
+}
+.pv-legend {
+  display: flex; gap: 14px; justify-content: center;
+  font-size: 9px; color: #888; margin-top: 22px; flex-wrap: wrap;
+}
 
 /* nav tutorial button */
 .kt-nav-btn {
@@ -1414,51 +1421,66 @@ body {
 
     <!-- VISUAL SLIDE — shown only on hasVisual step -->
     <div class="pace-vis-embed" id="pace-vis">
+      <!-- Goal cards -->
       <div class="pv-goal-row">
         <div class="pv-goal-card workshop">
           <div class="pv-badge">Today's Goal</div>
           <div class="pv-number">10:00</div>
-          <div class="pv-unit">minutes · 4 laps · no walking</div>
-          <div class="pv-desc">Hit this and earn 10 Relics. Up to 3 sets = up to 30 Relics today.</div>
+          <div class="pv-unit">4 laps · no walking</div>
+          <div class="pv-desc">Finish under 10 minutes = 10 Bonus Relics. Up to 3 sets today.</div>
         </div>
         <div class="pv-goal-card race">
           <div class="pv-badge">Race Day Goal</div>
-          <div class="pv-number">T2P</div>
-          <div class="pv-unit">your cut-off · 15 laps · June 6</div>
-          <div class="pv-desc">Complete 3.0 miles inside your grade-level cut-off. This is what we're building toward.</div>
+          <div class="pv-number">9:20</div>
+          <div class="pv-unit">4 laps · race pace · June 6</div>
+          <div class="pv-desc">This is the pace you need to hold on race day. Today is your first step toward it.</div>
         </div>
       </div>
-      <div class="pv-table-label">How Today Connects to Race Day</div>
-      <table class="pv-grade-table">
-        <thead>
-          <tr>
-            <th style="text-align:left">Group</th>
-            <th>10-Min Pace</th>
-            <th>T2P Pace</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="text-align:left;color:#4CAF50;font-weight:700;">🟢 LL (K & 1st)</td>
-            <td class="pv-wval">12:30/mi</td>
-            <td class="pv-tval">12:40/mi</td>
-            <td><span class="pv-status nearly">Almost there</span></td>
-          </tr>
-          <tr>
-            <td style="text-align:left;color:#4D7CFF;font-weight:700;">🔵 L1 (2nd & 3rd)</td>
-            <td class="pv-wval">12:30/mi</td>
-            <td class="pv-tval">11:40/mi</td>
-            <td><span class="pv-status milestone">First milestone</span></td>
-          </tr>
-          <tr>
-            <td style="text-align:left;color:#FFD700;font-weight:700;">🟡 L2 (4th & 5th)</td>
-            <td class="pv-wval">12:30/mi</td>
-            <td class="pv-tval">11:20/mi</td>
-            <td><span class="pv-status milestone">First milestone</span></td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Progress bars — scale: 12:00 (slow) → 8:00 (fast) per 4 laps -->
+      <!-- 10:00 goal marker at 50% · 9:20 T2P marker at 66.7% · current fill ~23% -->
+      <div class="pv-bars-label">Where You Are → Where You're Going</div>
+
+      <div class="pv-bar-row">
+        <div class="pv-bar-header">
+          <strong>🟢 Green (K &amp; 1st)</strong>
+          <span>slower ←&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ faster</span>
+        </div>
+        <div class="pv-bar-track">
+          <div class="pv-bar-fill" style="width:23%;background:linear-gradient(90deg,#27AE60,#4CAF50);"></div>
+          <div class="pv-marker-goal" style="left:50%;"><span class="pv-marker-goal-lbl">10:00</span></div>
+          <div class="pv-marker-t2p"  style="left:66.7%;"><span class="pv-marker-t2p-lbl">9:20</span></div>
+        </div>
+      </div>
+
+      <div class="pv-bar-row">
+        <div class="pv-bar-header">
+          <strong>🔵 Blue (2nd &amp; 3rd)</strong>
+          <span>slower ←&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ faster</span>
+        </div>
+        <div class="pv-bar-track">
+          <div class="pv-bar-fill" style="width:23%;background:linear-gradient(90deg,#1A25E6,#4D7CFF);"></div>
+          <div class="pv-marker-goal" style="left:50%;"><span class="pv-marker-goal-lbl">10:00</span></div>
+          <div class="pv-marker-t2p"  style="left:66.7%;"><span class="pv-marker-t2p-lbl">9:20</span></div>
+        </div>
+      </div>
+
+      <div class="pv-bar-row">
+        <div class="pv-bar-header">
+          <strong>🟡 Gold (4th &amp; 5th)</strong>
+          <span>slower ←&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ faster</span>
+        </div>
+        <div class="pv-bar-track">
+          <div class="pv-bar-fill" style="width:23%;background:linear-gradient(90deg,#B8860B,#FFD700);"></div>
+          <div class="pv-marker-goal" style="left:50%;"><span class="pv-marker-goal-lbl">10:00</span></div>
+          <div class="pv-marker-t2p"  style="left:66.7%;"><span class="pv-marker-t2p-lbl">9:20</span></div>
+        </div>
+      </div>
+
+      <div class="pv-legend">
+        <span>▓ Current avg pace</span>
+        <span style="color:#FFD700;">| = Today's Goal (10:00)</span>
+        <span style="color:#00C8FF;">| = Race Day (9:20)</span>
+      </div>
     </div>
 
     <div class="kt-dots" id="pace-dots"></div>
@@ -4058,32 +4080,32 @@ function olwPrev() {
 const PACE_STEPS = [
   {
     title: 'Incoming Transmission…',
-    text: "Agents. Monday briefing. Lock in. Today you are not just running — you are learning what your race pace actually feels like. Pay attention."
-  },
-  {
-    title: "Today's Challenge",
-    text: "Four laps. Under ten minutes. No walking. Complete one set and you earn 10 Relics. Hit three sets today and you walk away with 30. The clock does not lie. Neither do I."
-  },
-  {
-    title: 'Why 10 Minutes?',
-    text: "Ten minutes for four laps means you are holding 12 minutes and 30 seconds per mile. That is not sprint pace. That is sustainable pace — the pace you can actually hold when it gets hard. Find it today. Own it."
+    text: "Agents. Monday briefing. Today is about one thing — learning what your race pace feels like. Pay attention."
   },
   {
     title: 'Two Targets. One Race.',
-    text: "Study this. Your 10-minute goal is your first checkpoint. Your T2P cut-off is where this program is taking you by race day.",
+    text: "Here is where you are, and where we are taking you. Study this.",
     hasVisual: true
   },
   {
-    title: 'Know Your Group',
-    text: "Green group — you are already within ten seconds of your race pace. Today is about proving you can hold it for a full set. Blue and Gold — your race pace is faster. The 10-minute goal is your foundation. Once you own it, we push from there."
+    title: 'Your Test to Pass',
+    text: "On race day, you will need to hold a controlled pace for the entire 5K — start to finish. We are using today's training to help you feel what that pace is."
   },
   {
-    title: 'The Reward',
-    text: "Every set you complete — four laps, under ten minutes, no walking — earns you 10 Relics. Three sets are on the table. That is 30 Relics available today alone. No one is handing them out. You earn each one on the track."
+    title: "Today's Mission",
+    text: "You are each running 4 laps on your own. No stopping. If you finish all 4 laps in under 10 minutes, you earn Bonus Relics. Up to 3 sets today."
+  },
+  {
+    title: 'Control Your Pace',
+    text: "Don't start too fast. Don't walk. Find a pace you can hold — and stick to it. That is the whole game today."
+  },
+  {
+    title: 'What You Can Earn',
+    text: "Complete a set in under 10 minutes with no walking — that is 10 Bonus Relics. Three sets on the table. That is 30 Relics. The clock does not lie."
   },
   {
     title: 'Agent Koala — Out.',
-    text: "Start at a pace you can keep. Not too fast. Controlled. Stay there. Finish strong. Now moving to your mission briefing. Agent Koala — out."
+    text: "Steady pace. No stopping. Finish strong. Moving to your mission briefing now. Agent Koala — out."
   }
 ];
 
