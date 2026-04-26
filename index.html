@@ -1431,9 +1431,19 @@ body {
         </div>
         <div class="pv-goal-card race">
           <div class="pv-badge">Race Day Goal</div>
-          <div class="pv-number">9:20</div>
+          <div style="display:flex;justify-content:center;gap:16px;margin:8px 0 2px;">
+            <div style="text-align:center;">
+              <div class="pv-number" style="font-size:22px;">9:48</div>
+              <div style="font-size:8px;color:#aac4e0;margin-top:2px;">LL &amp; L1</div>
+            </div>
+            <div style="color:#334;font-size:22px;align-self:center;font-weight:200;">|</div>
+            <div style="text-align:center;">
+              <div class="pv-number" style="font-size:22px;">8:46</div>
+              <div style="font-size:8px;color:#aac4e0;margin-top:2px;">L2</div>
+            </div>
+          </div>
           <div class="pv-unit">4 laps · race pace · June 6</div>
-          <div class="pv-desc">This is the pace you need to hold on race day. Today is your first step toward it.</div>
+          <div class="pv-desc">This is where we are taking you. The bars below show your path to get there.</div>
         </div>
       </div>
       <!-- Progress bars — scale: 12:00 (slow) → 8:00 (fast) per 4 laps -->
@@ -1442,37 +1452,37 @@ body {
 
       <div class="pv-bar-row">
         <div class="pv-bar-header">
-          <strong>🟢 Green (K &amp; 1st)</strong>
+          <strong>🟢 Green · LL (K &amp; 1st)</strong>
           <span>slower ←&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ faster</span>
         </div>
         <div class="pv-bar-track">
           <div class="pv-bar-fill" style="width:23%;background:linear-gradient(90deg,#27AE60,#4CAF50);"></div>
           <div class="pv-marker-goal" style="left:50%;"><span class="pv-marker-goal-lbl">10:00</span></div>
-          <div class="pv-marker-t2p"  style="left:66.7%;"><span class="pv-marker-t2p-lbl">9:20</span></div>
+          <div class="pv-marker-t2p"  style="left:55%;"><span class="pv-marker-t2p-lbl">9:48</span></div>
         </div>
       </div>
 
       <div class="pv-bar-row">
         <div class="pv-bar-header">
-          <strong>🔵 Blue (2nd &amp; 3rd)</strong>
+          <strong>🔵 Blue · L1 (2nd &amp; 3rd)</strong>
           <span>slower ←&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ faster</span>
         </div>
         <div class="pv-bar-track">
           <div class="pv-bar-fill" style="width:23%;background:linear-gradient(90deg,#1A25E6,#4D7CFF);"></div>
           <div class="pv-marker-goal" style="left:50%;"><span class="pv-marker-goal-lbl">10:00</span></div>
-          <div class="pv-marker-t2p"  style="left:66.7%;"><span class="pv-marker-t2p-lbl">9:20</span></div>
+          <div class="pv-marker-t2p"  style="left:55%;"><span class="pv-marker-t2p-lbl">9:48</span></div>
         </div>
       </div>
 
       <div class="pv-bar-row">
         <div class="pv-bar-header">
-          <strong>🟡 Gold (4th &amp; 5th)</strong>
+          <strong>🟡 Gold · L2 (4th &amp; 5th)</strong>
           <span>slower ←&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ faster</span>
         </div>
         <div class="pv-bar-track">
           <div class="pv-bar-fill" style="width:23%;background:linear-gradient(90deg,#B8860B,#FFD700);"></div>
           <div class="pv-marker-goal" style="left:50%;"><span class="pv-marker-goal-lbl">10:00</span></div>
-          <div class="pv-marker-t2p"  style="left:66.7%;"><span class="pv-marker-t2p-lbl">9:20</span></div>
+          <div class="pv-marker-t2p"  style="left:80.8%;"><span class="pv-marker-t2p-lbl">8:46</span></div>
         </div>
       </div>
 
@@ -1496,9 +1506,9 @@ body {
 
 <!-- ── FUEL POINT REVEAL ──────────────────────────────── -->
 <div class="fp-overlay" id="fp-overlay">
-  <div class="fp-title">CROSS THE BRIDGE. EARN 10 ALPHA BUCKS.</div>
-  <div class="fp-subtitle">5 bands. 10 laps. The bridge is waiting.</div>
-  <button class="fp-dismiss" onclick="closeFuelPoint()">Cross the Bridge →</button>
+  <div class="fp-title">10 BONUS RELICS PER SET</div>
+  <div class="fp-subtitle">Earn up to 30 bonus relics today.</div>
+  <button class="fp-dismiss" onclick="closeFuelPoint()">Let's Go →</button>
 </div>
 
 <div class="airmail-stripe"></div>
@@ -4090,10 +4100,6 @@ const PACE_STEPS = [
   {
     title: 'Your Test to Pass',
     text: "On race day, you will need to hold a controlled pace for the entire 5K — start to finish. We are using today's training to help you feel what that pace is."
-  },
-  {
-    title: "Today's Mission",
-    text: "You are each running 4 laps on your own. No stopping. If you finish all 4 laps in under 10 minutes, you earn Bonus Relics. Up to 3 sets today."
   },
   {
     title: 'Control Your Pace',
