@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lap Tracker">
+<link rel="manifest" href="manifest.json">
 <title>ATW 5K · Lap Tracker</title>
 <style>
   :root {
@@ -19,25 +23,34 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  :root {
+    --header-h: 58px;
+    --stats-h:  34px;
+    --top-h:    92px; /* header + stats combined */
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    /* No height/overflow on body — fixed children handle layout */
   }
 
-  /* ── HEADER ─────────────────────────────────────────── */
+  /* ── HEADER — always fixed, survives zoom ────────────── */
   #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 10px 18px;
+    padding: 0 18px;
     display: flex;
     align-items: center;
     gap: 14px;
-    flex-shrink: 0;
+    z-index: 100;
+    /* Safe area insets for iPad notch/home indicator */
+    padding-left: max(18px, env(safe-area-inset-left));
+    padding-right: max(18px, env(safe-area-inset-right));
   }
   .brand {
     font-size: 14px; font-weight: 700;
@@ -137,19 +150,24 @@
 
   /* ── STATS BAR ──────────────────────────────────────── */
   #stats-bar {
+    position: fixed;
+    top: var(--header-h); left: 0; right: 0;
+    height: var(--stats-h);
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 6px 18px;
-    display: flex; gap: 24px;
+    padding: 0 18px;
+    display: flex; align-items: center; gap: 24px;
     font-size: 11px; color: var(--muted);
-    flex-shrink: 0;
+    z-index: 99;
   }
   .stat-chip span { color: var(--text); font-weight: 700; }
 
   /* ── BODY: GRID + LOG ───────────────────────────────── */
   #body {
+    position: fixed;
+    top: var(--top-h); left: 0; right: 0;
+    bottom: 0;
     display: flex;
-    flex: 1;
     overflow: hidden;
   }
 
@@ -451,15 +469,15 @@
 
   /* iPad portrait / landscape */
   @media (max-width: 900px) {
-    body { overflow: auto; }
-    #body { flex-direction: column; overflow: visible; height: auto; }
-    #grid-wrap { overflow: visible; }
+    :root { --header-h: 62px; --stats-h: 34px; --top-h: 96px; }
+    #body { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+    #grid-wrap { overflow: visible; flex-shrink: 0; }
     #grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
     #log-panel {
       width: 100%; border-left: none;
       border-top: 1px solid var(--border);
-      max-height: 280px;
+      max-height: 280px; flex-shrink: 0;
     }
     #log-list { max-height: 220px; }
 
@@ -725,13 +743,22 @@ function adjustLap(name, delta, source='manual') {
     d.timestamps.push(ts);
     pulseLapCount(name);
     addLogEntry(name, newLaps, ts, source);
+    d.laps = newLaps;
+    updateCard(name);
+    updateStats();
   } else {
-    if (d.timestamps.length > 0) d.timestamps.pop();
+    // Route subtract through removeLogEntry so log + card stay in sync
+    const lastEntry = logEntries.find(e => e.name === name);
+    if (lastEntry) {
+      removeLogEntry(lastEntry.id); // handles laps--, timestamp removal, DOM, updateCard, updateStats
+    } else {
+      // No log entry (edge case) — fall back to direct decrement
+      if (d.timestamps.length > 0) d.timestamps.pop();
+      d.laps = newLaps;
+      updateCard(name);
+      updateStats();
+    }
   }
-
-  d.laps = newLaps;
-  updateCard(name);
-  updateStats();
 }
 
 function pulseLapCount(name) {
@@ -1133,6 +1160,13 @@ document.addEventListener('keydown', e => {
 // ── INIT ──────────────────────────────────────────────────
 renderGrid();
 updateStats();
+
+// ── SERVICE WORKER (offline support) ──────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
