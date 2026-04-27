@@ -43,6 +43,11 @@
     font-size: 14px; font-weight: 700;
     letter-spacing: 0.05em; color: var(--accent);
     white-space: nowrap;
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .brand-sub {
+    font-size: 10px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.04em;
   }
 
   /* Timer section */
@@ -486,7 +491,10 @@
 
 <!-- ── HEADER ─────────────────────────────────────────── -->
 <div id="header">
-  <div class="brand">🏃 ATW 5K · Lap Tracker</div>
+  <div class="brand">
+    🏃 ATW 5K · Lap Tracker
+    <span class="brand-sub" id="session-label">—</span>
+  </div>
 
   <div class="timer-section">
     <button id="clock-btn" class="clock-btn start" onclick="toggleClock()">▶ Start</button>
@@ -576,6 +584,22 @@
 </div>
 
 <script>
+// ── SESSION CONTEXT (from hub.html) ──────────────────────
+const _params = new URLSearchParams(window.location.search);
+const SESSION = {
+  label: _params.get('label') || '',
+  day:   _params.get('day')   || '',
+  date:  _params.get('date')  || new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})
+};
+(function applySessionLabel() {
+  const parts = [];
+  if (SESSION.label) parts.push(SESSION.label);
+  if (SESSION.day && SESSION.date) parts.push(`${SESSION.day}, ${SESSION.date}`);
+  else if (SESSION.date) parts.push(SESSION.date);
+  const el = document.getElementById('session-label');
+  if (el) el.textContent = parts.join(' · ') || '—';
+})();
+
 // ── ROSTER ────────────────────────────────────────────────
 const STUDENTS = [
   "Annalise Faheem",  "Ari Faheem",          "Arthur Przybyl",
@@ -1053,24 +1077,36 @@ function showHistory(name) {
 function closeHistoryBtn() { document.getElementById('history-modal').classList.remove('open'); }
 
 // ── EXPORT ────────────────────────────────────────────────
+function sessionHeader() {
+  const parts = [];
+  if (SESSION.label) parts.push(SESSION.label);
+  if (SESSION.day && SESSION.date) parts.push(`${SESSION.day}, ${SESSION.date}`);
+  else if (SESSION.date) parts.push(SESSION.date);
+  return parts.join(' · ');
+}
+
 function buildExportSimple() {
+  const header = sessionHeader();
   const lines = [];
+  if (header) { lines.push(header); lines.push('─'.repeat(36)); }
   STUDENTS.filter(s => data[s].laps > 0).forEach(s => {
     lines.push(`${s}: ${data[s].laps}`);
   });
-  if (!lines.length) lines.push('No laps recorded yet.');
+  if (lines.filter(l => !l.startsWith('─') && l !== header).length === 0) {
+    lines.push('No laps recorded yet.');
+  }
   return lines.join('\n');
 }
 
 function buildExportDetail() {
-  const date = new Date().toLocaleDateString('en-US',
-    {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  const header = sessionHeader();
   const dur = sessionStart ? fmtElapsed(Date.now() - sessionStart) : '00:00';
   const total = STUDENTS.reduce((a, s) => a + data[s].laps, 0);
 
   const lines = [
     `ATW 5K — LAP SESSION DETAIL`,
-    `Date: ${date}   Time: ${dur}   Total Laps: ${total}`,
+    header ? header : '',
+    `Session Time: ${dur}   Total Laps: ${total}`,
     '─'.repeat(68),
     'NAME                       LAPS   AVG/LAP   SPLITS (each lap)',
     '─'.repeat(68)

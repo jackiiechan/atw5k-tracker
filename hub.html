@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATW 5K · Mission Control</title>
+<style>
+  :root {
+    --bg:      #080b14;
+    --surface: #101626;
+    --surface2:#171e30;
+    --border:  #1e2a44;
+    --accent:  #E8A020;
+    --text:    #d4dff5;
+    --muted:   #5a6a8a;
+    --green:   #22c55e;
+    --purple:  #a78bfa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  /* subtle grid bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(232,160,32,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,160,32,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .hub {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: relative;
+  }
+
+  /* ── HEADER ──────────────────────────────── */
+  .hub-header { text-align: center; }
+  .hub-eyebrow {
+    font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .hub-title {
+    font-size: 38px; font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #d4dff5 0%, #E8A020 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .hub-sub {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── SESSION CARD ────────────────────────── */
+  .session-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .session-card-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Date row */
+  .field-row { display: flex; flex-direction: column; gap: 6px; }
+  .field-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.05em;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-input::placeholder { color: var(--muted); }
+  input[type="date"].field-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+    cursor: pointer;
+  }
+
+  /* Day pills */
+  .day-pills {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .day-pill {
+    flex: 1; min-width: 52px;
+    padding: 9px 6px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .day-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .day-pill.active {
+    background: rgba(232,160,32,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Week label input */
+  .week-preview {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 40px;
+    display: flex; align-items: center;
+  }
+  .week-preview span { color: var(--text); font-weight: 600; }
+
+  /* ── TOOL BUTTONS ────────────────────────── */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .tool-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s;
+    text-decoration: none;
+    display: flex; flex-direction: column; gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tool-btn:hover { transform: translateY(-2px); }
+
+  .tool-btn.lap {
+    border-color: rgba(34,197,94,0.35);
+  }
+  .tool-btn.lap:hover {
+    background: rgba(34,197,94,0.06);
+    border-color: rgba(34,197,94,0.6);
+    box-shadow: 0 8px 24px rgba(34,197,94,0.12);
+  }
+  .tool-btn.tracker {
+    border-color: rgba(232,160,32,0.35);
+  }
+  .tool-btn.tracker:hover {
+    background: rgba(232,160,32,0.06);
+    border-color: rgba(232,160,32,0.6);
+    box-shadow: 0 8px 24px rgba(232,160,32,0.12);
+  }
+
+  .tool-icon { font-size: 28px; line-height: 1; }
+  .tool-name {
+    font-size: 15px; font-weight: 800;
+    color: var(--text); line-height: 1.2;
+  }
+  .tool-desc {
+    font-size: 11px; color: var(--muted); line-height: 1.4;
+  }
+  .tool-arrow {
+    font-size: 18px; margin-top: 4px;
+    transition: transform 0.15s;
+  }
+  .tool-btn.lap .tool-arrow { color: var(--green); }
+  .tool-btn.tracker .tool-arrow { color: var(--accent); }
+  .tool-btn:hover .tool-arrow { transform: translateX(4px); }
+
+  /* ── FOOTER ──────────────────────────────── */
+  .hub-footer {
+    text-align: center;
+    font-size: 11px; color: var(--muted);
+  }
+
+  /* ── RESPONSIVE ──────────────────────────── */
+  @media (max-width: 480px) {
+    .hub-title { font-size: 30px; }
+    .tool-grid { grid-template-columns: 1fr; }
+    .session-card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="hub">
+
+  <!-- Header -->
+  <div class="hub-header">
+    <div class="hub-eyebrow">🏃 Around the World · 5K Workshop</div>
+    <div class="hub-title">Mission Control</div>
+    <div class="hub-sub">Set the session before opening a tool.<br>Each tool opens fresh with today's context.</div>
+  </div>
+
+  <!-- Session Card -->
+  <div class="session-card">
+    <div class="session-card-title">📅 Set Session</div>
+
+    <div class="field-row">
+      <div class="field-label">Date</div>
+      <input type="date" id="session-date" class="field-input">
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">Day</div>
+      <div class="day-pills" id="day-pills">
+        <div class="day-pill" data-day="Monday">Mon</div>
+        <div class="day-pill" data-day="Tuesday">Tue</div>
+        <div class="day-pill" data-day="Wednesday">Wed</div>
+        <div class="day-pill" data-day="Thursday">Thu</div>
+        <div class="day-pill" data-day="Friday">Fri</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">Week Label</div>
+      <input type="text" id="week-label" class="field-input"
+        placeholder="e.g. Week 5 · Tokyo  |  April 27 – May 1">
+    </div>
+
+    <div class="week-preview" id="session-preview">
+      Set a date and week label above.
+    </div>
+  </div>
+
+  <!-- Tool Buttons -->
+  <div class="tool-grid">
+    <a class="tool-btn lap" id="lap-link" href="lap_tracker.html">
+      <div class="tool-icon">🏃</div>
+      <div class="tool-name">Lap Tracker</div>
+      <div class="tool-desc">Voice + manual lap counting. Export session results.</div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a class="tool-btn tracker" id="tracker-link" href="index.html">
+      <div class="tool-icon">📡</div>
+      <div class="tool-name">ATW 5K Tracker</div>
+      <div class="tool-desc">Relics, campaign map, student leaderboard.</div>
+      <div class="tool-arrow">→</div>
+    </a>
+  </div>
+
+  <div class="hub-footer">Tap a tool to open it. The session label will appear in all exports.</div>
+</div>
+
+<script>
+  // ── Init date to today ──────────────────────────────────
+  const dateInput = document.getElementById('session-date');
+  const today = new Date();
+  dateInput.value = today.toISOString().slice(0, 10);
+
+  // Auto-select today's day pill
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const todayDay = dayNames[today.getDay()];
+  let selectedDay = ['Monday','Tuesday','Wednesday','Thursday','Friday'].includes(todayDay)
+    ? todayDay : 'Monday';
+  highlightDay(selectedDay);
+
+  // ── Day pills ───────────────────────────────────────────
+  document.querySelectorAll('.day-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      selectedDay = pill.dataset.day;
+      highlightDay(selectedDay);
+      updatePreview();
+    });
+  });
+
+  function highlightDay(day) {
+    document.querySelectorAll('.day-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.day === day);
+    });
+  }
+
+  // ── Date change syncs day pill ──────────────────────────
+  dateInput.addEventListener('change', () => {
+    const d = new Date(dateInput.value + 'T12:00:00');
+    const name = dayNames[d.getDay()];
+    if (['Monday','Tuesday','Wednesday','Thursday','Friday'].includes(name)) {
+      selectedDay = name;
+      highlightDay(selectedDay);
+    }
+    updatePreview();
+  });
+
+  document.getElementById('week-label').addEventListener('input', updatePreview);
+
+  // ── Preview & link builder ──────────────────────────────
+  function updatePreview() {
+    const dateVal = dateInput.value;
+    const weekLabel = document.getElementById('week-label').value.trim();
+    const d = dateVal ? new Date(dateVal + 'T12:00:00') : today;
+    const formatted = d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+    const parts = [];
+    if (weekLabel) parts.push(weekLabel);
+    parts.push(`${selectedDay}, ${formatted}`);
+    const label = parts.join(' · ');
+
+    const preview = document.getElementById('session-preview');
+    preview.innerHTML = `<span>${label}</span>`;
+
+    // Build URL params
+    const params = new URLSearchParams({
+      label: weekLabel || '',
+      day: selectedDay,
+      date: formatted
+    });
+
+    document.getElementById('lap-link').href = `lap_tracker.html?${params}`;
+    // tracker link just goes to index — it has its own state
+    document.getElementById('tracker-link').href = `index.html`;
+  }
+
+  updatePreview();
+</script>
+</body>
+</html>
