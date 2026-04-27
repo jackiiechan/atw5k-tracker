@@ -654,7 +654,7 @@ const NAME_ALIASES = {
   "Lauren Creelman":      ["lauren"],
   "Mia Baklanova":        ["mia"],
   "Lorenzo Di Rocco":     ["lorenzo"],
-  "Rexa Gupta":           ["rexa"],
+  "Rexa Gupta":           ["rexa", "rexha", "rex a"],
   "Audrey Going":         ["audrey"],
   "Molly Going":          ["molly"],
   "Junning Zhang (Grace)":["grace", "junning"],
@@ -846,10 +846,15 @@ function removeLogEntry(id) {
 }
 
 function clearLog() {
+  // Reset all student lap data
+  STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
   logEntries = [];
   logSeq = 0;
+  logIdCounter = 0;
   document.getElementById('log-list').innerHTML =
     '<div class="log-empty" id="log-empty">Log cleared.</div>';
+  renderGrid();
+  updateStats();
 }
 
 // ── VOICE ─────────────────────────────────────────────────
