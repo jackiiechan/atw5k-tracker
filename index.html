@@ -1498,6 +1498,7 @@ body {
       </div>
     </div>
 
+    <button class="kt-voice-btn" id="pace-voice-btn" onclick="paceToggleVoice()">🔊 Voice On</button>
     <div class="kt-dots" id="pace-dots"></div>
     <div class="kt-btns">
       <button class="kt-btn-prev" id="pace-prev" onclick="pacePrev()">← Back</button>
@@ -4167,6 +4168,14 @@ const PACE_STEPS = [
 
 let paceStep = 0;
 let paceTypewriterTimer = null;
+let paceMuted = false;
+let paceAudio = null;
+
+const PACE_AUDIO = PACE_STEPS.map((_, i) => {
+  const a = new Audio(`audio/pace_0${i + 1}.mp3`);
+  a.preload = 'auto';
+  return a;
+});
 
 function openPaceBriefing() {
   paceStep = 0;
@@ -4177,6 +4186,15 @@ function openPaceBriefing() {
 function closePaceBriefing() {
   document.getElementById('pace-overlay').classList.remove('open');
   clearTimeout(paceTypewriterTimer);
+  paceStopAudio();
+}
+
+function paceStopAudio() {
+  if (paceAudio) {
+    paceAudio.pause();
+    paceAudio.currentTime = 0;
+    paceAudio = null;
+  }
 }
 
 function paceRenderStep() {
@@ -4206,8 +4224,27 @@ function paceRenderStep() {
   document.getElementById('pace-next').textContent = paceStep === total - 1 ? 'View Reward →' : 'Next →';
   document.getElementById('pace-prev').style.visibility = paceStep === 0 ? 'hidden' : 'visible';
 
-  // Play click SFX on step advance (skip step 0)
-  if (paceStep > 0) playSfx('click');
+  // Play voice audio for this step
+  paceStopAudio();
+  if (!paceMuted) {
+    paceAudio = PACE_AUDIO[paceStep];
+    paceAudio.currentTime = 0;
+    paceAudio.play().catch(() => {});
+  }
+}
+
+function paceToggleVoice() {
+  paceMuted = !paceMuted;
+  const btn = document.getElementById('pace-voice-btn');
+  btn.textContent = paceMuted ? '🔇 Voice Off' : '🔊 Voice On';
+  btn.classList.toggle('muted', paceMuted);
+  if (paceMuted) {
+    paceStopAudio();
+  } else {
+    paceAudio = PACE_AUDIO[paceStep];
+    paceAudio.currentTime = 0;
+    paceAudio.play().catch(() => {});
+  }
 }
 
 function paceTypewrite(text, el) {
