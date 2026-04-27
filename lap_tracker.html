@@ -613,33 +613,33 @@ const STUDENTS = [
   "Serena Ma"
 ];
 
-// Name → array of phonetic aliases for voice matching
-// First name is primary; aliases catch common speech-reco variants
+// Name → exact aliases only. No common English words, no short fragments.
+// These must be spoken clearly and match exactly what speech-reco returns.
 const NAME_ALIASES = {
-  "Annalise Faheem":      ["annalise", "annalisa", "analysis"],
-  "Ari Faheem":           ["ari", "arie", "harry"],
+  "Annalise Faheem":      ["annalise", "annalisa"],
+  "Ari Faheem":           ["ari"],
   "Arthur Przybyl":       ["arthur"],
   "Caleb Chang":          ["caleb", "kaleb"],
-  "Cora Ishaq":           ["cora", "kora"],
+  "Cora Ishaq":           ["cora"],
   "Emma Baklanova":       ["emma"],
-  "Graham Gattegno":      ["graham", "gram"],
+  "Graham Gattegno":      ["graham"],
   "Hana Wong":            ["hana", "hannah"],
-  "Nathaniel Kelly":      ["nathaniel", "nathan", "nat"],
-  "Nayel Bajwa":          ["nayel", "nile", "neil"],
-  "Olivia Wojtowicz":     ["olivia", "olivia w"],
-  "Reverie Stinson":      ["reverie", "revelry", "rev"],
-  "Sojourn Stinson":      ["sojourn", "so", "journey"],
+  "Nathaniel Kelly":      ["nathaniel", "nathan"],
+  "Nayel Bajwa":          ["nayel", "nile"],
+  "Olivia Wojtowicz":     ["olivia"],
+  "Reverie Stinson":      ["reverie"],
+  "Sojourn Stinson":      ["sojourn"],
   "Sabrina Yang":         ["sabrina"],
-  "Sophie Yang":          ["sophie", "sofia", "sophy"],
-  "Lucia Quimby":         ["lucia", "lucía", "lucy"],
-  "Cameron Creelman":     ["cameron", "cam"],
-  "Lauren Creelman":      ["lauren", "loren"],
+  "Sophie Yang":          ["sophie", "sofia"],
+  "Lucia Quimby":         ["lucia"],
+  "Cameron Creelman":     ["cameron"],
+  "Lauren Creelman":      ["lauren"],
   "Mia Baklanova":        ["mia"],
-  "Lorenzo Di Rocco":     ["lorenzo", "loren", "lorenz", "lorentz"],
-  "Rexa Gupta":           ["rexa", "reksa", "rex"],
+  "Lorenzo Di Rocco":     ["lorenzo"],
+  "Rexa Gupta":           ["rexa"],
   "Audrey Going":         ["audrey"],
-  "Molly Going":          ["molly", "mollie"],
-  "Junning Zhang (Grace)":["grace", "junning", "grays", "greys"],
+  "Molly Going":          ["molly"],
+  "Junning Zhang (Grace)":["grace", "junning"],
   "Serena Ma":            ["serena"]
 };
 
@@ -853,40 +853,35 @@ function startVoice() {
   };
 
   recognition.onresult = (event) => {
-    let interimText = '';
-    let finalText = '';
-
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) {
-        finalText += transcript + ' ';
-        processedInPhrase.clear(); // Reset for next phrase
-      } else {
-        interimText += transcript;
-      }
-    }
+      const result = event.results[i];
 
-    const textToProcess = (finalText || interimText).toLowerCase().trim();
-    if (!textToProcess || textToProcess === lastProcessedTranscript) return;
-    lastProcessedTranscript = textToProcess;
+      // Only act on FINAL results — ignore interim/partial speech.
+      // This is the key guard: mid-sentence fragments won't trigger names.
+      if (!result.isFinal) continue;
 
-    setVoiceStatus(`"${textToProcess}"`, true);
-    const matched = matchNamesFromTranscript(textToProcess);
+      // Require reasonable confidence. Low confidence = likely mishearing.
+      const confidence = result[0].confidence;
+      if (confidence > 0 && confidence < 0.55) continue;
 
-    matched.forEach(name => {
-      if (!processedInPhrase.has(name)) {
-        processedInPhrase.add(name);
-        adjustLap(name, +1, 'voice');
-      }
-    });
+      const transcript = result[0].transcript.trim();
+      if (!transcript) continue;
 
-    if (finalText) {
-      // Phrase is done — reset for next breath
+      setVoiceStatus(`"${transcript}"`, true);
+      const matched = matchNamesFromTranscript(transcript);
+
+      matched.forEach(name => {
+        if (!processedInPhrase.has(name)) {
+          processedInPhrase.add(name);
+          adjustLap(name, +1, 'voice');
+        }
+      });
+
+      // Each final result is a fresh phrase — reset for next utterance
       setTimeout(() => {
         processedInPhrase.clear();
-        lastProcessedTranscript = '';
         setVoiceStatus('Listening…', false);
-      }, 800);
+      }, 1200);
     }
   };
 
@@ -930,73 +925,35 @@ function setVoiceStatus(text, heard) {
 }
 
 // ── NAME MATCHING ─────────────────────────────────────────
-function levenshtein(a, b) {
-  const m = a.length, n = b.length;
-  const dp = Array.from({length: m + 1}, (_, i) =>
-    Array.from({length: n + 1}, (_, j) => i === 0 ? j : j === 0 ? i : 0));
-  for (let i = 1; i <= m; i++)
-    for (let j = 1; j <= n; j++)
-      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1]
-        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
-  return dp[m][n];
-}
-
 function matchNamesFromTranscript(text) {
-  // Normalize: lowercase, remove punctuation except spaces
-  const norm = text.replace(/[^\w\s]/g, ' ').replace(/\s+/g,' ').trim();
+  // Exact-only matching. No fuzzy. No starts-with.
+  // A word must appear verbatim in ALIAS_MAP to register a lap.
+  // This prevents conversational speech from accidentally matching names.
+  const norm = text.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const words = norm.split(' ');
   const matched = [];
-  const used = new Set(); // word indices already consumed
+  const used = new Set();
 
-  // Try multi-word windows first (2 words), then single words
-  for (let windowSize = 2; windowSize >= 1; windowSize--) {
-    for (let i = 0; i <= words.length - windowSize; i++) {
-      if (used.has(i)) continue;
-
-      const phrase = words.slice(i, i + windowSize).join(' ');
-      if (phrase.length < 2) continue;
-
-      // 1. Exact alias match
-      if (ALIAS_MAP[phrase]) {
-        matched.push(ALIAS_MAP[phrase]);
-        for (let k = i; k < i + windowSize; k++) used.add(k);
-        continue;
-      }
-
-      // 2. Starts-with match (for partial speech)
-      if (windowSize === 1 && phrase.length >= 3) {
-        const sw = Object.keys(ALIAS_MAP).find(alias =>
-          alias.startsWith(phrase) && phrase.length >= Math.max(3, alias.length - 2)
-        );
-        if (sw) {
-          matched.push(ALIAS_MAP[sw]);
-          used.add(i);
-          continue;
-        }
-      }
-
-      // 3. Fuzzy match — first 2 chars MUST match to prevent cross-name confusion
-      // e.g. "anna" ≠ "hana" (a≠h), "loren" ≠ "lauren" (lo≠la)
-      if (windowSize === 1 && phrase.length >= 5) {
-        let bestAlias = null, bestDist = 2; // threshold ≤ 1 for short, ≤ 2 for longer
-        const maxDist = phrase.length >= 7 ? 2 : 1;
-        Object.keys(ALIAS_MAP).forEach(alias => {
-          // First 2 characters must match exactly
-          if (alias.length < 2 || phrase.length < 2) return;
-          if (alias[0] !== phrase[0] || alias[1] !== phrase[1]) return;
-          if (Math.abs(alias.length - phrase.length) > 2) return;
-          const dist = levenshtein(phrase, alias);
-          if (dist <= maxDist && dist < bestDist) { bestDist = dist; bestAlias = alias; }
-        });
-        if (bestAlias) {
-          matched.push(ALIAS_MAP[bestAlias]);
-          used.add(i);
-        }
-      }
+  // Try 2-word phrases first (catches "junning zhang", "serena ma", etc.)
+  for (let i = 0; i < words.length - 1; i++) {
+    const phrase = words[i] + ' ' + words[i + 1];
+    if (ALIAS_MAP[phrase]) {
+      matched.push(ALIAS_MAP[phrase]);
+      used.add(i); used.add(i + 1);
     }
   }
 
-  // Deduplicate (same student could match multiple ways)
+  // Then single words not already consumed
+  for (let i = 0; i < words.length; i++) {
+    if (used.has(i)) continue;
+    const word = words[i];
+    if (word.length < 3) continue; // ignore very short tokens
+    if (ALIAS_MAP[word]) {
+      matched.push(ALIAS_MAP[word]);
+      used.add(i);
+    }
+  }
+
   return [...new Set(matched)];
 }
 
