@@ -1760,6 +1760,26 @@ body {
       <div class="admin-card-title">💰 Item Prices — edit any value and click Save</div>
       <div id="price-editor"></div>
     </div>
+    <!-- ADD STUDENT -->
+    <div class="admin-card">
+      <div class="admin-card-title">➕ Add New Student</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="field-group">
+          <label style="font-size:11px;color:#888;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;">Full Name</label>
+          <input type="text" id="add-student-name" placeholder="e.g. Jane Smith"
+            style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid #333;background:#111;color:#ddd;font-family:'Nunito',sans-serif;font-size:14px;"
+            onkeydown="if(event.key==='Enter')addNewStudent()">
+        </div>
+        <div class="field-group">
+          <label style="font-size:11px;color:#888;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;">Nickname / ID <span style="font-weight:400;text-transform:none;">(auto-set, editable)</span></label>
+          <input type="text" id="add-student-id" placeholder="jane"
+            style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid #333;background:#111;color:#ddd;font-family:'Nunito',sans-serif;font-size:14px;font-family:monospace;">
+        </div>
+        <button class="admin-btn" onclick="addNewStudent()" style="background:var(--t-primary);color:#fff;margin-top:4px;">➕ Add to Roster</button>
+        <p style="font-size:11px;color:#666;line-height:1.5;margin-top:2px;">Student starts at 0 relics, 0 laps. The Nickname is used in Quick Session Input (type it to find them).</p>
+      </div>
+    </div>
+
     <div class="admin-card">
       <div class="admin-card-title">⚠ Danger Zone</div>
       <button class="admin-btn danger" onclick="confirmReset()">🗑 Reset All Data (cannot undo)</button>
@@ -1988,6 +2008,7 @@ const CFG = {
     { id:'graham',   name:'Graham Gattegno'        },
     { id:'annalise', name:'Annalise Faheem'        },
     { id:'jojo',     name:'Sojourn Stinson'        },
+    { id:'serena',   name:'Serena Ma'              },
     { id:'cora',     name:'Cora Ishaq'             },
     { id:'lauren',   name:'Lauren Creelman'        },
     { id:'guide',    name:'Jackie Chan (Guide)'    },
@@ -3046,11 +3067,11 @@ function parseQuickInput(text) {
     const value     = parseFloat(match[2]);
     const unit      = (match[3] || '').toLowerCase();
 
-    // Fuzzy match: first name, partial, or nickname
+    // Match: ID (nate, jojo, grace…), first name, full name start, or partial first
     const student = roster.find(s => {
       const first = s.name.split(' ')[0].toLowerCase();
       const full  = s.name.toLowerCase();
-      return first === nameInput || full.startsWith(nameInput) || first.startsWith(nameInput);
+      return s.id === nameInput || first === nameInput || full.startsWith(nameInput) || first.startsWith(nameInput);
     });
 
     if (!student) { missed.push(line); continue; }
@@ -3264,6 +3285,47 @@ function setWeek(w) {
   applyTheme(dest);
   renderAdmin();
   showToast(`Destination set: ${dest.name} ${dest.flag}`, 'info');
+}
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                     ADD NEW STUDENT                               ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+// Auto-fill the ID field when typing a name
+document.addEventListener('DOMContentLoaded', () => {
+  const nameInput = document.getElementById('add-student-name');
+  const idInput   = document.getElementById('add-student-id');
+  if (nameInput && idInput) {
+    nameInput.addEventListener('input', () => {
+      const first = nameInput.value.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, '');
+      idInput.value = first;
+    });
+  }
+});
+
+function addNewStudent() {
+  const nameInput = document.getElementById('add-student-name');
+  const idInput   = document.getElementById('add-student-id');
+  const name = nameInput.value.trim();
+  const id   = idInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  if (!name) { showToast('Enter a student name.', 'error'); return; }
+  if (!id)   { showToast('Nickname/ID is required.', 'error'); return; }
+  if (STATE.students[id]) {
+    showToast(`ID "${id}" already taken by ${STATE.students[id].name}.`, 'error');
+    return;
+  }
+
+  const s = makeStudent({ id, name });
+  STATE.students[id] = s;
+  save();
+
+  nameInput.value = '';
+  idInput.value   = '';
+  showToast(`${name} added to the roster!`, 'success');
+  renderAdmin();       // refresh admin view so they show in Pace Bonus grid etc.
+  renderLeaderboard(); // show them on the board immediately
+  renderSession();     // show them in the session input panel
 }
 
 function confirmReset() {
