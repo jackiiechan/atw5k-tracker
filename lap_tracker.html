@@ -681,6 +681,8 @@ let voiceActive = false;
 let recognition = null;
 let lastProcessedTranscript = '';
 let processedInPhrase = new Set(); // names hit in current voice phrase
+const VOICE_COOLDOWN_MS = 90_000;  // 90 s between voice laps for the same runner
+const voiceCooldowns = {};          // name → Date.now() of last voice lap
 
 STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
 
@@ -851,6 +853,7 @@ function clearLog() {
   logEntries = [];
   logSeq = 0;
   logIdCounter = 0;
+  Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
   document.getElementById('log-list').innerHTML =
     '<div class="log-empty" id="log-empty">Log cleared.</div>';
   renderGrid();
@@ -950,12 +953,21 @@ function stopVoice() {
 
 // Fire laps for any names in transcript not already processed this phrase
 function fireNames(transcript) {
+  const now = Date.now();
   const matched = matchNamesFromTranscript(transcript);
   matched.forEach(name => {
-    if (!processedInPhrase.has(name)) {
-      processedInPhrase.add(name);
-      adjustLap(name, +1, 'voice');
+    if (processedInPhrase.has(name)) return; // already fired this phrase
+    const lastFired = voiceCooldowns[name] || 0;
+    const remaining = VOICE_COOLDOWN_MS - (now - lastFired);
+    if (remaining > 0) {
+      // Still cooling down — show how long left
+      const secs = Math.ceil(remaining / 1000);
+      setVoiceStatus(`⏱ ${name.split(' ')[0]} — cooldown ${secs}s`, false);
+      return;
     }
+    processedInPhrase.add(name);
+    voiceCooldowns[name] = now;
+    adjustLap(name, +1, 'voice');
   });
 }
 
@@ -1173,6 +1185,7 @@ function doReset() {
   cb.textContent = '▶ Start'; cb.className = 'clock-btn start';
   STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
   logEntries = []; logSeq = 0; logIdCounter = 0;
+  Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
   document.getElementById('log-list').innerHTML =
     '<div class="log-empty" id="log-empty">No laps recorded yet.<br>Start the clock, then tap + or use Voice.</div>';
   renderGrid(); updateStats(); closeConfirmBtn();
