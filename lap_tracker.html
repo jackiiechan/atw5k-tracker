@@ -164,6 +164,7 @@
   .lap-pulse { animation: lapPulse 0.22s ease-out; }
 
   .card-split { font-size: 10px; color: var(--muted); min-height: 14px; font-variant-numeric: tabular-nums; }
+  .card-prev  { font-size: 9px; color: #3b82f6; font-weight: 700; min-height: 12px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
   .card-btns { display: flex; gap: 6px; width: 100%; margin-top: 4px; }
   .btn-minus, .btn-plus {
     flex: 1; height: 40px; border-radius: 9px; border: none;
@@ -655,7 +656,7 @@ let processedInPhrase = new Set();
 const VOICE_COOLDOWN_MS = 10_000;
 const voiceCooldowns = {};
 
-STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
+STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [], prevSetSplit: null }; });
 
 // ── GROUP STATE ───────────────────────────────────────────
 let groupMode = false;
@@ -815,7 +816,7 @@ function removeLogEntry(id) {
 }
 
 function clearLog() {
-  STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
+  STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [], prevSetSplit: null }; });
   logEntries = []; logSeq = 0; logIdCounter = 0;
   Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
   // Reset group set logs and timers
@@ -1123,8 +1124,17 @@ function logGroupSet(gid) {
   gt.setLog.push(snapshot);
   gt.setCount++;
 
-  // Reset group members' lap counts for next set
-  g.members.forEach(name => { data[name] = { laps: 0, timestamps: [] }; });
+  // Capture last-lap split for each member before wiping, then reset for next set
+  g.members.forEach(name => {
+    const ts = data[name].timestamps;
+    let prevSetSplit = null;
+    if (ts.length >= 2) {
+      prevSetSplit = ts[ts.length - 1] - ts[ts.length - 2];
+    } else if (ts.length === 1) {
+      prevSetSplit = gt.pausedMs; // only 1 lap — use full set elapsed as their lap time
+    }
+    data[name] = { laps: 0, timestamps: [], prevSetSplit };
+  });
 
   // Reset group timer
   gt.startMs = null; gt.pausedMs = 0;
@@ -1157,6 +1167,7 @@ function cardHtml(name) {
       <div class="card-name" onclick="showHistory('${safe}')">${name}</div>
       <div class="card-lap-count" id="count-${slug}" onclick="showHistory('${safe}')">0</div>
       <div class="card-split" id="split-${slug}">—</div>
+      <div class="card-prev"  id="prev-${slug}"></div>
       <div class="card-btns">
         <button class="btn-minus" onclick="adjustLap('${safe}', -1)">−</button>
         <button class="btn-plus"  onclick="adjustLap('${safe}', +1)">+</button>
@@ -1243,6 +1254,11 @@ function updateCard(name) {
   card.className = `student-card ${getLapClass(name)}`;
   document.getElementById(`count-${slug}`).textContent = data[name].laps;
   document.getElementById(`split-${slug}`).textContent = getLastSplitText(name);
+  const prevEl = document.getElementById(`prev-${slug}`);
+  if (prevEl) {
+    const ps = data[name].prevSetSplit;
+    prevEl.textContent = ps != null ? `prev: ${fmtSplit(ps)}` : '';
+  }
   // No re-sort — alphabetical order is fixed at render time
 }
 
@@ -1414,7 +1430,7 @@ function doReset() {
   const cb = document.getElementById('clock-btn');
   cb.textContent = '▶ Start'; cb.className = 'clock-btn start';
 
-  STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
+  STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [], prevSetSplit: null }; });
   logEntries = []; logSeq = 0; logIdCounter = 0;
   Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
 
