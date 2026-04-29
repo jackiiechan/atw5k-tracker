@@ -331,6 +331,17 @@
   }
   .setup-chip:hover { border-color: #3b82f6; color: #1d4ed8; }
   .setup-chip.selected { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: 800; }
+  .setup-chip.assignable { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+  .setup-chip.assignable:hover { background: #dbeafe; border-color: #3b82f6; }
+  .setup-group-col.active-group { outline: 2.5px solid currentColor; }
+  .member-remove-btn {
+    background: none; border: none; color: var(--muted);
+    font-size: 11px; cursor: pointer; padding: 0 0 0 4px; line-height: 1;
+    display: inline-flex; align-items: center;
+  }
+  .member-remove-btn:hover { color: var(--red); }
+  .setup-drag-handle { cursor: grab; font-size: 12px; color: var(--muted); margin-right: 4px; }
+  @keyframes setupFlash { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 60%{transform:translateX(5px)} }
 
   .setup-groups-section { flex: 1; overflow-y: auto; }
   #setup-groups {
@@ -510,7 +521,7 @@
     </div>
 
     <div class="setup-pool-section">
-      <div class="setup-section-label">Unassigned — tap student to select, then tap a group to assign</div>
+      <div class="setup-section-label" id="setup-pool-label">Add a group below, then tap names to assign</div>
       <div id="setup-unassigned"></div>
     </div>
 
@@ -586,14 +597,14 @@ const SESSION = {
 // ── ROSTER ────────────────────────────────────────────────
 const STUDENTS = [
   "Annalise Faheem",  "Ari Faheem",          "Arthur Przybyl",
-  "Caleb Chang",      "Cora Ishaq",           "Emma Baklanova",
-  "Graham Gattegno",  "Hana Wong",            "Nathaniel Kelly",
-  "Nayel Bajwa",      "Olivia Wojtowicz",     "Reverie Stinson",
-  "Sojourn Stinson",  "Sabrina Yang",         "Sophie Yang",
-  "Lucia Quimby",     "Cameron Creelman",     "Lauren Creelman",
-  "Mia Baklanova",    "Lorenzo Di Rocco",     "Rexa Gupta",
-  "Audrey Going",     "Molly Going",          "Junning Zhang (Grace)",
-  "Serena Ma"
+  "Audrey Going",     "Caleb Chang",         "Cameron Creelman",
+  "Cora Ishaq",       "Emma Baklanova",      "Graham Gattegno",
+  "Hana Wong",        "Junning Zhang (Grace)","Lauren Creelman",
+  "Lorenzo Di Rocco", "Lucia Quimby",        "Mia Baklanova",
+  "Molly Going",      "Nathaniel Kelly",     "Nayel Bajwa",
+  "Olivia Wojtowicz", "Reverie Stinson",     "Rexa Gupta",
+  "Sabrina Yang",     "Serena Ma",           "Sojourn Stinson",
+  "Sophie Yang"
 ];
 
 const NAME_ALIASES = {
@@ -648,12 +659,22 @@ STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
 
 // ── GROUP STATE ───────────────────────────────────────────
 let groupMode = false;
-let groups = {};        // gid → { id, name, color, members: [] }
+let groups = {};        // gid → { id, members: [] }
 let groupTimers = {};   // gid → { running, startMs, pausedMs, intervalId, setCount, setLog[] }
-let pendingAssign = null; // student name selected in setup for assignment
-let groupCounter = 0;
+let groupOrder = [];    // ordered array of gids — determines A/B/C label + display position
+let selectedGroupId = null; // active target group for single-tap assignment
+let dragSrcGid = null;
 
 const GCOLORS = ['#2563eb','#15803d','#d97706','#7c3aed','#dc2626','#0891b2'];
+
+function getGroupName(gid) {
+  const idx = groupOrder.indexOf(gid);
+  return idx >= 0 ? `Group ${String.fromCharCode(65 + idx)}` : '?';
+}
+function getGroupColor(gid) {
+  const idx = groupOrder.indexOf(gid);
+  return GCOLORS[Math.max(0, idx) % GCOLORS.length];
+}
 
 // ── UTILITIES ─────────────────────────────────────────────
 function slugify(n) { return n.replace(/[^a-zA-Z0-9]/g, '_'); }
@@ -704,6 +725,7 @@ function adjustLap(name, delta, source='manual') {
   if (newLaps === d.laps) return;
 
   if (delta > 0) {
+    if (!sessionStart) sessionStart = Date.now(); // auto-start if clock not yet running
     const ts = elapsed();
     d.timestamps.push(ts);
     pulseLapCount(name);
@@ -797,9 +819,10 @@ function clearLog() {
   logEntries = []; logSeq = 0; logIdCounter = 0;
   Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
   // Reset group set logs and timers
-  Object.values(groupTimers).forEach(gt => {
-    stopGroupTimerById(Object.keys(groups).find(gid => groupTimers[gid] === gt));
-    gt.startMs = null; gt.pausedMs = 0; gt.setCount = 0; gt.setLog = [];
+  groupOrder.forEach(gid => {
+    stopGroupTimerById(gid);
+    const gt = groupTimers[gid];
+    if (gt) { gt.startMs = null; gt.pausedMs = 0; gt.setCount = 0; gt.setLog = []; }
   });
   document.getElementById('log-list').innerHTML = '<div class="log-empty" id="log-empty">Log cleared.</div>';
   renderGridArea();
@@ -915,60 +938,62 @@ function matchNamesFromTranscript(text) {
 
 // ── GROUP SETUP ───────────────────────────────────────────
 function openGroupSetup() {
-  pendingAssign = null;
   renderSetup();
   document.getElementById('group-setup-modal').classList.add('open');
 }
 function closeGroupSetup() {
   document.getElementById('group-setup-modal').classList.remove('open');
-  pendingAssign = null;
 }
 function applyGroupsAndClose() {
-  groupMode = Object.keys(groups).length > 0;
+  groupMode = groupOrder.length > 0;
   document.getElementById('groups-btn').classList.toggle('active', groupMode);
   closeGroupSetup();
   renderGridArea();
   updateStats();
 }
 function clearAllGroups() {
-  Object.values(groupTimers).forEach((gt, i) => {
-    const gid = Object.keys(groups)[i];
-    if (gid) stopGroupTimerById(gid);
-  });
-  groups = {}; groupTimers = {}; groupCounter = 0; pendingAssign = null;
+  groupOrder.forEach(gid => stopGroupTimerById(gid));
+  groups = {}; groupTimers = {}; groupOrder = [];
+  selectedGroupId = null;
   groupMode = false;
   document.getElementById('groups-btn').classList.remove('active');
   renderSetup();
 }
 function addGroup() {
-  const gid = `g${++groupCounter}`;
-  const color = GCOLORS[(groupCounter - 1) % GCOLORS.length];
-  const letter = String.fromCharCode(64 + groupCounter);
-  groups[gid] = { id: gid, name: `Group ${letter}`, color, members: [] };
+  const gid = `g${Date.now()}`;
+  groups[gid] = { id: gid, members: [] };
   groupTimers[gid] = { running: false, startMs: null, pausedMs: 0, intervalId: null, setCount: 0, setLog: [] };
+  groupOrder.push(gid);
+  if (!selectedGroupId) selectedGroupId = gid; // auto-select first group
   renderSetup();
 }
 function removeGroup(gid) {
   stopGroupTimerById(gid);
   delete groups[gid];
   delete groupTimers[gid];
-  pendingAssign = null;
+  groupOrder = groupOrder.filter(id => id !== gid);
+  if (selectedGroupId === gid) selectedGroupId = groupOrder[0] || null;
   renderSetup();
 }
-function selectForAssign(name) {
-  pendingAssign = (pendingAssign === name) ? null : name;
+function selectGroup(gid) {
+  selectedGroupId = gid;
   renderSetup();
 }
-function assignToGroup(gid) {
-  if (!pendingAssign) return;
-  Object.values(groups).forEach(g => { g.members = g.members.filter(m => m !== pendingAssign); });
-  groups[gid].members.push(pendingAssign);
-  pendingAssign = null;
+function assignStudentDirect(name) {
+  if (!selectedGroupId || !groups[selectedGroupId]) {
+    // Flash columns to signal "select a group first"
+    document.querySelectorAll('.setup-group-col').forEach(c => {
+      c.style.animation = 'setupFlash 0.35s ease';
+      setTimeout(() => { c.style.animation = ''; }, 400);
+    });
+    return;
+  }
+  Object.values(groups).forEach(g => { g.members = g.members.filter(m => m !== name); });
+  groups[selectedGroupId].members.push(name);
   renderSetup();
 }
-function unassignFromGroup(name, gid) {
+function removeFromGroup(name, gid) {
   groups[gid].members = groups[gid].members.filter(m => m !== name);
-  pendingAssign = null;
   renderSetup();
 }
 function getUnassigned() {
@@ -976,32 +1001,76 @@ function getUnassigned() {
   return STUDENTS.filter(s => !assigned.has(s));
 }
 
+// Drag-to-reorder group columns
+function handleGroupDragStart(e, gid) {
+  dragSrcGid = gid;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => { const el = document.getElementById(`setup-col-${gid}`); if (el) el.style.opacity = '0.45'; }, 0);
+}
+function handleGroupDragEnd(gid) {
+  dragSrcGid = null;
+  const el = document.getElementById(`setup-col-${gid}`);
+  if (el) el.style.opacity = '1';
+}
+function handleGroupDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function handleGroupDrop(e, gid) {
+  e.stopPropagation();
+  if (!dragSrcGid || dragSrcGid === gid) return;
+  const si = groupOrder.indexOf(dragSrcGid), di = groupOrder.indexOf(gid);
+  groupOrder.splice(si, 1);
+  groupOrder.splice(di, 0, dragSrcGid);
+  renderSetup();
+}
+
 function renderSetup() {
-  const unassigned = getUnassigned();
+  const unassigned = getUnassigned(); // already in STUDENTS alpha order
+
+  // Pool label
+  const lbl = document.getElementById('setup-pool-label');
+  if (lbl) {
+    if (groupOrder.length === 0) lbl.innerHTML = 'Add a group below, then tap names to assign';
+    else if (!selectedGroupId) lbl.innerHTML = 'Tap a group to select it, then tap names to assign';
+    else lbl.innerHTML = `Tap names to add to <strong style="color:${getGroupColor(selectedGroupId)}">${getGroupName(selectedGroupId)}</strong>`;
+  }
+
+  // Unassigned pool
+  const canAssign = selectedGroupId && groups[selectedGroupId];
   document.getElementById('setup-unassigned').innerHTML =
     unassigned.length === 0
       ? '<div style="color:#bbb;font-size:13px;font-style:italic;padding:4px;">All students assigned ✓</div>'
       : unassigned.map(name => {
           const safe = name.replace(/'/g, "\\'");
-          return `<div class="setup-chip${pendingAssign === name ? ' selected' : ''}" onclick="selectForAssign('${safe}')">${name.split(' ')[0]}</div>`;
+          return `<div class="setup-chip${canAssign ? ' assignable' : ''}" onclick="assignStudentDirect('${safe}')">${name.split(' ')[0]}</div>`;
         }).join('');
 
-  document.getElementById('setup-groups').innerHTML = Object.values(groups).map(g => {
-    const safe_gid = g.id;
+  // Group columns
+  document.getElementById('setup-groups').innerHTML = groupOrder.map(gid => {
+    const g = groups[gid]; if (!g) return '';
+    const gname = getGroupName(gid), gcolor = getGroupColor(gid);
+    const isActive = selectedGroupId === gid;
+    const membersAlpha = [...g.members].sort((a, b) => a.localeCompare(b));
     return `
-      <div class="setup-group-col" style="border-top:3px solid ${g.color}" onclick="assignToGroup('${safe_gid}')">
-        <div class="setup-group-header">
-          <span style="color:${g.color};font-weight:800;font-size:14px;">${g.name}</span>
-          <button class="setup-remove-group" onclick="event.stopPropagation();removeGroup('${safe_gid}')">✕</button>
+      <div class="setup-group-col${isActive ? ' active-group' : ''}" id="setup-col-${gid}"
+           style="border-top:3px solid ${gcolor};${isActive ? `outline:2.5px solid ${gcolor};` : ''}"
+           draggable="true"
+           ondragstart="handleGroupDragStart(event,'${gid}')"
+           ondragend="handleGroupDragEnd('${gid}')"
+           ondragover="handleGroupDragOver(event)"
+           ondrop="handleGroupDrop(event,'${gid}')">
+        <div class="setup-group-header" onclick="selectGroup('${gid}')">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="setup-drag-handle">⠿</span>
+            <span style="color:${gcolor};font-weight:800;font-size:14px;">${gname}</span>
+            ${isActive ? `<span style="font-size:10px;font-weight:700;color:${gcolor};background:${gcolor}22;padding:2px 7px;border-radius:10px;">Active</span>` : ''}
+          </div>
+          <button class="setup-remove-group" onclick="event.stopPropagation();removeGroup('${gid}')">✕</button>
         </div>
         <div class="setup-group-members">
-          ${g.members.map(name => {
+          ${membersAlpha.map(name => {
             const safe = name.replace(/'/g, "\\'");
-            return `<div class="setup-member-chip" onclick="event.stopPropagation();unassignFromGroup('${safe}','${safe_gid}')">${name.split(' ')[0]} ✕</div>`;
+            return `<div class="setup-member-chip"><span>${name.split(' ')[0]}</span><button class="member-remove-btn" onclick="removeFromGroup('${safe}','${gid}')">✕</button></div>`;
           }).join('')}
-          ${pendingAssign && !g.members.includes(pendingAssign)
-            ? `<div class="setup-drop-hint">+ Add ${pendingAssign.split(' ')[0]}</div>`
-            : (g.members.length === 0 ? '<div class="setup-drop-empty">Tap to assign</div>' : '')}
+          ${g.members.length === 0 ? '<div class="setup-drop-empty">No members yet</div>' : ''}
         </div>
       </div>`;
   }).join('');
@@ -1102,7 +1171,7 @@ function renderGrid() {
 function renderGridArea() {
   const wrap = document.getElementById('grid-wrap');
 
-  if (!groupMode || Object.keys(groups).length === 0) {
+  if (!groupMode || groupOrder.length === 0) {
     wrap.innerHTML = '<div id="grid"></div>';
     renderGrid();
     return;
@@ -1111,23 +1180,27 @@ function renderGridArea() {
   const unassigned = getUnassigned();
   let html = '';
 
-  Object.values(groups).forEach(g => {
-    const gt = groupTimers[g.id];
+  groupOrder.forEach(gid => {
+    const g = groups[gid];
+    const gt = groupTimers[gid];
+    if (!g || !gt) return;
+    const gname = getGroupName(gid), gcolor = getGroupColor(gid);
+    const membersAlpha = [...g.members].sort((a, b) => a.localeCompare(b));
     html += `
       <div class="group-section">
         <div class="group-header">
           <div class="group-header-left">
-            <span class="group-name" style="color:${g.color}">${g.name}</span>
+            <span class="group-name" style="color:${gcolor}">${gname}</span>
             <span class="group-set-badge">Set ${gt.setCount + 1}</span>
-            <div class="group-timer-display" id="gtimer-${g.id}">${fmtElapsed(groupElapsed(g.id))}</div>
+            <div class="group-timer-display" id="gtimer-${gid}">${fmtElapsed(groupElapsed(gid))}</div>
           </div>
           <div class="group-header-right">
-            <button id="gstart-${g.id}" class="g-clock-btn g-start" onclick="startGroupTimer('${g.id}')">▶ Start</button>
-            <button class="g-set-btn" onclick="logGroupSet('${g.id}')">📋 Log Set</button>
+            <button id="gstart-${gid}" class="g-clock-btn g-start" onclick="startGroupTimer('${gid}')">▶ Start</button>
+            <button class="g-set-btn" onclick="logGroupSet('${gid}')">📋 Log Set</button>
           </div>
         </div>
-        <div class="group-grid" id="ggrid-${g.id}">
-          ${g.members.map(cardHtml).join('')}
+        <div class="group-grid" id="ggrid-${gid}">
+          ${membersAlpha.map(cardHtml).join('')}
         </div>
         ${gt.setLog.length > 0 ? `
           <div class="group-set-log">
@@ -1154,10 +1227,9 @@ function renderGridArea() {
 
   wrap.innerHTML = html;
 
-  // Re-attach running timers
-  Object.keys(groups).forEach(gid => {
+  groupOrder.forEach(gid => {
     updateGroupControls(gid);
-    if (groupTimers[gid].running) {
+    if (groupTimers[gid] && groupTimers[gid].running) {
       const el = document.getElementById(`gtimer-${gid}`);
       if (el) el.className = 'group-timer-display running';
     }
@@ -1171,7 +1243,7 @@ function updateCard(name) {
   card.className = `student-card ${getLapClass(name)}`;
   document.getElementById(`count-${slug}`).textContent = data[name].laps;
   document.getElementById(`split-${slug}`).textContent = getLastSplitText(name);
-  sortGridForName(name);
+  // No re-sort — alphabetical order is fixed at render time
 }
 
 function sortGridEl(el) {
@@ -1257,18 +1329,19 @@ function buildExportSimple() {
   const lines = [];
   if (header) { lines.push(header); lines.push('─'.repeat(36)); }
 
-  if (groupMode && Object.keys(groups).length > 0) {
+  if (groupMode && groupOrder.length > 0) {
     // Group mode: show per-group and per-set breakdown
-    Object.values(groups).forEach(g => {
-      const gt = groupTimers[g.id];
-      lines.push(`\n── ${g.name} ──`);
+    groupOrder.forEach(gid => {
+      const g = groups[gid]; if (!g) return;
+      const gt = groupTimers[gid];
+      lines.push(`\n── ${getGroupName(gid)} ──`);
       // Completed sets
       gt.setLog.forEach(s => {
         lines.push(`  Set ${s.set} (${fmtElapsed(s.elapsed)})`);
         s.members.forEach(m => { if (m.laps > 0) lines.push(`    ${m.name}: ${m.laps}`); });
       });
       // Current set (in-progress laps)
-      const currentLaps = g.members.filter(name => data[name].laps > 0);
+      const currentLaps = (g.members || []).filter(name => data[name] && data[name].laps > 0);
       if (currentLaps.length > 0) {
         lines.push(`  Current set`);
         currentLaps.forEach(name => lines.push(`    ${name}: ${data[name].laps}`));
