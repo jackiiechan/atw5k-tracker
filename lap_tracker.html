@@ -4,503 +4,444 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Lap Tracker">
 <link rel="manifest" href="manifest.json">
 <title>ATW 5K · Lap Tracker</title>
 <style>
   :root {
-    --bg:        #080b14;
-    --surface:   #101626;
-    --surface2:  #171e30;
-    --border:    #1e2a44;
-    --accent:    #E8A020;
-    --text:      #d4dff5;
-    --muted:     #5a6a8a;
-    --green:     #22c55e;
-    --red:       #ef4444;
-    --amber:     #f59e0b;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
+    --bg:      #f2f3f8;
+    --surface: #ffffff;
+    --surface2:#e8eaf4;
+    --border:  #cdd2e8;
+    --accent:  #b06e00;
+    --text:    #0f1422;
+    --muted:   #6b7898;
+    --green:   #15803d;
+    --red:     #dc2626;
+    --amber:   #c77a00;
     --header-h: 58px;
     --stats-h:  34px;
-    --top-h:    92px; /* header + stats combined */
+    --top-h:    92px;
   }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-    /* No height/overflow on body — fixed children handle layout */
   }
 
-  /* ── HEADER — always fixed, survives zoom ────────────── */
+  /* ── HEADER ─────────────────────────────────────────────── */
   #header {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: var(--header-h);
     background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    z-index: 100;
-    /* Safe area insets for iPad notch/home indicator */
-    padding-left: max(18px, env(safe-area-inset-left));
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 max(18px, env(safe-area-inset-left));
     padding-right: max(18px, env(safe-area-inset-right));
+    display: flex; align-items: center; gap: 12px;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
   }
   .brand {
     font-size: 14px; font-weight: 700;
-    letter-spacing: 0.05em; color: var(--accent);
+    letter-spacing: 0.04em; color: var(--accent);
     white-space: nowrap;
     display: flex; flex-direction: column; gap: 1px;
   }
-  .brand-sub {
-    font-size: 10px; font-weight: 500;
-    color: var(--muted); letter-spacing: 0.04em;
-  }
+  .brand-sub { font-size: 10px; font-weight: 500; color: var(--muted); }
 
-  /* Timer section */
-  .timer-section {
-    display: flex; align-items: center; gap: 10px;
-    margin-left: 8px;
-  }
+  .timer-section { display: flex; align-items: center; gap: 10px; margin-left: 6px; }
   #timer {
     font-size: 26px; font-weight: 800;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    min-width: 72px;
-    transition: color 0.3s;
+    letter-spacing: 0.06em; color: var(--muted);
+    min-width: 72px; transition: color 0.3s;
   }
   #timer.running { color: var(--green); }
 
   .clock-btn {
-    padding: 7px 16px;
-    border-radius: 8px; border: none;
-    font-size: 13px; font-weight: 700;
-    cursor: pointer; transition: all 0.15s;
-    white-space: nowrap;
+    padding: 7px 16px; border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
   }
-  .clock-btn.start {
-    background: rgba(34,197,94,0.18);
-    border: 1.5px solid rgba(34,197,94,0.45);
-    color: var(--green);
-  }
-  .clock-btn.start:hover { background: rgba(34,197,94,0.30); }
-  .clock-btn.stop {
-    background: rgba(239,68,68,0.15);
-    border: 1.5px solid rgba(239,68,68,0.40);
-    color: var(--red);
-  }
-  .clock-btn.stop:hover { background: rgba(239,68,68,0.26); }
+  .clock-btn.start { background: #dcfce7; border: 1.5px solid #86efac; color: var(--green); }
+  .clock-btn.stop  { background: #fee2e2; border: 1.5px solid #fca5a5; color: var(--red); }
 
-  /* Voice button */
-  .voice-wrap { display: flex; align-items: center; gap: 8px; margin-left: 6px; }
+  .voice-wrap { display: flex; align-items: center; gap: 8px; margin-left: 4px; }
   #voice-btn {
     display: flex; align-items: center; gap: 6px;
-    padding: 7px 14px;
-    border-radius: 8px;
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    color: var(--muted);
-    font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
-    white-space: nowrap;
+    padding: 7px 14px; border-radius: 8px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    color: var(--muted); font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
   }
-  #voice-btn:hover { border-color: #a78bfa; color: #a78bfa; }
+  #voice-btn:hover { border-color: #7c3aed; color: #7c3aed; }
   #voice-btn.listening {
-    background: rgba(167,139,250,0.12);
-    border-color: #a78bfa;
-    color: #c4b5fd;
+    background: #ede9fe; border-color: #7c3aed; color: #6d28d9;
     animation: voicePulse 1.5s ease-in-out infinite;
   }
   @keyframes voicePulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.4); }
-    50%       { box-shadow: 0 0 0 6px rgba(167,139,250,0); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.3); }
+    50%      { box-shadow: 0 0 0 6px rgba(124,58,237,0); }
   }
-  .mic-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--muted); transition: background 0.2s;
-  }
-  #voice-btn.listening .mic-dot { background: #a78bfa; }
-  #voice-status {
-    font-size: 11px; color: var(--muted);
-    max-width: 160px; overflow: hidden;
-    text-overflow: ellipsis; white-space: nowrap;
-  }
-  #voice-status.heard { color: #c4b5fd; }
+  .mic-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  #voice-btn.listening .mic-dot { background: #7c3aed; }
+  #voice-status { font-size: 11px; color: var(--muted); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #voice-status.heard { color: #6d28d9; }
 
-  /* Right-side header actions */
-  .hdr-actions { margin-left: auto; display: flex; gap: 8px; }
+  .hdr-actions { margin-left: auto; display: flex; gap: 6px; }
   .hdr-btn {
-    padding: 7px 14px; border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--muted);
-    font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    padding: 7px 12px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: var(--surface2);
+    color: var(--muted); font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
   }
   .hdr-btn:hover { color: var(--text); border-color: var(--accent); }
-  .hdr-btn.export { border-color: rgba(34,197,94,0.4); color: var(--green); }
-  .hdr-btn.export:hover { background: rgba(34,197,94,0.12); }
+  .hdr-btn.export { border-color: #86efac; color: var(--green); }
+  .hdr-btn.export:hover { background: #dcfce7; }
+  .hdr-btn.groups { border-color: #93c5fd; color: #1d4ed8; }
+  .hdr-btn.groups:hover { background: #eff6ff; }
+  .hdr-btn.groups.active { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: 800; }
 
-  /* ── STATS BAR ──────────────────────────────────────── */
+  /* ── STATS BAR ──────────────────────────────────────────── */
   #stats-bar {
-    position: fixed;
-    top: var(--header-h); left: 0; right: 0;
-    height: var(--stats-h);
-    background: var(--surface);
+    position: fixed; top: var(--header-h); left: 0; right: 0;
+    height: var(--stats-h); background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 0 18px;
-    display: flex; align-items: center; gap: 24px;
-    font-size: 11px; color: var(--muted);
-    z-index: 99;
+    padding: 0 18px; display: flex; align-items: center; gap: 24px;
+    font-size: 11px; color: var(--muted); z-index: 99;
   }
   .stat-chip span { color: var(--text); font-weight: 700; }
 
-  /* ── BODY: GRID + LOG ───────────────────────────────── */
+  /* ── BODY ───────────────────────────────────────────────── */
   #body {
-    position: fixed;
-    top: var(--top-h); left: 0; right: 0;
-    bottom: 0;
-    display: flex;
-    overflow: hidden;
+    position: fixed; top: var(--top-h); left: 0; right: 0; bottom: 0;
+    display: flex; overflow: hidden;
   }
 
-  /* ── GRID ───────────────────────────────────────────── */
-  #grid-wrap {
-    flex: 1;
-    overflow-y: auto;
-    padding: 14px;
-  }
-  #grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
+  /* ── GRID WRAP ──────────────────────────────────────────── */
+  #grid-wrap { flex: 1; overflow-y: auto; padding: 14px; }
+  #grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
-  /* ── STUDENT CARD ───────────────────────────────────── */
+  /* ── STUDENT CARD ───────────────────────────────────────── */
   .student-card {
     background: var(--surface);
     border: 1.5px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 10px 10px;
+    border-radius: 12px; padding: 12px 10px 10px;
     display: flex; flex-direction: column;
     align-items: center; gap: 4px;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .student-card.lap-zero  { border-color: var(--border); }
-  .student-card.lap-one   { border-color: #92400e; }
-  .student-card.lap-two   { border-color: #d97706; box-shadow: 0 0 0 1px rgba(245,158,11,0.15); }
-  .student-card.lap-three { border-color: #16a34a; box-shadow: 0 0 0 1px rgba(34,197,94,0.2); }
-  .student-card.lap-four  { border-color: var(--green); box-shadow: 0 0 0 2px rgba(34,197,94,0.2); }
-  .student-card.lap-five-plus {
-    border-color: #4ade80;
-    box-shadow: 0 0 0 2px rgba(74,222,128,0.25), 0 0 18px rgba(74,222,128,0.1);
-  }
-  .student-card.voice-flash {
-    animation: voiceFlash 0.6s ease-out;
-  }
-  @keyframes voiceFlash {
-    0%   { background: rgba(167,139,250,0.25); }
-    100% { background: var(--surface); }
-  }
+  .student-card.lap-one   { border-color: #fbbf24; }
+  .student-card.lap-two   { border-color: #f59e0b; box-shadow: 0 0 0 1px rgba(245,158,11,0.1); }
+  .student-card.lap-three { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74,222,128,0.15); }
+  .student-card.lap-four  { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.15); }
+  .student-card.lap-five-plus { border-color: #16a34a; box-shadow: 0 0 0 2px rgba(21,128,61,0.2); }
+  .student-card.voice-flash { animation: voiceFlash 0.6s ease-out; }
+  @keyframes voiceFlash { 0% { background: #ede9fe; } 100% { background: var(--surface); } }
 
   .card-name {
-    font-size: 10.5px; font-weight: 600;
-    letter-spacing: 0.02em; color: var(--muted);
-    text-align: center; line-height: 1.3;
-    cursor: pointer; min-height: 26px;
-    display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px; font-weight: 600; color: var(--muted);
+    text-align: center; line-height: 1.3; cursor: pointer;
+    min-height: 26px; display: flex; align-items: center; justify-content: center;
   }
   .card-name:hover { color: var(--text); }
-
   .card-lap-count {
     font-size: 46px; font-weight: 900; line-height: 1;
-    cursor: pointer; transition: color 0.2s;
-    font-variant-numeric: tabular-nums;
+    cursor: pointer; transition: color 0.2s; font-variant-numeric: tabular-nums;
   }
-  .lap-zero     .card-lap-count { color: var(--muted); }
-  .lap-one      .card-lap-count { color: var(--amber); }
-  .lap-two      .card-lap-count { color: var(--amber); }
-  .lap-three    .card-lap-count { color: var(--green); }
-  .lap-four     .card-lap-count { color: var(--green); }
-  .lap-five-plus .card-lap-count { color: #4ade80; }
+  .lap-zero      .card-lap-count { color: #d1d5db; }
+  .lap-one       .card-lap-count { color: #f59e0b; }
+  .lap-two       .card-lap-count { color: #d97706; }
+  .lap-three     .card-lap-count { color: var(--green); }
+  .lap-four      .card-lap-count { color: #15803d; }
+  .lap-five-plus .card-lap-count { color: #166534; }
 
   @keyframes lapPulse { 0%{transform:scale(1)} 35%{transform:scale(1.2)} 100%{transform:scale(1)} }
   .lap-pulse { animation: lapPulse 0.22s ease-out; }
 
-  .card-split {
-    font-size: 10px; color: var(--muted);
-    min-height: 14px; font-variant-numeric: tabular-nums;
-  }
-
+  .card-split { font-size: 10px; color: var(--muted); min-height: 14px; font-variant-numeric: tabular-nums; }
   .card-btns { display: flex; gap: 6px; width: 100%; margin-top: 4px; }
   .btn-minus, .btn-plus {
     flex: 1; height: 40px; border-radius: 9px; border: none;
-    font-size: 22px; font-weight: 800;
-    cursor: pointer; transition: all 0.1s;
+    font-size: 22px; font-weight: 800; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     user-select: none; -webkit-user-select: none;
   }
-  .btn-minus {
-    background: rgba(239,68,68,0.10);
-    color: #f87171;
-    border: 1px solid rgba(239,68,68,0.22);
-  }
-  .btn-minus:hover  { background: rgba(239,68,68,0.20); }
-  .btn-minus:active { background: rgba(239,68,68,0.32); transform: scale(0.95); }
-  .btn-plus {
-    background: rgba(34,197,94,0.12);
-    color: #4ade80;
-    border: 1px solid rgba(34,197,94,0.28);
-  }
-  .btn-plus:hover  { background: rgba(34,197,94,0.22); }
-  .btn-plus:active { background: rgba(34,197,94,0.36); transform: scale(0.95); }
+  .btn-minus { background: #fee2e2; color: var(--red); border: 1px solid #fca5a5; }
+  .btn-minus:active { background: #fecaca; transform: scale(0.95); }
+  .btn-plus  { background: #dcfce7; color: var(--green); border: 1px solid #86efac; }
+  .btn-plus:active  { background: #bbf7d0; transform: scale(0.95); }
 
-  /* ── ACTIVITY LOG ───────────────────────────────────── */
-  #log-panel {
-    width: 280px;
-    flex-shrink: 0;
+  /* ── GROUP SECTIONS ─────────────────────────────────────── */
+  .group-section {
+    margin-bottom: 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
     background: var(--surface);
-    border-left: 1px solid var(--border);
-    display: flex; flex-direction: column;
     overflow: hidden;
   }
-  .log-header {
-    padding: 10px 14px 8px;
-    border-bottom: 1px solid var(--border);
+  .group-header {
     display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
+    padding: 10px 16px;
+    background: #f8f9fc;
+    border-bottom: 1.5px solid var(--border);
   }
-  .log-title {
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted);
+  .group-header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .group-name { font-size: 15px; font-weight: 800; }
+  .group-set-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--surface2); color: var(--muted);
+    border-radius: 20px; padding: 2px 9px; border: 1px solid var(--border);
   }
+  .group-timer-display {
+    font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--muted); min-width: 60px;
+  }
+  .group-timer-display.running { color: var(--green); }
+  .group-header-right { display: flex; align-items: center; gap: 8px; }
+  .g-clock-btn {
+    padding: 6px 14px; border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  }
+  .g-start { background: #dcfce7; border: 1.5px solid #86efac; color: var(--green); }
+  .g-stop  { background: #fee2e2; border: 1.5px solid #fca5a5; color: var(--red); }
+  .g-set-btn {
+    padding: 6px 14px; border-radius: 8px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .g-set-btn:hover { background: #e0e4f5; color: var(--text); }
+  .group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; }
+  .group-set-log {
+    border-top: 1px solid var(--border);
+    padding: 8px 12px; display: flex; flex-direction: column; gap: 4px;
+    background: #fafbfe;
+  }
+  .set-log-row {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; color: var(--muted);
+  }
+  .set-log-row span:first-child { font-weight: 800; color: var(--text); min-width: 40px; }
+  .set-log-row span:nth-child(2) { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--green); min-width: 50px; }
+  .set-log-row span:last-child { flex: 1; }
+  .group-unassigned-section { margin-bottom: 12px; }
+  .group-unassigned-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+
+  /* ── ACTIVITY LOG ───────────────────────────────────────── */
+  #log-panel {
+    width: 270px; flex-shrink: 0;
+    background: var(--surface); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .log-header {
+    padding: 10px 14px 8px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .log-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
   .log-clear {
-    font-size: 10px; color: var(--muted);
-    cursor: pointer; padding: 2px 6px;
-    border-radius: 4px; border: 1px solid transparent;
-    background: none;
+    font-size: 10px; color: var(--muted); cursor: pointer;
+    padding: 2px 6px; border-radius: 4px; border: 1px solid transparent; background: none;
   }
   .log-clear:hover { border-color: var(--border); color: var(--text); }
-
-  #log-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 0;
-  }
+  #log-list { flex: 1; overflow-y: auto; padding: 8px 0; }
   #log-list::-webkit-scrollbar { width: 4px; }
-  #log-list::-webkit-scrollbar-track { background: transparent; }
   #log-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   .log-entry {
     display: flex; align-items: center; gap: 8px;
-    padding: 6px 14px;
-    border-bottom: 1px solid rgba(30,42,68,0.5);
-    font-size: 12px;
-    animation: logSlide 0.2s ease-out;
+    padding: 6px 14px; border-bottom: 1px solid #eef0f8;
+    font-size: 12px; animation: logSlide 0.2s ease-out;
   }
-  @keyframes logSlide {
-    from { opacity: 0; transform: translateX(10px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-  .log-entry.voice-entry { background: rgba(167,139,250,0.06); }
-
-  .log-seq {
-    font-size: 10px; color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    min-width: 22px; text-align: right;
-  }
-  .log-name {
-    flex: 1; font-weight: 600;
-    color: var(--text);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .log-lap {
-    font-size: 11px; font-weight: 700;
-    background: rgba(34,197,94,0.12);
-    color: var(--green);
-    border-radius: 4px; padding: 1px 5px;
-    white-space: nowrap;
-  }
-  .log-time {
-    font-size: 10px; color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  .log-empty {
-    padding: 24px 14px; text-align: center;
-    font-size: 12px; color: var(--muted);
-    line-height: 1.6;
-  }
+  @keyframes logSlide { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:none; } }
+  .log-entry.voice-entry { background: #f5f3ff; }
+  .log-seq { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 22px; text-align: right; }
+  .log-name { flex: 1; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .log-lap { font-size: 11px; font-weight: 700; background: #dcfce7; color: var(--green); border-radius: 4px; padding: 1px 5px; white-space: nowrap; }
+  .log-time { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .log-empty { padding: 24px 14px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6; }
   .log-source { font-size: 9px; color: var(--muted); }
-  .log-source.voice { color: #a78bfa; }
+  .log-source.voice { color: #7c3aed; }
   .log-delete {
     width: 18px; height: 18px; border-radius: 4px;
     background: none; border: 1px solid transparent;
     color: var(--muted); font-size: 12px; line-height: 1;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all 0.12s;
-    padding: 0;
+    flex-shrink: 0; padding: 0;
   }
-  .log-delete:hover {
-    background: rgba(239,68,68,0.15);
-    border-color: rgba(239,68,68,0.35);
-    color: var(--red);
-  }
+  .log-delete:hover { background: #fee2e2; border-color: #fca5a5; color: var(--red); }
 
-  /* ── MODALS ─────────────────────────────────────────── */
+  /* ── GROUP SETUP MODAL ──────────────────────────────────── */
   .modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.72);
+    background: rgba(0,0,0,0.45);
     display: flex; align-items: center; justify-content: center;
-    z-index: 500;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.18s;
+    z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.18s;
   }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
   .modal-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 24px;
     min-width: 300px; max-width: 420px; width: 90%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
   }
+
+  /* Group setup specific */
+  #group-setup-modal .modal-box {
+    max-width: 90vw; width: 780px;
+    max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .setup-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; flex-shrink: 0;
+  }
+  .setup-title { font-size: 17px; font-weight: 800; }
+  .setup-header-actions { display: flex; gap: 8px; }
+  .setup-done-btn {
+    padding: 8px 20px; border-radius: 9px; border: none;
+    background: #1d4ed8; color: white; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .setup-done-btn:hover { background: #1e40af; }
+  .setup-clear-btn {
+    padding: 8px 14px; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .setup-pool-section { margin-bottom: 14px; flex-shrink: 0; }
+  .setup-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  #setup-unassigned {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    min-height: 36px; padding: 8px;
+    background: var(--surface2); border-radius: 10px; border: 1px solid var(--border);
+  }
+  .setup-chip {
+    padding: 5px 12px; border-radius: 20px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--text);
+    cursor: pointer; transition: all 0.12s; user-select: none;
+  }
+  .setup-chip:hover { border-color: #3b82f6; color: #1d4ed8; }
+  .setup-chip.selected { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: 800; }
+
+  .setup-groups-section { flex: 1; overflow-y: auto; }
+  #setup-groups {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start;
+  }
+  .setup-group-col {
+    min-width: 160px; flex: 1;
+    background: var(--surface2); border-radius: 12px;
+    border: 2px solid transparent; padding: 12px;
+    cursor: pointer; transition: border-color 0.12s;
+  }
+  .setup-group-col:hover { border-color: currentColor; }
+  .setup-group-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+  }
+  .setup-remove-group {
+    background: none; border: none; color: var(--muted);
+    font-size: 14px; cursor: pointer; padding: 2px 4px; border-radius: 4px;
+  }
+  .setup-remove-group:hover { background: #fee2e2; color: var(--red); }
+  .setup-group-members { display: flex; flex-wrap: wrap; gap: 5px; min-height: 30px; }
+  .setup-member-chip {
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--text);
+    cursor: pointer;
+  }
+  .setup-member-chip:hover { background: #fee2e2; border-color: #fca5a5; color: var(--red); }
+  .setup-drop-hint {
+    padding: 4px 10px; border-radius: 20px;
+    background: #dbeafe; border: 1.5px dashed #3b82f6;
+    font-size: 12px; font-weight: 700; color: #1d4ed8;
+    pointer-events: none;
+  }
+  .setup-drop-empty {
+    font-size: 11px; color: #bbb; font-style: italic; padding: 4px;
+    pointer-events: none;
+  }
+  .setup-add-group-btn {
+    padding: 8px 16px; border-radius: 9px;
+    border: 1.5px dashed var(--border); background: none;
+    color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer;
+    width: 100%; margin-top: 10px; flex-shrink: 0;
+  }
+  .setup-add-group-btn:hover { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+
+  /* ── HISTORY MODAL ──────────────────────────────────────── */
   .modal-name { font-size: 18px; font-weight: 800; margin-bottom: 3px; }
   .modal-laps { font-size: 13px; color: var(--green); font-weight: 700; margin-bottom: 14px; }
-  .history-list {
-    display: flex; flex-direction: column; gap: 5px;
-    max-height: 260px; overflow-y: auto; margin-bottom: 14px;
-  }
-  .hist-row {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--surface2); border-radius: 7px;
-    padding: 7px 10px; font-size: 12px;
-  }
+  .history-list { display: flex; flex-direction: column; gap: 5px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; }
+  .hist-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 7px; padding: 7px 10px; font-size: 12px; }
   .hist-lap { font-weight: 700; color: var(--accent); min-width: 44px; }
   .hist-time { font-variant-numeric: tabular-nums; color: var(--text); }
   .hist-split { margin-left: auto; color: var(--green); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .hist-source { font-size: 9px; color: #a78bfa; margin-left: 4px; }
+  .hist-source { font-size: 9px; color: #7c3aed; margin-left: 4px; }
   .hist-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 16px 0; }
-  .hist-avg {
-    background: rgba(34,197,94,0.08);
-    border: 1px solid rgba(34,197,94,0.18);
-    border-radius: 7px; padding: 7px 10px;
-    text-align: center; font-size: 12px;
-    font-weight: 700; color: var(--green);
-  }
-  .modal-close {
-    width: 100%; padding: 9px; border-radius: 9px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--muted); font-size: 13px; cursor: pointer;
-  }
+  .hist-avg { background: #dcfce7; border: 1px solid #86efac; border-radius: 7px; padding: 7px 10px; text-align: center; font-size: 12px; font-weight: 700; color: var(--green); }
+  .modal-close { width: 100%; padding: 9px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 13px; cursor: pointer; }
   .modal-close:hover { color: var(--text); border-color: var(--accent); }
 
-  /* Export */
+  /* ── EXPORT MODAL ───────────────────────────────────────── */
   .export-box { max-width: 880px; width: 95%; }
   .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 14px; }
   .export-cols { display: flex; gap: 14px; }
   .export-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-  .export-col-title {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--muted);
-  }
+  .export-col-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
   .export-col-title span { color: var(--accent); }
   .export-textarea {
     flex: 1; height: 280px;
-    background: #060810; border: 1px solid var(--border);
-    border-radius: 9px; color: #90a8c8;
+    background: #f8f9fc; border: 1px solid var(--border);
+    border-radius: 9px; color: #374151;
     font-family: 'SF Mono','Fira Code','Consolas', monospace;
-    font-size: 11px; padding: 12px; resize: none;
-    line-height: 1.7; width: 100%;
+    font-size: 11px; padding: 12px; resize: none; line-height: 1.7; width: 100%;
   }
-  .export-copy-btn {
-    width: 100%; padding: 9px; border-radius: 9px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    transition: all 0.15s;
-    background: rgba(34,197,94,0.12);
-    border: 1px solid rgba(34,197,94,0.35);
-    color: var(--green);
-  }
-  .export-copy-btn:hover { background: rgba(34,197,94,0.24); }
+  .export-copy-btn { width: 100%; padding: 9px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; background: #dcfce7; border: 1px solid #86efac; color: var(--green); }
+  .export-copy-btn:hover { background: #bbf7d0; }
   .export-close-row { margin-top: 10px; }
-  .export-close-btn {
-    width: 100%; padding: 9px; border-radius: 9px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted); transition: all 0.15s;
-  }
-  .export-close-btn:hover { color: var(--text); border-color: var(--accent); }
+  .export-close-btn { width: 100%; padding: 9px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
 
   /* Confirm */
   #confirm-modal .modal-box { text-align: center; max-width: 300px; }
   .confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
   .confirm-msg { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
   .confirm-actions { display: flex; gap: 8px; }
-  .confirm-actions button {
-    flex: 1; padding: 9px; border-radius: 9px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-  }
-  .confirm-yes {
-    background: rgba(239,68,68,0.12);
-    border: 1px solid rgba(239,68,68,0.35);
-    color: var(--red);
-  }
-  .confirm-yes:hover { background: rgba(239,68,68,0.24); }
-  .confirm-no {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
+  .confirm-actions button { flex: 1; padding: 9px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .confirm-yes { background: #fee2e2; border: 1px solid #fca5a5; color: var(--red); }
+  .confirm-yes:hover { background: #fecaca; }
+  .confirm-no  { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
 
-  /* ── RESPONSIVE ─────────────────────────────────────── */
-  @media (max-width: 1100px) {
-    #grid { grid-template-columns: repeat(3, 1fr); }
-    #log-panel { width: 240px; }
-  }
-
-  /* iPad portrait / landscape */
+  /* ── RESPONSIVE ─────────────────────────────────────────── */
+  @media (max-width: 1100px) { #grid { grid-template-columns: repeat(3, 1fr); } #log-panel { width: 230px; } }
   @media (max-width: 900px) {
-    :root { --header-h: 62px; --stats-h: 34px; --top-h: 96px; }
+    :root { --header-h: 62px; --top-h: 96px; }
     #body { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
     #grid-wrap { overflow: visible; flex-shrink: 0; }
-    #grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-    #log-panel {
-      width: 100%; border-left: none;
-      border-top: 1px solid var(--border);
-      max-height: 280px; flex-shrink: 0;
-    }
+    #grid, .group-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    #log-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); max-height: 280px; flex-shrink: 0; }
     #log-list { max-height: 220px; }
-
-    /* Bigger touch targets on tablet */
     .btn-minus, .btn-plus { height: 52px; font-size: 26px; border-radius: 10px; }
     .card-lap-count { font-size: 52px; }
     .card-name { font-size: 12px; }
     .clock-btn { padding: 9px 18px; font-size: 14px; }
     #voice-btn { padding: 9px 16px; font-size: 14px; }
     #timer { font-size: 30px; }
-
-    /* Export stacks on tablet */
     .export-cols { flex-direction: column; }
     .export-textarea { height: 180px; }
     .export-box { max-width: 95vw; }
   }
-
   @media (max-width: 600px) {
-    #grid { grid-template-columns: repeat(2, 1fr); }
+    #grid, .group-grid { grid-template-columns: repeat(2, 1fr); }
     #header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
-    .brand { font-size: 13px; }
-    .hdr-actions { margin-left: 0; }
-    #grid-wrap { padding: 10px; }
     .card-lap-count { font-size: 44px; }
   }
 </style>
@@ -528,6 +469,7 @@
   </div>
 
   <div class="hdr-actions">
+    <button class="hdr-btn groups" id="groups-btn" onclick="openGroupSetup()">🔀 Groups</button>
     <button class="hdr-btn export" onclick="showExport()">📋 Export</button>
     <button class="hdr-btn" onclick="confirmReset()">🔄 Reset</button>
   </div>
@@ -545,7 +487,6 @@
 <div id="body">
   <div id="grid-wrap"><div id="grid"></div></div>
 
-  <!-- Activity Log -->
   <div id="log-panel">
     <div class="log-header">
       <div class="log-title">📋 Activity Log</div>
@@ -553,6 +494,30 @@
     </div>
     <div id="log-list">
       <div class="log-empty" id="log-empty">No laps recorded yet.<br>Start the clock, then tap + or use Voice.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── GROUP SETUP MODAL ──────────────────────────────── -->
+<div class="modal-overlay" id="group-setup-modal" onclick="if(event.target===this)closeGroupSetup()">
+  <div class="modal-box">
+    <div class="setup-header">
+      <div class="setup-title">🔀 Group Setup</div>
+      <div class="setup-header-actions">
+        <button class="setup-clear-btn" onclick="clearAllGroups()">Clear All</button>
+        <button class="setup-done-btn" onclick="applyGroupsAndClose()">Apply →</button>
+      </div>
+    </div>
+
+    <div class="setup-pool-section">
+      <div class="setup-section-label">Unassigned — tap student to select, then tap a group to assign</div>
+      <div id="setup-unassigned"></div>
+    </div>
+
+    <div class="setup-groups-section">
+      <div class="setup-section-label">Groups</div>
+      <div id="setup-groups"></div>
+      <button class="setup-add-group-btn" onclick="addGroup()">+ Add Group</button>
     </div>
   </div>
 </div>
@@ -589,11 +554,11 @@
   </div>
 </div>
 
-<!-- ── CONFIRM RESET MODAL ───────────────────────────── -->
+<!-- ── CONFIRM RESET ──────────────────────────────────── -->
 <div id="confirm-modal" class="modal-overlay" onclick="if(event.target===this)closeConfirmBtn()">
   <div class="modal-box">
     <div class="confirm-title">Reset Session?</div>
-    <div class="confirm-msg">All lap data, timestamps, and the activity log will be cleared.</div>
+    <div class="confirm-msg">All lap data, group timers, timestamps, and the activity log will be cleared.</div>
     <div class="confirm-actions">
       <button class="confirm-yes" onclick="doReset()">Yes, Reset</button>
       <button class="confirm-no" onclick="closeConfirmBtn()">Cancel</button>
@@ -631,8 +596,6 @@ const STUDENTS = [
   "Serena Ma"
 ];
 
-// Name → exact aliases only. No common English words, no short fragments.
-// These must be spoken clearly and match exactly what speech-reco returns.
 const NAME_ALIASES = {
   "Annalise Faheem":      ["annalise", "annalisa"],
   "Ari Faheem":           ["ari"],
@@ -661,15 +624,12 @@ const NAME_ALIASES = {
   "Serena Ma":            ["serena"]
 };
 
-// Build reverse lookup: alias → student name
 const ALIAS_MAP = {};
 Object.entries(NAME_ALIASES).forEach(([student, aliases]) => {
-  aliases.forEach(alias => {
-    ALIAS_MAP[alias.toLowerCase()] = student;
-  });
+  aliases.forEach(alias => { ALIAS_MAP[alias.toLowerCase()] = student; });
 });
 
-// ── STATE ─────────────────────────────────────────────────
+// ── MAIN STATE ────────────────────────────────────────────
 let clockRunning = false;
 let sessionStart = null;
 let timerInterval = null;
@@ -680,15 +640,23 @@ let logIdCounter = 0;
 let voiceActive = false;
 let recognition = null;
 let lastProcessedTranscript = '';
-let processedInPhrase = new Set(); // names hit in current voice phrase
-const VOICE_COOLDOWN_MS = 10_000;  // 10 s between voice laps for the same runner
-const voiceCooldowns = {};          // name → Date.now() of last voice lap
+let processedInPhrase = new Set();
+const VOICE_COOLDOWN_MS = 10_000;
+const voiceCooldowns = {};
 
 STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
 
+// ── GROUP STATE ───────────────────────────────────────────
+let groupMode = false;
+let groups = {};        // gid → { id, name, color, members: [] }
+let groupTimers = {};   // gid → { running, startMs, pausedMs, intervalId, setCount, setLog[] }
+let pendingAssign = null; // student name selected in setup for assignment
+let groupCounter = 0;
+
+const GCOLORS = ['#2563eb','#15803d','#d97706','#7c3aed','#dc2626','#0891b2'];
+
 // ── UTILITIES ─────────────────────────────────────────────
 function slugify(n) { return n.replace(/[^a-zA-Z0-9]/g, '_'); }
-
 function fmtElapsed(ms) {
   const s = Math.floor(Math.abs(ms) / 1000);
   return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
@@ -697,22 +665,17 @@ function fmtSplit(ms) {
   const s = Math.floor(Math.abs(ms) / 1000);
   return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 }
-
 function getLapClass(name) {
   const n = data[name].laps;
   return ['lap-zero','lap-one','lap-two','lap-three','lap-four','lap-five-plus'][Math.min(n, 5)];
 }
-
 function getLastSplitText(name) {
   const ts = data[name].timestamps;
   if (!ts.length) return '—';
   if (ts.length === 1) return `@ ${fmtElapsed(ts[0])}`;
   return `last: ${fmtSplit(ts[ts.length-1] - ts[ts.length-2])}`;
 }
-
-function elapsed() {
-  return sessionStart ? Date.now() - sessionStart : 0;
-}
+function elapsed() { return sessionStart ? Date.now() - sessionStart : 0; }
 
 // ── CLOCK ─────────────────────────────────────────────────
 function toggleClock() {
@@ -749,12 +712,10 @@ function adjustLap(name, delta, source='manual') {
     updateCard(name);
     updateStats();
   } else {
-    // Route subtract through removeLogEntry so log + card stay in sync
     const lastEntry = logEntries.find(e => e.name === name);
     if (lastEntry) {
-      removeLogEntry(lastEntry.id); // handles laps--, timestamp removal, DOM, updateCard, updateStats
+      removeLogEntry(lastEntry.id);
     } else {
-      // No log entry (edge case) — fall back to direct decrement
       if (d.timestamps.length > 0) d.timestamps.pop();
       d.laps = newLaps;
       updateCard(name);
@@ -776,19 +737,14 @@ function addLogEntry(name, lapNum, ts, source) {
   logSeq++;
   const id = ++logIdCounter;
   const entry = { id, seq: logSeq, name, lapNum, ts, source };
-  logEntries.unshift(entry); // newest first
+  logEntries.unshift(entry);
 
   const emptyEl = document.getElementById('log-empty');
   if (emptyEl) emptyEl.remove();
 
-  // Flash card for voice entries
   if (source === 'voice') {
     const card = document.getElementById(`card-${slugify(name)}`);
-    if (card) {
-      card.classList.remove('voice-flash');
-      void card.offsetWidth;
-      card.classList.add('voice-flash');
-    }
+    if (card) { card.classList.remove('voice-flash'); void card.offsetWidth; card.classList.add('voice-flash'); }
   }
 
   const div = document.createElement('div');
@@ -802,9 +758,7 @@ function addLogEntry(name, lapNum, ts, source) {
     <span class="log-source ${source === 'voice' ? 'voice' : ''}">${source === 'voice' ? '🎤' : '+'}</span>
     <button class="log-delete" onclick="removeLogEntry(${id})" title="Remove this lap">✕</button>
   `;
-
-  const list = document.getElementById('log-list');
-  list.insertBefore(div, list.firstChild);
+  document.getElementById('log-list').insertBefore(div, document.getElementById('log-list').firstChild);
 }
 
 function removeLogEntry(id) {
@@ -812,18 +766,12 @@ function removeLogEntry(id) {
   if (entryIdx < 0) return;
   const entry = logEntries[entryIdx];
 
-  // Remove timestamp from student data
   const d = data[entry.name];
   const tsIdx = d.timestamps.indexOf(entry.ts);
-  if (tsIdx >= 0) {
-    d.timestamps.splice(tsIdx, 1);
-    d.laps = Math.max(0, d.laps - 1);
-  }
+  if (tsIdx >= 0) { d.timestamps.splice(tsIdx, 1); d.laps = Math.max(0, d.laps - 1); }
 
-  // Remove from entries array
   logEntries.splice(entryIdx, 1);
 
-  // Update lapNum for remaining entries of this student (recount oldest→newest)
   let count = 0;
   [...logEntries].reverse().forEach(e => {
     if (e.name === entry.name) {
@@ -833,14 +781,11 @@ function removeLogEntry(id) {
     }
   });
 
-  // Remove DOM element
   const el = document.getElementById(`log-entry-${id}`);
   if (el) el.remove();
 
-  // Show empty state if log is now empty
   if (logEntries.length === 0) {
-    document.getElementById('log-list').innerHTML =
-      '<div class="log-empty" id="log-empty">Log cleared.</div>';
+    document.getElementById('log-list').innerHTML = '<div class="log-empty" id="log-empty">Log cleared.</div>';
   }
 
   updateCard(entry.name);
@@ -848,15 +793,16 @@ function removeLogEntry(id) {
 }
 
 function clearLog() {
-  // Reset all student lap data
   STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
-  logEntries = [];
-  logSeq = 0;
-  logIdCounter = 0;
+  logEntries = []; logSeq = 0; logIdCounter = 0;
   Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
-  document.getElementById('log-list').innerHTML =
-    '<div class="log-empty" id="log-empty">Log cleared.</div>';
-  renderGrid();
+  // Reset group set logs and timers
+  Object.values(groupTimers).forEach(gt => {
+    stopGroupTimerById(Object.keys(groups).find(gid => groupTimers[gid] === gt));
+    gt.startMs = null; gt.pausedMs = 0; gt.setCount = 0; gt.setLog = [];
+  });
+  document.getElementById('log-list').innerHTML = '<div class="log-empty" id="log-empty">Log cleared.</div>';
+  renderGridArea();
   updateStats();
 }
 
@@ -864,12 +810,8 @@ function clearLog() {
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 function toggleVoice() {
-  if (!SR) {
-    alert('Speech recognition is not supported in this browser. Use Chrome or Edge.');
-    return;
-  }
-  if (voiceActive) stopVoice();
-  else startVoice();
+  if (!SR) { alert('Speech recognition is not supported. Use Chrome or Safari on iPad.'); return; }
+  if (voiceActive) stopVoice(); else startVoice();
 }
 
 function startVoice() {
@@ -889,29 +831,18 @@ function startVoice() {
 
   recognition.onresult = (event) => {
     let interimText = '';
-
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const result = event.results[i];
       const transcript = result[0].transcript.trim();
       if (!transcript) continue;
-
       if (result.isFinal) {
-        // Final: confidence gate, then fire any remaining unmatched names
         const confidence = result[0].confidence;
-        if (confidence === 0 || confidence >= 0.45) {
-          fireNames(transcript);
-        }
-        // Reset phrase tracking after a short display window
-        setTimeout(() => {
-          processedInPhrase.clear();
-          setVoiceStatus('Listening…', false);
-        }, 800);
+        if (confidence === 0 || confidence >= 0.45) fireNames(transcript);
+        setTimeout(() => { processedInPhrase.clear(); setVoiceStatus('Listening…', false); }, 800);
       } else {
-        // Interim: accumulate and fire names immediately as they appear
         interimText += ' ' + transcript;
       }
     }
-
     if (interimText.trim()) {
       setVoiceStatus(`"${interimText.trim()}"`, true);
       fireNames(interimText);
@@ -919,50 +850,36 @@ function startVoice() {
   };
 
   recognition.onerror = (event) => {
-    if (event.error === 'no-speech') return; // Expected, just keep going
-    if (event.error === 'aborted') return;
+    if (event.error === 'no-speech' || event.error === 'aborted') return;
     console.warn('Speech error:', event.error);
     setVoiceStatus(`Error: ${event.error}`, false);
   };
 
   recognition.onend = () => {
-    // Auto-restart if still supposed to be active
-    if (voiceActive) {
-      try { recognition.start(); } catch(e) {}
-    }
+    if (voiceActive) { try { recognition.start(); } catch(e) {} }
   };
 
-  try {
-    recognition.start();
-  } catch(e) {
-    alert('Could not start microphone. Make sure you allow microphone access.');
-  }
+  try { recognition.start(); }
+  catch(e) { alert('Could not start microphone. Allow microphone access in browser settings.'); }
 }
 
 function stopVoice() {
   voiceActive = false;
-  if (recognition) {
-    recognition.abort();
-    recognition = null;
-  }
+  if (recognition) { recognition.abort(); recognition = null; }
   document.getElementById('voice-btn').classList.remove('listening');
   setVoiceStatus('off', false);
   processedInPhrase.clear();
   lastProcessedTranscript = '';
 }
 
-// Fire laps for any names in transcript not already processed this phrase
 function fireNames(transcript) {
   const now = Date.now();
   const matched = matchNamesFromTranscript(transcript);
   matched.forEach(name => {
-    if (processedInPhrase.has(name)) return; // already fired this phrase
-    const lastFired = voiceCooldowns[name] || 0;
-    const remaining = VOICE_COOLDOWN_MS - (now - lastFired);
+    if (processedInPhrase.has(name)) return;
+    const remaining = VOICE_COOLDOWN_MS - (now - (voiceCooldowns[name] || 0));
     if (remaining > 0) {
-      // Still cooling down — show how long left
-      const secs = Math.ceil(remaining / 1000);
-      setVoiceStatus(`⏱ ${name.split(' ')[0]} — cooldown ${secs}s`, false);
+      setVoiceStatus(`⏱ ${name.split(' ')[0]} — cooldown ${Math.ceil(remaining/1000)}s`, false);
       return;
     }
     processedInPhrase.add(name);
@@ -977,55 +894,274 @@ function setVoiceStatus(text, heard) {
   el.className = heard ? 'heard' : '';
 }
 
-// ── NAME MATCHING ─────────────────────────────────────────
 function matchNamesFromTranscript(text) {
-  // Exact-only matching. No fuzzy. No starts-with.
-  // A word must appear verbatim in ALIAS_MAP to register a lap.
-  // This prevents conversational speech from accidentally matching names.
   const norm = text.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const words = norm.split(' ');
   const matched = [];
   const used = new Set();
 
-  // Try 2-word phrases first (catches "junning zhang", "serena ma", etc.)
   for (let i = 0; i < words.length - 1; i++) {
     const phrase = words[i] + ' ' + words[i + 1];
-    if (ALIAS_MAP[phrase]) {
-      matched.push(ALIAS_MAP[phrase]);
-      used.add(i); used.add(i + 1);
-    }
+    if (ALIAS_MAP[phrase]) { matched.push(ALIAS_MAP[phrase]); used.add(i); used.add(i + 1); }
   }
-
-  // Then single words not already consumed
   for (let i = 0; i < words.length; i++) {
     if (used.has(i)) continue;
     const word = words[i];
-    if (word.length < 3) continue; // ignore very short tokens
-    if (ALIAS_MAP[word]) {
-      matched.push(ALIAS_MAP[word]);
-      used.add(i);
-    }
+    if (word.length < 3) continue;
+    if (ALIAS_MAP[word]) { matched.push(ALIAS_MAP[word]); used.add(i); }
   }
-
   return [...new Set(matched)];
 }
 
-// ── RENDER ────────────────────────────────────────────────
-function renderGrid() {
-  document.getElementById('grid').innerHTML = STUDENTS.map(name => {
-    const slug = slugify(name);
-    const safeName = name.replace(/'/g, "\\'");
+// ── GROUP SETUP ───────────────────────────────────────────
+function openGroupSetup() {
+  pendingAssign = null;
+  renderSetup();
+  document.getElementById('group-setup-modal').classList.add('open');
+}
+function closeGroupSetup() {
+  document.getElementById('group-setup-modal').classList.remove('open');
+  pendingAssign = null;
+}
+function applyGroupsAndClose() {
+  groupMode = Object.keys(groups).length > 0;
+  document.getElementById('groups-btn').classList.toggle('active', groupMode);
+  closeGroupSetup();
+  renderGridArea();
+  updateStats();
+}
+function clearAllGroups() {
+  Object.values(groupTimers).forEach((gt, i) => {
+    const gid = Object.keys(groups)[i];
+    if (gid) stopGroupTimerById(gid);
+  });
+  groups = {}; groupTimers = {}; groupCounter = 0; pendingAssign = null;
+  groupMode = false;
+  document.getElementById('groups-btn').classList.remove('active');
+  renderSetup();
+}
+function addGroup() {
+  const gid = `g${++groupCounter}`;
+  const color = GCOLORS[(groupCounter - 1) % GCOLORS.length];
+  const letter = String.fromCharCode(64 + groupCounter);
+  groups[gid] = { id: gid, name: `Group ${letter}`, color, members: [] };
+  groupTimers[gid] = { running: false, startMs: null, pausedMs: 0, intervalId: null, setCount: 0, setLog: [] };
+  renderSetup();
+}
+function removeGroup(gid) {
+  stopGroupTimerById(gid);
+  delete groups[gid];
+  delete groupTimers[gid];
+  pendingAssign = null;
+  renderSetup();
+}
+function selectForAssign(name) {
+  pendingAssign = (pendingAssign === name) ? null : name;
+  renderSetup();
+}
+function assignToGroup(gid) {
+  if (!pendingAssign) return;
+  Object.values(groups).forEach(g => { g.members = g.members.filter(m => m !== pendingAssign); });
+  groups[gid].members.push(pendingAssign);
+  pendingAssign = null;
+  renderSetup();
+}
+function unassignFromGroup(name, gid) {
+  groups[gid].members = groups[gid].members.filter(m => m !== name);
+  pendingAssign = null;
+  renderSetup();
+}
+function getUnassigned() {
+  const assigned = new Set(Object.values(groups).flatMap(g => g.members));
+  return STUDENTS.filter(s => !assigned.has(s));
+}
+
+function renderSetup() {
+  const unassigned = getUnassigned();
+  document.getElementById('setup-unassigned').innerHTML =
+    unassigned.length === 0
+      ? '<div style="color:#bbb;font-size:13px;font-style:italic;padding:4px;">All students assigned ✓</div>'
+      : unassigned.map(name => {
+          const safe = name.replace(/'/g, "\\'");
+          return `<div class="setup-chip${pendingAssign === name ? ' selected' : ''}" onclick="selectForAssign('${safe}')">${name.split(' ')[0]}</div>`;
+        }).join('');
+
+  document.getElementById('setup-groups').innerHTML = Object.values(groups).map(g => {
+    const safe_gid = g.id;
     return `
-      <div class="student-card lap-zero" id="card-${slug}">
-        <div class="card-name" onclick="showHistory('${safeName}')">${name}</div>
-        <div class="card-lap-count" id="count-${slug}" onclick="showHistory('${safeName}')">0</div>
-        <div class="card-split" id="split-${slug}">—</div>
-        <div class="card-btns">
-          <button class="btn-minus" onclick="adjustLap('${safeName}', -1)">−</button>
-          <button class="btn-plus"  onclick="adjustLap('${safeName}', +1)">+</button>
+      <div class="setup-group-col" style="border-top:3px solid ${g.color}" onclick="assignToGroup('${safe_gid}')">
+        <div class="setup-group-header">
+          <span style="color:${g.color};font-weight:800;font-size:14px;">${g.name}</span>
+          <button class="setup-remove-group" onclick="event.stopPropagation();removeGroup('${safe_gid}')">✕</button>
+        </div>
+        <div class="setup-group-members">
+          ${g.members.map(name => {
+            const safe = name.replace(/'/g, "\\'");
+            return `<div class="setup-member-chip" onclick="event.stopPropagation();unassignFromGroup('${safe}','${safe_gid}')">${name.split(' ')[0]} ✕</div>`;
+          }).join('')}
+          ${pendingAssign && !g.members.includes(pendingAssign)
+            ? `<div class="setup-drop-hint">+ Add ${pendingAssign.split(' ')[0]}</div>`
+            : (g.members.length === 0 ? '<div class="setup-drop-empty">Tap to assign</div>' : '')}
         </div>
       </div>`;
   }).join('');
+}
+
+// ── GROUP TIMERS ──────────────────────────────────────────
+function startGroupTimer(gid) {
+  const gt = groupTimers[gid];
+  if (!gt || gt.running) return;
+  gt.running = true;
+  gt.startMs = Date.now() - gt.pausedMs;
+  gt.intervalId = setInterval(() => {
+    const el = document.getElementById(`gtimer-${gid}`);
+    if (el) { el.textContent = fmtElapsed(groupElapsed(gid)); el.className = 'group-timer-display running'; }
+  }, 500);
+  updateGroupControls(gid);
+}
+
+function stopGroupTimerById(gid) {
+  const gt = groupTimers[gid];
+  if (!gt || !gt.running) return;
+  gt.running = false;
+  clearInterval(gt.intervalId);
+  gt.pausedMs = groupElapsed(gid);
+  const el = document.getElementById(`gtimer-${gid}`);
+  if (el) el.className = 'group-timer-display';
+  updateGroupControls(gid);
+}
+
+function groupElapsed(gid) {
+  const gt = groupTimers[gid];
+  if (!gt || !gt.startMs) return gt ? gt.pausedMs : 0;
+  if (gt.running) return Date.now() - gt.startMs;
+  return gt.pausedMs;
+}
+
+function logGroupSet(gid) {
+  const g = groups[gid];
+  const gt = groupTimers[gid];
+  if (!g || !gt) return;
+
+  stopGroupTimerById(gid);
+
+  // Record set snapshot
+  const snapshot = {
+    set: gt.setCount + 1,
+    elapsed: gt.pausedMs,
+    members: g.members.map(name => ({ name, laps: data[name].laps }))
+  };
+  gt.setLog.push(snapshot);
+  gt.setCount++;
+
+  // Reset group members' lap counts for next set
+  g.members.forEach(name => { data[name] = { laps: 0, timestamps: [] }; });
+
+  // Reset group timer
+  gt.startMs = null; gt.pausedMs = 0;
+
+  // Re-render the group section
+  renderGridArea();
+  updateStats();
+}
+
+function updateGroupControls(gid) {
+  const gt = groupTimers[gid];
+  const btn = document.getElementById(`gstart-${gid}`);
+  if (!btn || !gt) return;
+  if (gt.running) {
+    btn.textContent = '⏹ Stop'; btn.className = 'g-clock-btn g-stop';
+    btn.onclick = () => stopGroupTimerById(gid);
+  } else {
+    btn.textContent = gt.pausedMs > 0 ? '▶ Resume' : '▶ Start';
+    btn.className = 'g-clock-btn g-start';
+    btn.onclick = () => startGroupTimer(gid);
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function cardHtml(name) {
+  const slug = slugify(name);
+  const safe = name.replace(/'/g, "\\'");
+  return `
+    <div class="student-card lap-zero" id="card-${slug}">
+      <div class="card-name" onclick="showHistory('${safe}')">${name}</div>
+      <div class="card-lap-count" id="count-${slug}" onclick="showHistory('${safe}')">0</div>
+      <div class="card-split" id="split-${slug}">—</div>
+      <div class="card-btns">
+        <button class="btn-minus" onclick="adjustLap('${safe}', -1)">−</button>
+        <button class="btn-plus"  onclick="adjustLap('${safe}', +1)">+</button>
+      </div>
+    </div>`;
+}
+
+function renderGrid() {
+  document.getElementById('grid').innerHTML = STUDENTS.map(cardHtml).join('');
+}
+
+function renderGridArea() {
+  const wrap = document.getElementById('grid-wrap');
+
+  if (!groupMode || Object.keys(groups).length === 0) {
+    wrap.innerHTML = '<div id="grid"></div>';
+    renderGrid();
+    return;
+  }
+
+  const unassigned = getUnassigned();
+  let html = '';
+
+  Object.values(groups).forEach(g => {
+    const gt = groupTimers[g.id];
+    html += `
+      <div class="group-section">
+        <div class="group-header">
+          <div class="group-header-left">
+            <span class="group-name" style="color:${g.color}">${g.name}</span>
+            <span class="group-set-badge">Set ${gt.setCount + 1}</span>
+            <div class="group-timer-display" id="gtimer-${g.id}">${fmtElapsed(groupElapsed(g.id))}</div>
+          </div>
+          <div class="group-header-right">
+            <button id="gstart-${g.id}" class="g-clock-btn g-start" onclick="startGroupTimer('${g.id}')">▶ Start</button>
+            <button class="g-set-btn" onclick="logGroupSet('${g.id}')">📋 Log Set</button>
+          </div>
+        </div>
+        <div class="group-grid" id="ggrid-${g.id}">
+          ${g.members.map(cardHtml).join('')}
+        </div>
+        ${gt.setLog.length > 0 ? `
+          <div class="group-set-log">
+            ${gt.setLog.map(s => `
+              <div class="set-log-row">
+                <span>Set ${s.set}</span>
+                <span>${fmtElapsed(s.elapsed)}</span>
+                <span>${s.members.map(m => `${m.name.split(' ')[0]}: ${m.laps}`).join(' · ')}</span>
+              </div>
+            `).join('')}
+          </div>` : ''}
+      </div>`;
+  });
+
+  if (unassigned.length > 0) {
+    html += `
+      <div class="group-unassigned-section">
+        <div class="group-unassigned-label">Unassigned</div>
+        <div id="grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+          ${unassigned.map(cardHtml).join('')}
+        </div>
+      </div>`;
+  }
+
+  wrap.innerHTML = html;
+
+  // Re-attach running timers
+  Object.keys(groups).forEach(gid => {
+    updateGroupControls(gid);
+    if (groupTimers[gid].running) {
+      const el = document.getElementById(`gtimer-${gid}`);
+      if (el) el.className = 'group-timer-display running';
+    }
+  });
 }
 
 function updateCard(name) {
@@ -1035,19 +1171,32 @@ function updateCard(name) {
   card.className = `student-card ${getLapClass(name)}`;
   document.getElementById(`count-${slug}`).textContent = data[name].laps;
   document.getElementById(`split-${slug}`).textContent = getLastSplitText(name);
-  sortGrid();
+  sortGridForName(name);
 }
 
-// Re-order cards live — most laps floats to top
-function sortGrid() {
-  const grid = document.getElementById('grid');
-  const cards = Array.from(grid.children);
+function sortGridEl(el) {
+  if (!el) return;
+  const cards = Array.from(el.children);
   cards.sort((a, b) => {
-    const aLaps = parseInt(a.querySelector('.card-lap-count')?.textContent) || 0;
-    const bLaps = parseInt(b.querySelector('.card-lap-count')?.textContent) || 0;
-    return bLaps - aLaps;
+    const aL = parseInt(a.querySelector('.card-lap-count')?.textContent) || 0;
+    const bL = parseInt(b.querySelector('.card-lap-count')?.textContent) || 0;
+    return bL - aL;
   });
-  cards.forEach(c => grid.appendChild(c));
+  cards.forEach(c => el.appendChild(c));
+}
+
+function sortGridForName(name) {
+  if (groupMode) {
+    // Sort the group grid this student belongs to
+    const gid = Object.keys(groups).find(id => groups[id].members.includes(name));
+    if (gid) {
+      sortGridEl(document.getElementById(`ggrid-${gid}`));
+    } else {
+      sortGridEl(document.getElementById('grid')); // unassigned
+    }
+  } else {
+    sortGridEl(document.getElementById('grid'));
+  }
 }
 
 function updateStats() {
@@ -1055,9 +1204,7 @@ function updateStats() {
   const total  = STUDENTS.reduce((a, s) => a + data[s].laps, 0);
   const avg    = active > 0 ? (total / active).toFixed(1) : '—';
   const leader = STUDENTS.reduce((b, s) => data[s].laps > (b ? data[b].laps : -1) ? s : b, null);
-  const leadStr = leader && data[leader].laps > 0
-    ? `${leader.split(' ')[0]} (${data[leader].laps})`
-    : '—';
+  const leadStr = leader && data[leader].laps > 0 ? `${leader.split(' ')[0]} (${data[leader].laps})` : '—';
   document.getElementById('stat-active').textContent = active;
   document.getElementById('stat-total').textContent = total;
   document.getElementById('stat-avg').textContent = avg;
@@ -1069,8 +1216,7 @@ function showHistory(name) {
   const d = data[name];
   const ts = d.timestamps;
   document.getElementById('history-name').textContent = name;
-  document.getElementById('history-laps').textContent =
-    `${d.laps} lap${d.laps !== 1 ? 's' : ''}`;
+  document.getElementById('history-laps').textContent = `${d.laps} lap${d.laps !== 1 ? 's' : ''}`;
 
   let html = '';
   if (!ts.length) {
@@ -1078,9 +1224,7 @@ function showHistory(name) {
   } else {
     ts.forEach((t, i) => {
       const split = i === 0 ? '—' : fmtSplit(t - ts[i-1]);
-      const isVoice = logEntries.find(e =>
-        e.name === name && e.lapNum === (i + 1) && e.source === 'voice'
-      );
+      const isVoice = logEntries.find(e => e.name === name && e.lapNum === (i + 1) && e.source === 'voice');
       html += `<div class="hist-row">
         <span class="hist-lap">Lap ${i+1}</span>
         <span class="hist-time">${fmtElapsed(t)}</span>
@@ -1112,11 +1256,33 @@ function buildExportSimple() {
   const header = sessionHeader();
   const lines = [];
   if (header) { lines.push(header); lines.push('─'.repeat(36)); }
-  STUDENTS.filter(s => data[s].laps > 0).forEach(s => {
-    lines.push(`${s}: ${data[s].laps}`);
-  });
-  if (lines.filter(l => !l.startsWith('─') && l !== header).length === 0) {
-    lines.push('No laps recorded yet.');
+
+  if (groupMode && Object.keys(groups).length > 0) {
+    // Group mode: show per-group and per-set breakdown
+    Object.values(groups).forEach(g => {
+      const gt = groupTimers[g.id];
+      lines.push(`\n── ${g.name} ──`);
+      // Completed sets
+      gt.setLog.forEach(s => {
+        lines.push(`  Set ${s.set} (${fmtElapsed(s.elapsed)})`);
+        s.members.forEach(m => { if (m.laps > 0) lines.push(`    ${m.name}: ${m.laps}`); });
+      });
+      // Current set (in-progress laps)
+      const currentLaps = g.members.filter(name => data[name].laps > 0);
+      if (currentLaps.length > 0) {
+        lines.push(`  Current set`);
+        currentLaps.forEach(name => lines.push(`    ${name}: ${data[name].laps}`));
+      }
+    });
+    // Unassigned
+    const ua = getUnassigned().filter(s => data[s].laps > 0);
+    if (ua.length > 0) {
+      lines.push('\n── Unassigned ──');
+      ua.forEach(s => lines.push(`  ${s}: ${data[s].laps}`));
+    }
+  } else {
+    STUDENTS.filter(s => data[s].laps > 0).forEach(s => lines.push(`${s}: ${data[s].laps}`));
+    if (!STUDENTS.some(s => data[s].laps > 0)) lines.push('No laps recorded yet.');
   }
   return lines.join('\n');
 }
@@ -1127,8 +1293,7 @@ function buildExportDetail() {
   const total = STUDENTS.reduce((a, s) => a + data[s].laps, 0);
 
   const lines = [
-    `ATW 5K — LAP SESSION DETAIL`,
-    header ? header : '',
+    'ATW 5K — LAP SESSION DETAIL', header || '',
     `Session Time: ${dur}   Total Laps: ${total}`,
     '─'.repeat(68),
     'NAME                       LAPS   AVG/LAP   SPLITS (each lap)',
@@ -1139,10 +1304,8 @@ function buildExportDetail() {
     const d = data[name];
     const ts = d.timestamps;
     if (d.laps === 0) return;
-    const avg = ts.length > 1
-      ? fmtSplit((ts[ts.length-1] - ts[0]) / (ts.length - 1)) : '—';
-    const splits = ts.length === 0 ? '—'
-      : ts.map((t, i) => i === 0 ? `@${fmtElapsed(t)}` : fmtSplit(t - ts[i-1])).join(' · ');
+    const avg = ts.length > 1 ? fmtSplit((ts[ts.length-1] - ts[0]) / (ts.length - 1)) : '—';
+    const splits = ts.length === 0 ? '—' : ts.map((t, i) => i === 0 ? `@${fmtElapsed(t)}` : fmtSplit(t - ts[i-1])).join(' · ');
     lines.push(`${name.padEnd(27)}${String(d.laps).padEnd(7)}${avg.padEnd(10)}${splits}`);
   });
 
@@ -1156,20 +1319,14 @@ function showExport() {
 }
 
 function copyText(text, btnId) {
-  try { navigator.clipboard.writeText(text).catch(() => {}); }
-  catch { /* fallback */ }
+  try { navigator.clipboard.writeText(text).catch(() => {}); } catch {}
   const btn = document.getElementById(btnId);
   const orig = btn.textContent;
   btn.textContent = '✓ Copied!';
   setTimeout(() => { btn.textContent = orig; }, 1800);
 }
-
-function copyExportSimple() {
-  copyText(document.getElementById('export-simple').value, 'copy-simple-btn');
-}
-function copyExportDetail() {
-  copyText(document.getElementById('export-detail').value, 'copy-detail-btn');
-}
+function copyExportSimple() { copyText(document.getElementById('export-simple').value, 'copy-simple-btn'); }
+function copyExportDetail() { copyText(document.getElementById('export-detail').value, 'copy-detail-btn'); }
 function closeExportBtn() { document.getElementById('export-modal').classList.remove('open'); }
 
 // ── RESET ─────────────────────────────────────────────────
@@ -1183,29 +1340,37 @@ function doReset() {
   t.textContent = '00:00'; t.classList.remove('running');
   const cb = document.getElementById('clock-btn');
   cb.textContent = '▶ Start'; cb.className = 'clock-btn start';
+
   STUDENTS.forEach(s => { data[s] = { laps: 0, timestamps: [] }; });
   logEntries = []; logSeq = 0; logIdCounter = 0;
   Object.keys(voiceCooldowns).forEach(k => delete voiceCooldowns[k]);
+
+  // Stop all group timers, clear set logs
+  Object.keys(groupTimers).forEach(gid => {
+    const gt = groupTimers[gid];
+    clearInterval(gt.intervalId);
+    gt.running = false; gt.startMs = null; gt.pausedMs = 0;
+    gt.setCount = 0; gt.setLog = [];
+  });
+
   document.getElementById('log-list').innerHTML =
     '<div class="log-empty" id="log-empty">No laps recorded yet.<br>Start the clock, then tap + or use Voice.</div>';
-  renderGrid(); updateStats(); closeConfirmBtn();
+
+  renderGridArea(); updateStats(); closeConfirmBtn();
 }
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    closeHistoryBtn(); closeExportBtn(); closeConfirmBtn();
+    closeHistoryBtn(); closeExportBtn(); closeConfirmBtn(); closeGroupSetup();
   }
 });
 
 // ── INIT ──────────────────────────────────────────────────
-renderGrid();
+renderGridArea();
 updateStats();
 
-// ── SERVICE WORKER (offline support) ──────────────────────
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
 }
 </script>
 </body>
