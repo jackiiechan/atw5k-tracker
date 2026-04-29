@@ -699,6 +699,14 @@ function getLastSplitText(name) {
 }
 function elapsed() { return sessionStart ? Date.now() - sessionStart : 0; }
 
+function elapsedForStudent(name) {
+  if (groupMode) {
+    const gid = groupOrder.find(id => groups[id] && groups[id].members.includes(name));
+    if (gid) return groupElapsed(gid);
+  }
+  return elapsed();
+}
+
 // ── CLOCK ─────────────────────────────────────────────────
 function toggleClock() {
   if (!clockRunning) {
@@ -726,8 +734,8 @@ function adjustLap(name, delta, source='manual') {
   if (newLaps === d.laps) return;
 
   if (delta > 0) {
-    if (!sessionStart) sessionStart = Date.now(); // auto-start if clock not yet running
-    const ts = elapsed();
+    if (!sessionStart) sessionStart = Date.now(); // auto-start global clock if needed
+    const ts = elapsedForStudent(name); // use group timer if in group mode
     d.timestamps.push(ts);
     pulseLapCount(name);
     addLogEntry(name, newLaps, ts, source);
