@@ -885,35 +885,33 @@ function startVoice() {
   };
 
   recognition.onresult = (event) => {
+    let interimText = '';
+
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const result = event.results[i];
-
-      // Only act on FINAL results — ignore interim/partial speech.
-      // This is the key guard: mid-sentence fragments won't trigger names.
-      if (!result.isFinal) continue;
-
-      // Require reasonable confidence. Low confidence = likely mishearing.
-      const confidence = result[0].confidence;
-      if (confidence > 0 && confidence < 0.55) continue;
-
       const transcript = result[0].transcript.trim();
       if (!transcript) continue;
 
-      setVoiceStatus(`"${transcript}"`, true);
-      const matched = matchNamesFromTranscript(transcript);
-
-      matched.forEach(name => {
-        if (!processedInPhrase.has(name)) {
-          processedInPhrase.add(name);
-          adjustLap(name, +1, 'voice');
+      if (result.isFinal) {
+        // Final: confidence gate, then fire any remaining unmatched names
+        const confidence = result[0].confidence;
+        if (confidence === 0 || confidence >= 0.45) {
+          fireNames(transcript);
         }
-      });
+        // Reset phrase tracking after a short display window
+        setTimeout(() => {
+          processedInPhrase.clear();
+          setVoiceStatus('Listening…', false);
+        }, 800);
+      } else {
+        // Interim: accumulate and fire names immediately as they appear
+        interimText += ' ' + transcript;
+      }
+    }
 
-      // Each final result is a fresh phrase — reset for next utterance
-      setTimeout(() => {
-        processedInPhrase.clear();
-        setVoiceStatus('Listening…', false);
-      }, 1200);
+    if (interimText.trim()) {
+      setVoiceStatus(`"${interimText.trim()}"`, true);
+      fireNames(interimText);
     }
   };
 
@@ -948,6 +946,17 @@ function stopVoice() {
   setVoiceStatus('off', false);
   processedInPhrase.clear();
   lastProcessedTranscript = '';
+}
+
+// Fire laps for any names in transcript not already processed this phrase
+function fireNames(transcript) {
+  const matched = matchNamesFromTranscript(transcript);
+  matched.forEach(name => {
+    if (!processedInPhrase.has(name)) {
+      processedInPhrase.add(name);
+      adjustLap(name, +1, 'voice');
+    }
+  });
 }
 
 function setVoiceStatus(text, heard) {
@@ -1014,6 +1023,19 @@ function updateCard(name) {
   card.className = `student-card ${getLapClass(name)}`;
   document.getElementById(`count-${slug}`).textContent = data[name].laps;
   document.getElementById(`split-${slug}`).textContent = getLastSplitText(name);
+  sortGrid();
+}
+
+// Re-order cards live — most laps floats to top
+function sortGrid() {
+  const grid = document.getElementById('grid');
+  const cards = Array.from(grid.children);
+  cards.sort((a, b) => {
+    const aLaps = parseInt(a.querySelector('.card-lap-count')?.textContent) || 0;
+    const bLaps = parseInt(b.querySelector('.card-lap-count')?.textContent) || 0;
+    return bLaps - aLaps;
+  });
+  cards.forEach(c => grid.appendChild(c));
 }
 
 function updateStats() {
