@@ -1,14 +1,11 @@
 // ATW 5K Workshop — Service Worker
-// Cache-first for all app assets so the lap tracker works fully offline on iPad.
+// Network-first for HTML, cache-first for audio/assets.
 
-const CACHE = 'atw5k-v4';
+const CACHE = 'atw5k-v5';
 
-const PRECACHE = [
-  './',
-  './hub.html',
-  './lap_tracker.html',
-  './index.html',
-  // audio briefing files
+const HTML_FILES = ['./', './index.html', './hub.html', './lap_tracker.html'];
+
+const PRECACHE_ASSETS = [
   './audio/pace_01.mp3',
   './audio/pace_02.mp3',
   './audio/pace_03.mp3',
@@ -17,10 +14,10 @@ const PRECACHE = [
   './audio/pace_06.mp3',
 ];
 
-// ── Install: pre-cache everything we know about ─────────────
+// ── Install: pre-cache audio assets ─────────────────────────
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(PRECACHE))
+    caches.open(CACHE).then(cache => cache.addAll(PRECACHE_ASSETS))
   );
   self.skipWaiting();
 });
@@ -35,26 +32,39 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// ── Fetch: cache-first, fall back to network ─────────────────
+// ── Fetch ─────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
-  // Only handle same-origin GET requests
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
+  const url = new URL(event.request.url);
+  const isHTML = HTML_FILES.some(f => url.pathname.endsWith(f.replace('./', '/'))) ||
+                 url.pathname === '/' ||
+                 url.pathname.endsWith('.html');
 
-      return fetch(event.request).then(response => {
-        // Cache successful responses for future offline use
+  if (isHTML) {
+    // Network-first for HTML: always get fresh content, fall back to cache offline
+    event.respondWith(
+      fetch(event.request).then(response => {
         if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE).then(cache => cache.put(event.request, clone));
         }
         return response;
-      }).catch(() => {
-        // Network unavailable and nothing in cache — return nothing
-        // (browser will show its own offline error for uncached navigations)
-      });
-    })
-  );
+      }).catch(() => caches.match(event.request))
+    );
+  } else {
+    // Cache-first for assets (audio, etc.)
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        return fetch(event.request).then(response => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        }).catch(() => {});
+      })
+    );
+  }
 });
