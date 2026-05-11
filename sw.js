@@ -1,7 +1,7 @@
 // ATW 5K Workshop — Service Worker
 // Cache-first for all app assets so the lap tracker works fully offline on iPad.
 
-const CACHE = 'atw5k-v3';
+const CACHE = 'atw5k-v4';
 
 const PRECACHE = [
   './',
