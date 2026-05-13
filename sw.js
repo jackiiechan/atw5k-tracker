@@ -1,7 +1,7 @@
 // ATW 5K Workshop — Service Worker
 // Network-first for HTML, cache-first for audio/assets.
 
-const CACHE = 'atw5k-v5';
+const CACHE = 'atw5k-v6';
 
 const HTML_FILES = ['./', './index.html', './hub.html', './lap_tracker.html'];
 
